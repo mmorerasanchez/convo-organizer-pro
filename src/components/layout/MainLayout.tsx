@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, Grid, MessageCircle, Plus, Search, Settings, User } from 'lucide-react';
+import { BookOpen, Brain, Grid, MessageCircle, Plus, Search, Settings, Type, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -16,6 +16,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     { icon: <Grid size={20} />, text: 'Dashboard', href: '/' },
     { icon: <BookOpen size={20} />, text: 'Projects', href: '/projects' },
     { icon: <MessageCircle size={20} />, text: 'Conversations', href: '/conversations' },
+    { icon: <Type size={20} />, text: 'Prompting', href: '/prompting' },
   ];
 
   return (
