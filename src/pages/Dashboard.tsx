@@ -4,8 +4,10 @@ import MainLayout from '@/components/layout/MainLayout';
 import StatCard from '@/components/dashboard/StatCard';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import ProjectList from '@/components/dashboard/ProjectList';
+import AITools from '@/components/dashboard/AITools';
 import { mockProjects, mockConversations } from '@/lib/mockData';
-import { BookOpen, MessageCircle, Tags } from 'lucide-react';
+import { BookOpen, MessageCircle, Tags, Brain } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Dashboard = () => {
   // For a real app, we would fetch this data from an API
@@ -50,10 +52,28 @@ const Dashboard = () => {
           />
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <RecentActivity conversations={sortedConversations} />
-          <ProjectList projects={sortedProjects} />
-        </div>
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="mb-4">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="ai-tools">
+              <span className="flex items-center gap-2">
+                <Brain size={16} />
+                AI Tools
+              </span>
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview" className="space-y-0">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <RecentActivity conversations={sortedConversations} />
+              <ProjectList projects={sortedProjects} />
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="ai-tools">
+            <AITools />
+          </TabsContent>
+        </Tabs>
       </div>
     </MainLayout>
   );

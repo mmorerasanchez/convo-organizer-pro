@@ -23,3 +23,13 @@ export interface Project {
   updatedAt: string;
   conversationCount: number;
 }
+
+export interface AITool {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  type: 'model' | 'prompt' | 'function' | 'integration';
+  status: 'active' | 'inactive' | 'pending';
+  lastUsed?: string;
+}
