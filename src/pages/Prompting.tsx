@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PromptingGuide from '@/components/prompting/PromptingGuide';
@@ -9,7 +9,12 @@ const Prompting = () => {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold tracking-tight">Prompting Tools</h1>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Prompting Tools</h1>
+          <p className="text-muted-foreground mt-2">
+            Learn best practices for crafting effective prompts and improve your inputs for better AI-generated outputs
+          </p>
+        </div>
         
         <Tabs defaultValue="guide" className="w-full">
           <TabsList className="mb-4">
