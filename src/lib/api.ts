@@ -60,7 +60,8 @@ export const createProject = async (project: {
   name: string;
   description: string;
 }): Promise<Project> => {
-  const { user } = await supabase.auth.getUser();
+  // Fix: Access the current user's data using getUser()
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('User not authenticated');
   
   const { data, error } = await supabase
@@ -261,7 +262,8 @@ export const fetchTags = async (): Promise<Tag[]> => {
 };
 
 export const createTag = async (tag: { name: string; color: string }): Promise<Tag> => {
-  const { user } = await supabase.auth.getUser();
+  // Fix: Access the current user's data using getUser()
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('User not authenticated');
   
   const { data, error } = await supabase
