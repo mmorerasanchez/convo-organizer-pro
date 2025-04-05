@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Project, Conversation, Tag } from './types';
 import { Database } from '@/integrations/supabase/types';
@@ -60,9 +59,13 @@ export const createProject = async (project: {
   name: string;
   description: string;
 }): Promise<Project> => {
-  // Fix: Access the current user's data using getUser()
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
+  // Get the current user session
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  
+  if (sessionError) throw sessionError;
+  if (!sessionData.session || !sessionData.session.user) {
+    throw new Error('User not authenticated');
+  }
   
   const { data, error } = await supabase
     .from('projects')
@@ -70,7 +73,7 @@ export const createProject = async (project: {
       {
         name: project.name,
         description: project.description,
-        user_id: user.id
+        user_id: sessionData.session.user.id
       }
     ])
     .select()
@@ -262,9 +265,13 @@ export const fetchTags = async (): Promise<Tag[]> => {
 };
 
 export const createTag = async (tag: { name: string; color: string }): Promise<Tag> => {
-  // Fix: Access the current user's data using getUser()
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
+  // Get the current user session
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  
+  if (sessionError) throw sessionError;
+  if (!sessionData.session || !sessionData.session.user) {
+    throw new Error('User not authenticated');
+  }
   
   const { data, error } = await supabase
     .from('tags')
@@ -272,7 +279,7 @@ export const createTag = async (tag: { name: string; color: string }): Promise<T
       {
         name: tag.name,
         color: tag.color,
-        user_id: user.id
+        user_id: sessionData.session.user.id
       }
     ])
     .select()
