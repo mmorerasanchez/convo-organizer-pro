@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Home, BookOpen, MessageCircle, Lightbulb, Menu, UserCircle, LogOut } from 'lucide-react';
+import { Home, BookOpen, MessageCircle, Lightbulb, Menu, UserCircle, LogOut, Wrench } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -26,6 +26,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     { icon: Home, label: 'Dashboard', path: '/' },
     { icon: BookOpen, label: 'Projects', path: '/projects' },
     { icon: MessageCircle, label: 'Conversations', path: '/conversations' },
+    { icon: Wrench, label: 'Tools', path: '/tools' },
     { icon: Lightbulb, label: 'Prompting', path: '/prompting' },
   ];
 

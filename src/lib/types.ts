@@ -13,6 +13,8 @@ export interface Conversation {
   capturedAt: string;
   tags: Tag[];
   projectId: string;
+  externalId?: string;
+  status?: string;
 }
 
 export interface Project {
@@ -22,6 +24,7 @@ export interface Project {
   createdAt: string;
   updatedAt: string;
   conversationCount: number;
+  shareLink?: string;
 }
 
 export interface AITool {
@@ -32,4 +35,14 @@ export interface AITool {
   type: 'model' | 'prompt' | 'function' | 'integration';
   status: 'active' | 'inactive' | 'pending';
   lastUsed?: string;
+}
+
+export interface Tool {
+  id: string;
+  name: string;
+  model: string;
+  score: number;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
 }

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Conversation, Project } from '@/lib/types';
 import { format } from 'date-fns';
 import TagList from './TagList';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import EditConversationDialog from './EditConversationDialog';
@@ -14,6 +14,7 @@ import { deleteConversation } from '@/lib/api';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import TagManagement from './TagManagement';
+import { Badge } from '@/components/ui/badge';
 
 interface ConversationDetailProps {
   conversation: Conversation;
@@ -41,6 +42,21 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({ conversation, p
 
   const handleDelete = () => {
     deleteConversationMutation.mutate();
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'active':
+        return 'bg-green-500';
+      case 'in progress':
+        return 'bg-blue-500'; 
+      case 'draft':
+        return 'bg-yellow-500';
+      case 'final':
+        return 'bg-purple-500';
+      default:
+        return 'bg-gray-500';
+    }
   };
 
   return (
@@ -79,6 +95,12 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({ conversation, p
           {conversation.platform}
         </span>
         
+        {conversation.status && (
+          <span className={`inline-block px-2 py-1 text-xs rounded-full text-white ${getStatusColor(conversation.status)}`}>
+            {conversation.status}
+          </span>
+        )}
+        
         {project && (
           <Link to={`/projects/${project.id}`}>
             <span className="inline-block px-2 py-1 text-xs rounded-full bg-secondary text-secondary-foreground">
@@ -91,6 +113,13 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({ conversation, p
           Captured on {format(new Date(conversation.capturedAt), 'PPP')}
         </span>
       </div>
+      
+      {conversation.externalId && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <ExternalLink className="h-4 w-4" />
+          <span>External ID: {conversation.externalId}</span>
+        </div>
+      )}
       
       <Card className="overflow-hidden">
         <CardContent className="p-0">

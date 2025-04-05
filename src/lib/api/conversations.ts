@@ -33,7 +33,9 @@ export const fetchConversations = async (): Promise<Conversation[]> => {
       platform: item.platform,
       capturedAt: item.captured_at,
       tags,
-      projectId: item.project_id
+      projectId: item.project_id,
+      externalId: item.external_id,
+      status: item.status || 'active'
     };
   });
 };
@@ -65,7 +67,9 @@ export const fetchConversationsByProjectId = async (projectId: string): Promise<
       platform: item.platform,
       capturedAt: item.captured_at,
       tags,
-      projectId: item.project_id
+      projectId: item.project_id,
+      externalId: item.external_id,
+      status: item.status || 'active'
     };
   });
 };
@@ -98,7 +102,9 @@ export const fetchConversationById = async (id: string): Promise<Conversation | 
     platform: conversation.platform,
     capturedAt: conversation.captured_at,
     tags,
-    projectId: conversation.project_id
+    projectId: conversation.project_id,
+    externalId: conversation.external_id,
+    status: conversation.status || 'active'
   };
 };
 
@@ -107,6 +113,8 @@ export const createConversation = async (conversation: {
   content: string;
   platform: string;
   projectId: string;
+  externalId?: string;
+  status?: string;
 }): Promise<Conversation> => {
   const { data, error } = await supabase
     .from('conversations')
@@ -115,7 +123,9 @@ export const createConversation = async (conversation: {
         title: conversation.title,
         content: conversation.content,
         platform: conversation.platform,
-        project_id: conversation.projectId
+        project_id: conversation.projectId,
+        external_id: conversation.externalId,
+        status: conversation.status || 'active'
       }
     ])
     .select()
@@ -131,13 +141,22 @@ export const createConversation = async (conversation: {
     platform: data.platform,
     capturedAt: data.captured_at,
     tags: [],
-    projectId: data.project_id
+    projectId: data.project_id,
+    externalId: data.external_id,
+    status: data.status || 'active'
   };
 };
 
 export const updateConversation = async (
   id: string,
-  updates: { title?: string; content?: string; platform?: string; projectId?: string }
+  updates: { 
+    title?: string; 
+    content?: string; 
+    platform?: string; 
+    projectId?: string;
+    externalId?: string;
+    status?: string;
+  }
 ): Promise<void> => {
   const updatedData: Record<string, any> = {};
   
@@ -145,6 +164,8 @@ export const updateConversation = async (
   if (updates.content) updatedData.content = updates.content;
   if (updates.platform) updatedData.platform = updates.platform;
   if (updates.projectId) updatedData.project_id = updates.projectId;
+  if (updates.externalId !== undefined) updatedData.external_id = updates.externalId;
+  if (updates.status) updatedData.status = updates.status;
   
   const { error } = await supabase
     .from('conversations')

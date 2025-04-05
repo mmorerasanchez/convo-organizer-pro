@@ -44,9 +44,11 @@ export type Database = {
           captured_at: string
           content: string
           created_at: string
+          external_id: string | null
           id: string
           platform: string
           project_id: string
+          status: string | null
           title: string
           updated_at: string
         }
@@ -54,9 +56,11 @@ export type Database = {
           captured_at?: string
           content: string
           created_at?: string
+          external_id?: string | null
           id?: string
           platform: string
           project_id: string
+          status?: string | null
           title: string
           updated_at?: string
         }
@@ -64,9 +68,11 @@ export type Database = {
           captured_at?: string
           content?: string
           created_at?: string
+          external_id?: string | null
           id?: string
           platform?: string
           project_id?: string
+          status?: string | null
           title?: string
           updated_at?: string
         }
@@ -107,12 +113,42 @@ export type Database = {
         }
         Relationships: []
       }
+      project_shares: {
+        Row: {
+          created_at: string
+          id: string
+          project_id: string
+          shared_with_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          project_id: string
+          shared_with_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          project_id?: string
+          shared_with_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_shares_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           created_at: string
           description: string | null
           id: string
           name: string
+          share_link: string | null
           updated_at: string
           user_id: string
         }
@@ -121,6 +157,7 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          share_link?: string | null
           updated_at?: string
           user_id: string
         }
@@ -129,6 +166,7 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          share_link?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -173,6 +211,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tools: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          model: string
+          name: string
+          score: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          model: string
+          name: string
+          score: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          model?: string
+          name?: string
+          score?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {

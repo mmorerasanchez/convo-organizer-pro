@@ -15,6 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import ProjectShareDialog from '@/components/projects/ProjectShareDialog';
 
 const ProjectDetail = () => {
   useRequireAuth();
@@ -113,6 +114,7 @@ const ProjectDetail = () => {
             <h1 className="text-3xl font-bold tracking-tight">{project.name}</h1>
           </div>
           <div className="flex items-center gap-2">
+            <ProjectShareDialog project={project} />
             <EditProjectDialog project={project} />
             <Button 
               variant="destructive" 

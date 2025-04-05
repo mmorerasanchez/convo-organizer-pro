@@ -25,6 +25,8 @@ const EditConversationDialog: React.FC<EditConversationDialogProps> = ({
   const [content, setContent] = useState(conversation.content);
   const [platform, setPlatform] = useState(conversation.platform);
   const [projectId, setProjectId] = useState(conversation.projectId);
+  const [externalId, setExternalId] = useState(conversation.externalId || '');
+  const [status, setStatus] = useState(conversation.status || 'active');
   const [open, setOpen] = useState(false);
   
   const queryClient = useQueryClient();
@@ -40,7 +42,9 @@ const EditConversationDialog: React.FC<EditConversationDialogProps> = ({
       title: title.trim(),
       content: content.trim(),
       platform,
-      projectId
+      projectId,
+      externalId: externalId.trim() || null,
+      status
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['conversation', conversation.id] });
@@ -132,6 +136,36 @@ const EditConversationDialog: React.FC<EditConversationDialogProps> = ({
                       No projects available
                     </SelectItem>
                   )}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="externalId">External ID</Label>
+              <Input
+                id="externalId"
+                value={externalId}
+                onChange={(e) => setExternalId(e.target.value)}
+                placeholder="External conversation ID"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select 
+                value={status} 
+                onValueChange={setStatus}
+              >
+                <SelectTrigger id="status">
+                  <SelectValue placeholder="Conversation status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="In Progress">In Progress</SelectItem>
+                  <SelectItem value="Draft">Draft</SelectItem>
+                  <SelectItem value="Final">Final</SelectItem>
                 </SelectContent>
               </Select>
             </div>

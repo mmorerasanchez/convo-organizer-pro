@@ -25,6 +25,8 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
   const [content, setContent] = useState('');
   const [platform, setPlatform] = useState('ChatGPT');
   const [selectedProjectId, setSelectedProjectId] = useState(projectId || '');
+  const [externalId, setExternalId] = useState('');
+  const [status, setStatus] = useState('Active');
   const [open, setOpen] = useState(false);
   
   const navigate = useNavigate();
@@ -54,6 +56,7 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
       setOpen(false);
       setTitle('');
       setContent('');
+      setExternalId('');
       navigate(`/conversations/${newConversation.id}`);
     },
     onError: (error: Error) => {
@@ -68,7 +71,9 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
       title: title.trim(),
       content: content.trim(),
       platform,
-      projectId: selectedProjectId
+      projectId: selectedProjectId,
+      externalId: externalId.trim() || undefined,
+      status
     });
   };
   
@@ -140,6 +145,36 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
                       No projects available
                     </SelectItem>
                   )}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="externalId">External ID</Label>
+              <Input
+                id="externalId"
+                value={externalId}
+                onChange={(e) => setExternalId(e.target.value)}
+                placeholder="External conversation ID"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select 
+                value={status} 
+                onValueChange={setStatus}
+              >
+                <SelectTrigger id="status">
+                  <SelectValue placeholder="Conversation status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="In Progress">In Progress</SelectItem>
+                  <SelectItem value="Draft">Draft</SelectItem>
+                  <SelectItem value="Final">Final</SelectItem>
                 </SelectContent>
               </Select>
             </div>
