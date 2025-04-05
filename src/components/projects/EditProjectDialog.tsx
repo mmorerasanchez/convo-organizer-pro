@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Edit } from 'lucide-react';
 import { toast } from 'sonner';
 import { Project } from '@/lib/types';
+import { updateProject } from '@/lib/api';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface EditProjectDialogProps {
   project: Project;
@@ -21,18 +23,28 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description);
   const [open, setOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const queryClient = useQueryClient();
+  
+  const updateProjectMutation = useMutation({
+    mutationFn: () => updateProject(project.id, {
+      name: name.trim(),
+      description: description.trim()
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['project', project.id] });
+      toast.success(`Project "${name}" updated successfully`);
+      setOpen(false);
+    },
+    onError: (error: Error) => {
+      toast.error(`Error updating project: ${error.message}`);
+    }
+  });
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    
-    // For the prototype we're just simulating a successful update
-    setTimeout(() => {
-      toast.success(`Project "${name}" updated successfully`);
-      setIsSubmitting(false);
-      setOpen(false);
-    }, 500);
+    updateProjectMutation.mutate();
   };
   
   const triggerButton = trigger || (
@@ -74,9 +86,9 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
           <DialogFooter>
             <Button 
               type="submit" 
-              disabled={isSubmitting || !name.trim()}
+              disabled={updateProjectMutation.isPending || !name.trim()}
             >
-              {isSubmitting ? 'Saving...' : 'Save Changes'}
+              {updateProjectMutation.isPending ? 'Saving...' : 'Save Changes'}
             </Button>
           </DialogFooter>
         </form>

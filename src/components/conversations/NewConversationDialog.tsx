@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { mockProjects, mockConversations } from '@/lib/mockData';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { fetchProjects, createConversation } from '@/lib/api';
 
 interface NewConversationDialogProps {
   trigger?: React.ReactNode;
@@ -25,43 +26,50 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
   const [platform, setPlatform] = useState('ChatGPT');
   const [selectedProjectId, setSelectedProjectId] = useState(projectId || '');
   const [open, setOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Create a new conversation with a unique ID
-    const newConversation = {
-      id: Date.now().toString(), // Using timestamp as a unique ID
-      title: title.trim(),
-      content: content.trim(),
-      platform: platform,
-      capturedAt: new Date().toISOString(),
-      tags: [],
-      projectId: selectedProjectId
-    };
-    
-    // Add the new conversation to the mockConversations array
-    mockConversations.push(newConversation);
-    
-    // Update the project's conversation count
-    const project = mockProjects.find(p => p.id === selectedProjectId);
-    if (project) {
-      project.conversationCount += 1;
-      project.updatedAt = new Date().toISOString();
+  // Fetch projects for the dropdown
+  const { data: projects = [] } = useQuery({
+    queryKey: ['projects'],
+    queryFn: fetchProjects
+  });
+  
+  // Update selected project when projectId prop changes
+  useEffect(() => {
+    if (projectId) {
+      setSelectedProjectId(projectId);
     }
-    
-    setTimeout(() => {
+  }, [projectId]);
+  
+  const createConversationMutation = useMutation({
+    mutationFn: createConversation,
+    onSuccess: (newConversation) => {
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      queryClient.invalidateQueries({ queryKey: ['conversations', 'project', selectedProjectId] });
+      queryClient.invalidateQueries({ queryKey: ['project', selectedProjectId] });
+      
       toast.success(`Conversation "${title}" added successfully`);
-      setIsSubmitting(false);
       setOpen(false);
       setTitle('');
       setContent('');
       navigate(`/conversations/${newConversation.id}`);
-    }, 500);
+    },
+    onError: (error: Error) => {
+      toast.error(`Error creating conversation: ${error.message}`);
+    }
+  });
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    createConversationMutation.mutate({
+      title: title.trim(),
+      content: content.trim(),
+      platform,
+      projectId: selectedProjectId
+    });
   };
   
   const triggerButton = trigger || (
@@ -116,18 +124,18 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
               <Select 
                 value={selectedProjectId} 
                 onValueChange={setSelectedProjectId}
-                disabled={mockProjects.length === 0}
+                disabled={projects.length === 0}
               >
                 <SelectTrigger id="project">
                   <SelectValue placeholder="Select project" />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockProjects.map(project => (
+                  {projects.map(project => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.name}
                     </SelectItem>
                   ))}
-                  {mockProjects.length === 0 && (
+                  {projects.length === 0 && (
                     <SelectItem value="no-projects" disabled>
                       No projects available
                     </SelectItem>
@@ -152,9 +160,14 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
           <DialogFooter>
             <Button 
               type="submit" 
-              disabled={isSubmitting || !title.trim() || !content.trim() || !selectedProjectId}
+              disabled={
+                createConversationMutation.isPending || 
+                !title.trim() || 
+                !content.trim() || 
+                !selectedProjectId
+              }
             >
-              {isSubmitting ? 'Adding...' : 'Add Conversation'}
+              {createConversationMutation.isPending ? 'Adding...' : 'Add Conversation'}
             </Button>
           </DialogFooter>
         </form>

@@ -3,11 +3,20 @@ import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import ProjectCard from '@/components/projects/ProjectCard';
 import NewProjectButton from '@/components/projects/NewProjectButton';
-import { mockProjects } from '@/lib/mockData';
 import NewProjectDialog from '@/components/projects/NewProjectDialog';
-import { Plus } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchProjects } from '@/lib/api';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Projects = () => {
+  useRequireAuth();
+  
+  const { data: projects = [], isLoading, error } = useQuery({
+    queryKey: ['projects'],
+    queryFn: fetchProjects
+  });
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -18,12 +27,24 @@ const Projects = () => {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <NewProjectButton />
-          {mockProjects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="h-40 w-full" />
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-red-500">Error loading projects. Please try again later.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <NewProjectButton />
+            {projects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
+        )}
       </div>
     </MainLayout>
   );

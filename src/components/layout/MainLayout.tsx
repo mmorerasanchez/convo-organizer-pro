@@ -1,113 +1,130 @@
 
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, Brain, Grid, MessageCircle, Plus, Search, Settings, Type, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import NewProjectDialog from '@/components/projects/NewProjectDialog';
+import { Home, BookOpen, MessageCircle, Lightbulb, Menu, UserCircle, LogOut } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+  const [open, setOpen] = useState(false);
   const location = useLocation();
-  
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const isActive = (path: string) => {
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+
   const navItems = [
-    { icon: <Grid size={20} />, text: 'Dashboard', href: '/' },
-    { icon: <BookOpen size={20} />, text: 'Projects', href: '/projects' },
-    { icon: <MessageCircle size={20} />, text: 'Conversations', href: '/conversations' },
-    { icon: <Type size={20} />, text: 'Prompting', href: '/prompting' },
+    { icon: Home, label: 'Dashboard', path: '/' },
+    { icon: BookOpen, label: 'Projects', path: '/projects' },
+    { icon: MessageCircle, label: 'Conversations', path: '/conversations' },
+    { icon: Lightbulb, label: 'Prompting', path: '/prompting' },
   ];
 
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success('Signed out successfully');
+      navigate('/auth');
+    } catch (error) {
+      toast.error('Error signing out');
+    }
+  };
+
+  const renderNavLinks = () => (
+    <>
+      {navItems.map((item) => (
+        <Link
+          key={item.path}
+          to={item.path}
+          className={cn(
+            'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all',
+            isActive(item.path)
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+          )}
+          onClick={() => setOpen(false)}
+        >
+          <item.icon className="h-4 w-4" />
+          {item.label}
+        </Link>
+      ))}
+    </>
+  );
+
   return (
-    <div className="min-h-screen flex bg-background">
-      {/* Sidebar */}
-      <div className="hidden md:flex flex-col w-64 border-r bg-card">
-        <div className="p-4 border-b">
-          <Link to="/" className="flex items-center gap-2">
-            <MessageCircle className="h-6 w-6 text-primary" />
-            <h1 className="font-bold text-lg">Convo Organizer</h1>
-          </Link>
-        </div>
-        
-        <div className="p-4">
-          <NewProjectDialog 
-            variant="outline" 
-            trigger={
-              <Button variant="outline" className="w-full justify-start gap-2">
-                <Plus size={16} />
-                New Project
+    <div className="flex min-h-screen flex-col">
+      <div className="border-b">
+        <div className="flex h-16 items-center px-4 sm:px-6">
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="mr-4 md:hidden">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle mobile navigation</span>
               </Button>
-            }
-          />
-        </div>
-        
-        <nav className="flex-1 p-4 space-y-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
-                location.pathname === item.href
-                  ? 'bg-primary text-primary-foreground'
-                  : 'hover:bg-muted'
-              }`}
-            >
-              {item.icon}
-              <span>{item.text}</span>
-            </Link>
-          ))}
-        </nav>
-        
-        <div className="p-4 border-t mt-auto">
+            </SheetTrigger>
+            <SheetContent side="left" className="w-60 sm:max-w-xs pr-0">
+              <div className="flex flex-col gap-4">
+                <Link
+                  to="/"
+                  className="text-xl font-bold tracking-tight"
+                  onClick={() => setOpen(false)}
+                >
+                  Prompt Copilot
+                </Link>
+                <nav className="flex flex-col gap-1">
+                  {renderNavLinks()}
+                </nav>
+              </div>
+            </SheetContent>
+          </Sheet>
           <Link
-            to="/settings"
-            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted"
+            to="/"
+            className="flex items-center gap-2 text-lg font-semibold md:text-xl"
           >
-            <Settings size={20} />
-            <span>Settings</span>
+            <MessageCircle className="h-5 w-5" />
+            <span className="hidden md:inline-block">Prompt Copilot</span>
           </Link>
-          <Link
-            to="/profile"
-            className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted"
-          >
-            <User size={20} />
-            <span>Profile</span>
-          </Link>
+          <div className="ml-auto flex gap-2 items-center">
+            {user ? (
+              <>
+                <div className="hidden md:block text-sm mr-2">
+                  {user.email}
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={handleSignOut}
+                  title="Sign out"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </>
+            ) : (
+              <Link to="/auth">
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <UserCircle className="h-4 w-4" />
+                  Sign In
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
-      
-      {/* Main content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="h-16 border-b flex items-center justify-between px-4 bg-card">
-          <div className="md:hidden flex items-center gap-2">
-            <MessageCircle className="h-6 w-6 text-primary" />
-            <h1 className="font-bold">Convo Organizer</h1>
-          </div>
-          
-          <div className="hidden md:flex max-w-md w-full relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search conversations, projects..." 
-              className="pl-8"
-            />
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Search />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <User />
-            </Button>
-          </div>
-        </header>
-        
-        {/* Page content */}
-        <main className="flex-1 overflow-auto p-4 md:p-6">
-          {children}
+      <div className="flex flex-1">
+        <aside className="hidden w-60 flex-col border-r px-4 pt-8 md:flex">
+          <nav className="flex flex-col gap-1">{renderNavLinks()}</nav>
+        </aside>
+        <main className="flex-1 px-4 py-8 sm:px-6 sm:py-10">
+          <div className="mx-auto max-w-5xl">{children}</div>
         </main>
       </div>
     </div>

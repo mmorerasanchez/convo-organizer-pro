@@ -8,7 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { mockProjects } from '@/lib/mockData';
+import { createProject } from '@/lib/api';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface NewProjectDialogProps {
   trigger?: React.ReactNode;
@@ -22,35 +23,31 @@ const NewProjectDialog: React.FC<NewProjectDialogProps> = ({
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [open, setOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Create a new project with a unique ID
-    const newProject = {
-      id: Date.now().toString(), // Using timestamp as a unique ID
-      name: name.trim(),
-      description: description.trim(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      conversationCount: 0
-    };
-    
-    // Add the new project to the mockProjects array
-    mockProjects.push(newProject);
-    
-    setTimeout(() => {
+  const createProjectMutation = useMutation({
+    mutationFn: createProject,
+    onSuccess: (newProject) => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       toast.success(`Project "${name}" created successfully`);
-      setIsSubmitting(false);
       setOpen(false);
       setName('');
       setDescription('');
       navigate(`/projects/${newProject.id}`);
-    }, 500);
+    },
+    onError: (error: Error) => {
+      toast.error(`Error creating project: ${error.message}`);
+    }
+  });
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    createProjectMutation.mutate({
+      name: name.trim(),
+      description: description.trim()
+    });
   };
   
   const triggerButton = trigger || (
@@ -96,10 +93,10 @@ const NewProjectDialog: React.FC<NewProjectDialogProps> = ({
           <DialogFooter>
             <Button 
               type="submit" 
-              disabled={isSubmitting || !name.trim()}
+              disabled={createProjectMutation.isPending || !name.trim()}
               className="gap-1"
             >
-              {isSubmitting ? 'Creating...' : 'Create Project'}
+              {createProjectMutation.isPending ? 'Creating...' : 'Create Project'}
             </Button>
           </DialogFooter>
         </form>
