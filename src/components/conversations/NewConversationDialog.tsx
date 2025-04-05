@@ -128,7 +128,7 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
                     </SelectItem>
                   ))}
                   {mockProjects.length === 0 && (
-                    <SelectItem value="" disabled>
+                    <SelectItem value="no-projects" disabled>
                       No projects available
                     </SelectItem>
                   )}
