@@ -5,6 +5,7 @@ import ProjectCard from '@/components/projects/ProjectCard';
 import NewProjectButton from '@/components/projects/NewProjectButton';
 import JoinProjectButton from '@/components/projects/JoinProjectButton';
 import NewProjectDialog from '@/components/projects/NewProjectDialog';
+import JoinProjectDialog from '@/components/projects/JoinProjectDialog';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProjects } from '@/lib/api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
