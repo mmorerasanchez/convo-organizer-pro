@@ -2,19 +2,46 @@
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import ConversationCard from '@/components/conversations/ConversationCard';
-import { mockConversations, mockTags } from '@/lib/mockData';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, X } from 'lucide-react';
 import { Tag } from '@/lib/types';
 import NewConversationDialog from '@/components/conversations/NewConversationDialog';
+import { useQuery } from '@tanstack/react-query';
+import { fetchConversations, fetchTags } from '@/lib/api';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Conversations = () => {
+  useRequireAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   
+  // Fetch conversations
+  const { 
+    data: conversations = [], 
+    isLoading: isLoadingConversations,
+    error: conversationsError
+  } = useQuery({
+    queryKey: ['conversations'],
+    queryFn: fetchConversations
+  });
+  
+  // Fetch tags
+  const { 
+    data: tags = [], 
+    isLoading: isLoadingTags,
+    error: tagsError
+  } = useQuery({
+    queryKey: ['tags'],
+    queryFn: fetchTags
+  });
+  
+  const isLoading = isLoadingConversations || isLoadingTags;
+  const error = conversationsError || tagsError;
+  
   // Filter conversations based on search term and selected tags
-  const filteredConversations = mockConversations.filter(conversation => {
+  const filteredConversations = conversations.filter(conversation => {
     const matchesSearch = searchTerm === '' || 
       conversation.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       conversation.content.toLowerCase().includes(searchTerm.toLowerCase());
@@ -40,6 +67,44 @@ const Conversations = () => {
     setSelectedTags([]);
   };
 
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-10 w-40" />
+            <Skeleton className="h-10 w-32" />
+          </div>
+          <Skeleton className="h-12 w-full" />
+          <div className="flex flex-wrap gap-2">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton key={i} className="h-6 w-20 rounded-full" />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-48 w-full" />
+            ))}
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <MainLayout>
+        <div className="text-center py-12">
+          <h1 className="text-2xl font-bold mb-4">Error loading data</h1>
+          <p className="mb-4 text-red-500">{(error as Error).message}</p>
+          <Button onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -63,7 +128,7 @@ const Conversations = () => {
           </div>
           
           <div className="flex flex-wrap gap-2">
-            {mockTags.map((tag) => (
+            {tags.map((tag) => (
               <button
                 key={tag.id}
                 onClick={() => handleTagSelect(tag)}

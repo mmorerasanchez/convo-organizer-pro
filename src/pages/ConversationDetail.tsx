@@ -2,15 +2,65 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
-import ConversationDetail from '@/components/conversations/ConversationDetail';
-import { getConversationById, getProjectById } from '@/lib/mockData';
+import ConversationDetailComponent from '@/components/conversations/ConversationDetail';
 import { Button } from '@/components/ui/button';
+import { useQuery } from '@tanstack/react-query';
+import { fetchConversationById, fetchProjectById } from '@/lib/api';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ConversationDetailPage = () => {
+  useRequireAuth();
   const { id } = useParams<{ id: string }>();
   
-  const conversation = getConversationById(id || '');
-  const project = conversation ? getProjectById(conversation.projectId) : undefined;
+  const { 
+    data: conversation, 
+    isLoading: isLoadingConversation,
+    error: conversationError
+  } = useQuery({
+    queryKey: ['conversation', id],
+    queryFn: () => fetchConversationById(id || ''),
+    enabled: !!id
+  });
+  
+  const { 
+    data: project, 
+    isLoading: isLoadingProject,
+    error: projectError
+  } = useQuery({
+    queryKey: ['project', conversation?.projectId],
+    queryFn: () => fetchProjectById(conversation?.projectId || ''),
+    enabled: !!conversation?.projectId
+  });
+  
+  const isLoading = isLoadingConversation || isLoadingProject;
+  const error = conversationError || projectError;
+  
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="space-y-6">
+          <Skeleton className="h-10 w-1/3" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-60 w-full" />
+        </div>
+      </MainLayout>
+    );
+  }
+  
+  if (error) {
+    return (
+      <MainLayout>
+        <div className="text-center py-12">
+          <h1 className="text-2xl font-bold mb-4">Error loading conversation</h1>
+          <p className="mb-4 text-red-500">{(error as Error).message}</p>
+          <Link to="/conversations">
+            <Button>Back to Conversations</Button>
+          </Link>
+        </div>
+      </MainLayout>
+    );
+  }
   
   if (!conversation) {
     return (
@@ -27,7 +77,7 @@ const ConversationDetailPage = () => {
 
   return (
     <MainLayout>
-      <ConversationDetail conversation={conversation} project={project} />
+      <ConversationDetailComponent conversation={conversation} project={project || undefined} />
     </MainLayout>
   );
 };

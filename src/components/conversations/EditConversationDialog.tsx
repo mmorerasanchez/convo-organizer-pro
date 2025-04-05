@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Edit } from 'lucide-react';
 import { toast } from 'sonner';
 import { Conversation } from '@/lib/types';
-import { mockProjects } from '@/lib/mockData';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { fetchProjects, updateConversation } from '@/lib/api';
 
 interface EditConversationDialogProps {
   conversation: Conversation;
@@ -25,18 +26,43 @@ const EditConversationDialog: React.FC<EditConversationDialogProps> = ({
   const [platform, setPlatform] = useState(conversation.platform);
   const [projectId, setProjectId] = useState(conversation.projectId);
   const [open, setOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const queryClient = useQueryClient();
+  
+  // Fetch projects for the dropdown
+  const { data: projects = [] } = useQuery({
+    queryKey: ['projects'],
+    queryFn: fetchProjects
+  });
+  
+  const updateConversationMutation = useMutation({
+    mutationFn: () => updateConversation(conversation.id, {
+      title: title.trim(),
+      content: content.trim(),
+      platform,
+      projectId
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['conversation', conversation.id] });
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      queryClient.invalidateQueries({ queryKey: ['conversations', 'project', projectId] });
+      
+      // If project changed, also invalidate the old project's conversations
+      if (projectId !== conversation.projectId) {
+        queryClient.invalidateQueries({ queryKey: ['conversations', 'project', conversation.projectId] });
+      }
+      
+      toast.success(`Conversation "${title}" updated successfully`);
+      setOpen(false);
+    },
+    onError: (error: Error) => {
+      toast.error(`Error updating conversation: ${error.message}`);
+    }
+  });
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    
-    // For the prototype we're just simulating a successful update
-    setTimeout(() => {
-      toast.success(`Conversation "${title}" updated successfully`);
-      setIsSubmitting(false);
-      setOpen(false);
-    }, 500);
+    updateConversationMutation.mutate();
   };
   
   const triggerButton = trigger || (
@@ -90,16 +116,22 @@ const EditConversationDialog: React.FC<EditConversationDialogProps> = ({
               <Select 
                 value={projectId} 
                 onValueChange={setProjectId}
+                disabled={projects.length === 0}
               >
                 <SelectTrigger id="project">
                   <SelectValue placeholder="Select project" />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockProjects.map(project => (
+                  {projects.map(project => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.name}
                     </SelectItem>
                   ))}
+                  {projects.length === 0 && (
+                    <SelectItem value="no-projects" disabled>
+                      No projects available
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -120,9 +152,14 @@ const EditConversationDialog: React.FC<EditConversationDialogProps> = ({
           <DialogFooter>
             <Button 
               type="submit" 
-              disabled={isSubmitting || !title.trim() || !content.trim() || !projectId}
+              disabled={
+                updateConversationMutation.isPending || 
+                !title.trim() || 
+                !content.trim() || 
+                !projectId
+              }
             >
-              {isSubmitting ? 'Saving...' : 'Save Changes'}
+              {updateConversationMutation.isPending ? 'Saving...' : 'Save Changes'}
             </Button>
           </DialogFooter>
         </form>

@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Project, Conversation, Tag } from './types';
 import { Database } from '@/integrations/supabase/types';
@@ -115,7 +116,8 @@ export const deleteProject = async (id: string): Promise<void> => {
 
 // Conversations API
 export const fetchConversations = async (): Promise<Conversation[]> => {
-  const { data, error } = await supabase
+  // First fetch all conversations
+  const { data: conversationsData, error: conversationsError } = await supabase
     .from('conversations')
     .select(`
       *,
@@ -123,66 +125,183 @@ export const fetchConversations = async (): Promise<Conversation[]> => {
     `)
     .order('captured_at', { ascending: false });
 
-  if (error) throw error;
-  if (!data) return [];
+  if (conversationsError) throw conversationsError;
+  if (!conversationsData) return [];
 
-  // Convert data into the format we need
-  return data.map((item) => ({
-    id: item.id,
-    title: item.title,
-    content: item.content,
-    platform: item.platform,
-    capturedAt: item.captured_at,
-    tags: [], // We'll implement tags separately
-    projectId: item.project_id
-  }));
+  // Now fetch all tags for these conversations
+  const conversationIds = conversationsData.map(conv => conv.id);
+  
+  const { data: tagRelations, error: tagRelationsError } = await supabase
+    .from('conversation_tags')
+    .select('conversation_id, tag_id')
+    .in('conversation_id', conversationIds);
+
+  if (tagRelationsError) throw tagRelationsError;
+
+  // Fetch all relevant tags
+  const tagIds = tagRelations ? tagRelations.map(rel => rel.tag_id) : [];
+  
+  let tags: Tag[] = [];
+  if (tagIds.length > 0) {
+    const { data: tagsData, error: tagsError } = await supabase
+      .from('tags')
+      .select('*')
+      .in('id', tagIds);
+      
+    if (tagsError) throw tagsError;
+    if (tagsData) {
+      tags = tagsData.map(tag => ({
+        id: tag.id,
+        name: tag.name,
+        color: tag.color
+      }));
+    }
+  }
+
+  // Map tags to conversations
+  return conversationsData.map((item) => {
+    // Find tags for this conversation
+    const conversationTagIds = tagRelations
+      ? tagRelations
+          .filter(rel => rel.conversation_id === item.id)
+          .map(rel => rel.tag_id)
+      : [];
+      
+    const conversationTags = tags.filter(tag => 
+      conversationTagIds.includes(tag.id)
+    );
+
+    return {
+      id: item.id,
+      title: item.title,
+      content: item.content,
+      platform: item.platform,
+      capturedAt: item.captured_at,
+      tags: conversationTags,
+      projectId: item.project_id
+    };
+  });
 };
 
 export const fetchConversationsByProjectId = async (projectId: string): Promise<Conversation[]> => {
-  const { data, error } = await supabase
+  // First fetch all conversations for the project
+  const { data: conversationsData, error: conversationsError } = await supabase
     .from('conversations')
     .select('*')
     .eq('project_id', projectId)
     .order('captured_at', { ascending: false });
 
-  if (error) throw error;
-  if (!data) return [];
+  if (conversationsError) throw conversationsError;
+  if (!conversationsData) return [];
 
-  return data.map((item) => ({
-    id: item.id,
-    title: item.title,
-    content: item.content,
-    platform: item.platform,
-    capturedAt: item.captured_at,
-    tags: [], // We'll implement tags separately
-    projectId: item.project_id
-  }));
+  // Now fetch all tags for these conversations
+  const conversationIds = conversationsData.map(conv => conv.id);
+  
+  const { data: tagRelations, error: tagRelationsError } = await supabase
+    .from('conversation_tags')
+    .select('conversation_id, tag_id')
+    .in('conversation_id', conversationIds);
+
+  if (tagRelationsError) throw tagRelationsError;
+
+  // Fetch all relevant tags
+  const tagIds = tagRelations ? tagRelations.map(rel => rel.tag_id) : [];
+  
+  let tags: Tag[] = [];
+  if (tagIds.length > 0) {
+    const { data: tagsData, error: tagsError } = await supabase
+      .from('tags')
+      .select('*')
+      .in('id', tagIds);
+      
+    if (tagsError) throw tagsError;
+    if (tagsData) {
+      tags = tagsData.map(tag => ({
+        id: tag.id,
+        name: tag.name,
+        color: tag.color
+      }));
+    }
+  }
+
+  // Map tags to conversations
+  return conversationsData.map((item) => {
+    // Find tags for this conversation
+    const conversationTagIds = tagRelations
+      ? tagRelations
+          .filter(rel => rel.conversation_id === item.id)
+          .map(rel => rel.tag_id)
+      : [];
+      
+    const conversationTags = tags.filter(tag => 
+      conversationTagIds.includes(tag.id)
+    );
+
+    return {
+      id: item.id,
+      title: item.title,
+      content: item.content,
+      platform: item.platform,
+      capturedAt: item.captured_at,
+      tags: conversationTags,
+      projectId: item.project_id
+    };
+  });
 };
 
 export const fetchConversationById = async (id: string): Promise<Conversation | null> => {
-  const { data, error } = await supabase
+  // Fetch the conversation
+  const { data: conversation, error: conversationError } = await supabase
     .from('conversations')
     .select('*')
     .eq('id', id)
     .single();
 
-  if (error) {
-    if (error.code === 'PGRST116') {
+  if (conversationError) {
+    if (conversationError.code === 'PGRST116') {
       return null; // Not found
     }
-    throw error;
+    throw conversationError;
   }
 
-  if (!data) return null;
+  if (!conversation) return null;
+
+  // Fetch tags for this conversation
+  const { data: tagRelations, error: tagRelationsError } = await supabase
+    .from('conversation_tags')
+    .select('tag_id')
+    .eq('conversation_id', id);
+
+  if (tagRelationsError) throw tagRelationsError;
+
+  // Fetch all tag details
+  let tags: Tag[] = [];
+  if (tagRelations && tagRelations.length > 0) {
+    const tagIds = tagRelations.map(rel => rel.tag_id);
+    
+    const { data: tagsData, error: tagsError } = await supabase
+      .from('tags')
+      .select('*')
+      .in('id', tagIds);
+      
+    if (tagsError) throw tagsError;
+    if (tagsData) {
+      tags = tagsData.map(tag => ({
+        id: tag.id,
+        name: tag.name,
+        color: tag.color
+      }));
+    }
+  }
 
   return {
-    id: data.id,
-    title: data.title,
-    content: data.content,
-    platform: data.platform,
-    capturedAt: data.captured_at,
-    tags: [], // We'll implement tags separately
-    projectId: data.project_id
+    id: conversation.id,
+    title: conversation.title,
+    content: conversation.content,
+    platform: conversation.platform,
+    capturedAt: conversation.captured_at,
+    tags,
+    projectId: conversation.project_id
   };
 };
 
@@ -293,4 +412,28 @@ export const createTag = async (tag: { name: string; color: string }): Promise<T
     name: data.name,
     color: data.color
   };
+};
+
+// Tag assignment API
+export const assignTagToConversation = async (conversationId: string, tagId: string): Promise<void> => {
+  const { error } = await supabase
+    .from('conversation_tags')
+    .insert([
+      {
+        conversation_id: conversationId,
+        tag_id: tagId
+      }
+    ]);
+
+  if (error) throw error;
+};
+
+export const removeTagFromConversation = async (conversationId: string, tagId: string): Promise<void> => {
+  const { error } = await supabase
+    .from('conversation_tags')
+    .delete()
+    .eq('conversation_id', conversationId)
+    .eq('tag_id', tagId);
+
+  if (error) throw error;
 };
