@@ -9,7 +9,6 @@ import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { mockProjects } from '@/lib/mockData';
-import { v4 as uuidv4 } from 'uuid';
 
 interface NewProjectDialogProps {
   trigger?: React.ReactNode;
@@ -33,7 +32,7 @@ const NewProjectDialog: React.FC<NewProjectDialogProps> = ({
     
     // Create a new project with a unique ID
     const newProject = {
-      id: uuidv4(),
+      id: Date.now().toString(), // Using timestamp as a unique ID
       name: name.trim(),
       description: description.trim(),
       createdAt: new Date().toISOString(),

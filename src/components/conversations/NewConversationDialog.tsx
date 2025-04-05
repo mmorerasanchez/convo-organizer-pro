@@ -10,7 +10,6 @@ import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { mockProjects, mockConversations } from '@/lib/mockData';
-import { v4 as uuidv4 } from 'uuid';
 
 interface NewConversationDialogProps {
   trigger?: React.ReactNode;
@@ -36,7 +35,7 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
     
     // Create a new conversation with a unique ID
     const newConversation = {
-      id: uuidv4(),
+      id: Date.now().toString(), // Using timestamp as a unique ID
       title: title.trim(),
       content: content.trim(),
       platform: platform,
