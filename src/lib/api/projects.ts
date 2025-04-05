@@ -195,7 +195,7 @@ export const getSharedProjects = async (): Promise<Project[]> => {
     .from('project_shares')
     .select(`
       project_id,
-      project:projects(
+      projects!inner(
         id, name, description, created_at, updated_at, 
         conversations(count)
       )
@@ -203,15 +203,15 @@ export const getSharedProjects = async (): Promise<Project[]> => {
     .order('created_at', { ascending: false });
     
   if (sharedError) throw sharedError;
-  if (!sharedData) return [];
+  if (!sharedData || !sharedData.length) return [];
   
   return sharedData.map(item => ({
-    id: item.project.id,
-    name: item.project.name,
-    description: item.project.description || '',
-    createdAt: item.project.created_at,
-    updatedAt: item.project.updated_at,
-    conversationCount: item.project.conversations?.[0]?.count || 0,
+    id: item.projects.id,
+    name: item.projects.name,
+    description: item.projects.description || '',
+    createdAt: item.projects.created_at,
+    updatedAt: item.projects.updated_at,
+    conversationCount: item.projects.conversations?.[0]?.count || 0,
     shareLink: undefined
   }));
 };

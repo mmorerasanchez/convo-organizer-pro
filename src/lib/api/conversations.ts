@@ -34,7 +34,7 @@ export const fetchConversations = async (): Promise<Conversation[]> => {
       capturedAt: item.captured_at,
       tags,
       projectId: item.project_id,
-      externalId: item.external_id,
+      externalId: item.external_id || undefined,
       status: item.status || 'active'
     };
   });
@@ -68,7 +68,7 @@ export const fetchConversationsByProjectId = async (projectId: string): Promise<
       capturedAt: item.captured_at,
       tags,
       projectId: item.project_id,
-      externalId: item.external_id,
+      externalId: item.external_id || undefined,
       status: item.status || 'active'
     };
   });
@@ -103,7 +103,7 @@ export const fetchConversationById = async (id: string): Promise<Conversation | 
     capturedAt: conversation.captured_at,
     tags,
     projectId: conversation.project_id,
-    externalId: conversation.external_id,
+    externalId: conversation.external_id || undefined,
     status: conversation.status || 'active'
   };
 };
@@ -142,7 +142,7 @@ export const createConversation = async (conversation: {
     capturedAt: data.captured_at,
     tags: [],
     projectId: data.project_id,
-    externalId: data.external_id,
+    externalId: data.external_id || undefined,
     status: data.status || 'active'
   };
 };
