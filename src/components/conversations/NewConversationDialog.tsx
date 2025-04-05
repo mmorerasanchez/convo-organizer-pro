@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { mockProjects } from '@/lib/mockData';
+import { mockProjects, mockConversations } from '@/lib/mockData';
+import { v4 as uuidv4 } from 'uuid';
 
 interface NewConversationDialogProps {
   trigger?: React.ReactNode;
@@ -33,14 +34,34 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
     e.preventDefault();
     setIsSubmitting(true);
     
-    // For the prototype we're just simulating a successful creation
+    // Create a new conversation with a unique ID
+    const newConversation = {
+      id: uuidv4(),
+      title: title.trim(),
+      content: content.trim(),
+      platform: platform,
+      capturedAt: new Date().toISOString(),
+      tags: [],
+      projectId: selectedProjectId
+    };
+    
+    // Add the new conversation to the mockConversations array
+    mockConversations.push(newConversation);
+    
+    // Update the project's conversation count
+    const project = mockProjects.find(p => p.id === selectedProjectId);
+    if (project) {
+      project.conversationCount += 1;
+      project.updatedAt = new Date().toISOString();
+    }
+    
     setTimeout(() => {
       toast.success(`Conversation "${title}" added successfully`);
       setIsSubmitting(false);
       setOpen(false);
       setTitle('');
       setContent('');
-      navigate('/conversations');
+      navigate(`/conversations/${newConversation.id}`);
     }, 500);
   };
   
@@ -96,6 +117,7 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
               <Select 
                 value={selectedProjectId} 
                 onValueChange={setSelectedProjectId}
+                disabled={mockProjects.length === 0}
               >
                 <SelectTrigger id="project">
                   <SelectValue placeholder="Select project" />
@@ -106,6 +128,11 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
                       {project.name}
                     </SelectItem>
                   ))}
+                  {mockProjects.length === 0 && (
+                    <SelectItem value="" disabled>
+                      No projects available
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
