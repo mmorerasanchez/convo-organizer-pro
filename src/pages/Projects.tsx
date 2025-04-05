@@ -3,6 +3,7 @@ import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import ProjectCard from '@/components/projects/ProjectCard';
 import NewProjectButton from '@/components/projects/NewProjectButton';
+import JoinProjectButton from '@/components/projects/JoinProjectButton';
 import NewProjectDialog from '@/components/projects/NewProjectDialog';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProjects } from '@/lib/api';
@@ -22,7 +23,8 @@ const Projects = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-          <div className="hidden md:block">
+          <div className="hidden md:flex space-x-2">
+            <JoinProjectDialog />
             <NewProjectDialog />
           </div>
         </div>
@@ -40,6 +42,7 @@ const Projects = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <NewProjectButton />
+            <JoinProjectButton />
             {projects.map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}

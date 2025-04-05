@@ -25,6 +25,7 @@ export const fetchProjects = async (): Promise<Project[]> => {
 };
 
 export const fetchProjectById = async (id: string): Promise<Project | null> => {
+  // First try to fetch by regular ID
   const { data, error } = await supabase
     .from('projects')
     .select('*, conversations(count)')
@@ -33,7 +34,31 @@ export const fetchProjectById = async (id: string): Promise<Project | null> => {
 
   if (error) {
     if (error.code === 'PGRST116') {
-      return null; // Not found
+      // If not found by ID, try to find by share_link
+      const { data: sharedData, error: sharedError } = await supabase
+        .from('projects')
+        .select('*, conversations(count)')
+        .eq('share_link', id)
+        .single();
+        
+      if (sharedError) {
+        if (sharedError.code === 'PGRST116') {
+          return null; // Not found with either ID or share_link
+        }
+        throw sharedError;
+      }
+      
+      if (!sharedData) return null;
+      
+      return {
+        id: sharedData.id,
+        name: sharedData.name,
+        description: sharedData.description || '',
+        createdAt: sharedData.created_at,
+        updatedAt: sharedData.updated_at,
+        conversationCount: sharedData.conversations?.[0]?.count || 0,
+        shareLink: sharedData.share_link
+      };
     }
     throw error;
   }

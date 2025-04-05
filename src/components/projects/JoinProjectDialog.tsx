@@ -1,0 +1,90 @@
+
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { UsersIcon } from 'lucide-react';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { shareProjectWithUser } from '@/lib/api';
+
+interface JoinProjectDialogProps {
+  variant?: 'default' | 'card';
+  trigger?: React.ReactNode;
+}
+
+const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({ 
+  variant = 'default',
+  trigger
+}) => {
+  const [open, setOpen] = useState(false);
+  const [projectShareLink, setProjectShareLink] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!projectShareLink.trim()) {
+      toast.error('Please enter a project share link');
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      // Navigate to the shared project view
+      navigate(`/projects/shared/${projectShareLink}`);
+      setOpen(false);
+    } catch (error) {
+      toast.error('Failed to join project. Please check the project ID and try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const defaultTrigger = (
+    <Button variant={variant === 'card' ? 'default' : 'outline'}>
+      <UsersIcon className="mr-2 h-4 w-4" />
+      Join a Project
+    </Button>
+  );
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {trigger || defaultTrigger}
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Join a Project</DialogTitle>
+          <DialogDescription>
+            Enter the project share link provided to you to access the shared project.
+          </DialogDescription>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Input
+              placeholder="Project Share Link (UUID)"
+              value={projectShareLink}
+              onChange={(e) => setProjectShareLink(e.target.value)}
+              required
+            />
+          </div>
+          
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? 'Joining...' : 'Join Project'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default JoinProjectDialog;
