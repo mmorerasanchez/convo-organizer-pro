@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { BookOpen, Brain, Grid, MessageCircle, Plus, Search, Settings, Type, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import NewProjectDialog from '@/components/projects/NewProjectDialog';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -31,10 +32,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </div>
         
         <div className="p-4">
-          <Button variant="outline" className="w-full justify-start gap-2">
-            <Plus size={16} />
-            New Project
-          </Button>
+          <NewProjectDialog 
+            variant="outline" 
+            trigger={
+              <Button variant="outline" className="w-full justify-start gap-2">
+                <Plus size={16} />
+                New Project
+              </Button>
+            }
+          />
         </div>
         
         <nav className="flex-1 p-4 space-y-1">

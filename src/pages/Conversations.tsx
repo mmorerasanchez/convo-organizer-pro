@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, X } from 'lucide-react';
 import { Tag } from '@/lib/types';
+import NewConversationDialog from '@/components/conversations/NewConversationDialog';
 
 const Conversations = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -44,10 +45,9 @@ const Conversations = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight">Conversations</h1>
-          <Button className="hidden md:flex gap-2">
-            <Plus size={16} />
-            New Conversation
-          </Button>
+          <div className="hidden md:block">
+            <NewConversationDialog />
+          </div>
         </div>
         
         {/* Search and filters */}
@@ -107,10 +107,12 @@ const Conversations = () => {
             {searchTerm || selectedTags.length > 0 ? (
               <Button onClick={clearFilters}>Clear Filters</Button>
             ) : (
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Conversation
-              </Button>
+              <NewConversationDialog trigger={
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Conversation
+                </Button>
+              } />
             )}
           </div>
         )}

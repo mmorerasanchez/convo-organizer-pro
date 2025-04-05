@@ -6,6 +6,9 @@ import ConversationCard from '@/components/conversations/ConversationCard';
 import { getProjectById, getConversationsByProjectId } from '@/lib/mockData';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, MessageCircle, Plus } from 'lucide-react';
+import NewConversationDialog from '@/components/conversations/NewConversationDialog';
+import EditProjectDialog from '@/components/projects/EditProjectDialog';
+import DeleteDialog from '@/components/common/DeleteDialog';
 
 const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -29,23 +32,30 @@ const ProjectDetail = () => {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <div className="flex items-center gap-2">
-          <Link to="/projects">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
-          <h1 className="text-3xl font-bold tracking-tight">{project.name}</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Link to="/projects">
+              <Button variant="ghost" size="icon">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
+            <h1 className="text-3xl font-bold tracking-tight">{project.name}</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <EditProjectDialog project={project} />
+            <DeleteDialog 
+              itemType="project" 
+              itemName={project.name}
+              redirectPath="/projects"
+            />
+          </div>
         </div>
         
         <p className="text-muted-foreground">{project.description}</p>
         
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Conversations</h2>
-          <Button className="gap-2">
-            <Plus size={16} />
-            New Conversation
-          </Button>
+          <NewConversationDialog projectId={project.id} />
         </div>
         
         {conversations.length > 0 ? (
@@ -61,10 +71,12 @@ const ProjectDetail = () => {
             <p className="text-muted-foreground mb-4">
               Start adding conversations to this project
             </p>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Conversation
-            </Button>
+            <NewConversationDialog projectId={project.id} trigger={
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Conversation
+              </Button>
+            } />
           </div>
         )}
       </div>

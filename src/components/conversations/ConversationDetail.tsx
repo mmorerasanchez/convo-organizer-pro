@@ -4,9 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Conversation, Project } from '@/lib/types';
 import { format } from 'date-fns';
 import TagList from './TagList';
-import { ArrowLeft, Edit, Trash } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import EditConversationDialog from './EditConversationDialog';
+import DeleteDialog from '../common/DeleteDialog';
 
 interface ConversationDetailProps {
   conversation: Conversation;
@@ -26,12 +28,12 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({ conversation, p
           <h1 className="text-2xl font-bold">{conversation.title}</h1>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon">
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="icon">
-            <Trash className="h-4 w-4" />
-          </Button>
+          <EditConversationDialog conversation={conversation} />
+          <DeleteDialog 
+            itemType="conversation" 
+            itemName={conversation.title}
+            redirectPath="/conversations"
+          />
         </div>
       </div>
       
