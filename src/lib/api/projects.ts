@@ -61,19 +61,25 @@ export const createProject = async (project: {
     throw new Error('User not authenticated');
   }
   
+  const userId = sessionData.session.user.id;
+  
   const { data, error } = await supabase
     .from('projects')
     .insert([
       {
         name: project.name,
         description: project.description,
-        user_id: sessionData.session.user.id
+        user_id: userId
       }
     ])
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('Project creation error:', error);
+    throw error;
+  }
+  
   if (!data) throw new Error('Failed to create project');
 
   return {
