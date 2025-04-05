@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { InfoIcon } from 'lucide-react';
 
 const AuthForm = () => {
   const [email, setEmail] = useState('');
@@ -23,6 +25,10 @@ const AuthForm = () => {
       const { error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          // For development, we can skip email verification
+          emailRedirectTo: window.location.origin,
+        }
       });
       
       if (error) throw error;
@@ -115,6 +121,13 @@ const AuthForm = () => {
               <CardDescription>
                 Create a new account to get started
               </CardDescription>
+              
+              <Alert className="bg-blue-50 text-blue-800 border-blue-200 mb-4">
+                <InfoIcon className="h-4 w-4 mr-2" />
+                <AlertDescription>
+                  After signing up, you'll need to confirm your email before signing in.
+                </AlertDescription>
+              </Alert>
               
               <div className="space-y-2">
                 <Label htmlFor="signup-email">Email</Label>
