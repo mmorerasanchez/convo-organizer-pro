@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { UsersIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { shareProjectWithUser } from '@/lib/api';
 
 interface JoinProjectDialogProps {
   variant?: 'default' | 'card';
@@ -33,9 +32,25 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
     setIsLoading(true);
     
     try {
+      // Extract the UUID from URL if it's a full URL
+      let shareId = projectShareLink.trim();
+      
+      // Check if it's a URL and extract the UUID from it
+      if (shareId.includes('/')) {
+        const parts = shareId.split('/');
+        shareId = parts[parts.length - 1];
+      }
+      
+      // Validate that it looks like a UUID
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(shareId)) {
+        throw new Error('Invalid project ID format');
+      }
+      
       // Navigate to the shared project view
-      navigate(`/projects/shared/${projectShareLink}`);
+      navigate(`/projects/shared/${shareId}`);
       setOpen(false);
+      
     } catch (error) {
       toast.error('Failed to join project. Please check the project ID and try again.');
     } finally {
@@ -59,14 +74,14 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Join a Project</DialogTitle>
           <DialogDescription>
-            Enter the project share link provided to you to access the shared project.
+            Enter the project share link or ID provided to you to access the shared project.
           </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Input
-              placeholder="Project Share Link (UUID)"
+              placeholder="Project Share Link or ID"
               value={projectShareLink}
               onChange={(e) => setProjectShareLink(e.target.value)}
               required

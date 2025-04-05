@@ -21,11 +21,10 @@ const SharedProjectDetail = () => {
     queryFn: async () => {
       try {
         // Fetch project using the share link
-        const projectData = await fetchProjectById(shareLink || '');
-        return projectData;
+        return await fetchProjectById(shareLink || '');
       } catch (error) {
         console.error('Error fetching shared project:', error);
-        return null;
+        throw error;
       }
     },
     enabled: !!shareLink
