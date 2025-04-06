@@ -17,6 +17,9 @@ const AuthForm = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Get the current origin for redirection
+  const origin = window.location.origin;
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -26,8 +29,7 @@ const AuthForm = () => {
         email,
         password,
         options: {
-          // For development, we can skip email verification
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: origin,
         }
       });
       
