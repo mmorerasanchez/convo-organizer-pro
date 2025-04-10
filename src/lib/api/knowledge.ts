@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Knowledge } from "@/lib/types";
 
@@ -25,6 +24,18 @@ export const fetchKnowledgeByProjectId = async (projectId: string): Promise<Know
     updatedAt: item.updated_at,
     projectId: item.project_id
   }));
+};
+
+export const fetchKnowledgeCount = async (): Promise<number> => {
+  const { count, error } = await supabase
+    .from('knowledge')
+    .select('*', { count: 'exact', head: true });
+
+  if (error) {
+    throw new Error(`Error fetching knowledge count: ${error.message}`);
+  }
+
+  return count || 0;
 };
 
 export const fetchKnowledgeById = async (id: string): Promise<Knowledge> => {

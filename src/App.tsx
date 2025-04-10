@@ -9,7 +9,6 @@ import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import ProjectDetail from "./pages/ProjectDetail";
 import SharedProjectDetail from "./pages/SharedProjectDetail";
-import Conversations from "./pages/Conversations";
 import ConversationDetail from "./pages/ConversationDetail";
 import Prompting from "./pages/Prompting";
 import Tools from "./pages/Tools";
@@ -30,7 +29,6 @@ const App = () => (
             <Route path="/projects" element={<Projects />} />
             <Route path="/projects/:id" element={<ProjectDetail />} />
             <Route path="/projects/shared/:shareLink" element={<SharedProjectDetail />} />
-            <Route path="/conversations" element={<Conversations />} />
             <Route path="/conversations/:id" element={<ConversationDetail />} />
             <Route path="/prompting" element={<Prompting />} />
             <Route path="/tools" element={<Tools />} />

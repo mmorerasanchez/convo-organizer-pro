@@ -5,12 +5,13 @@ import StatCard from '@/components/dashboard/StatCard';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import ProjectList from '@/components/dashboard/ProjectList';
 import AITools from '@/components/dashboard/AITools';
-import { BookOpen, MessageCircle, Tags, Brain } from 'lucide-react';
+import { BookOpen, MessageCircle, Wrench, Database, Brain } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
-import { fetchProjects, fetchConversations } from '@/lib/api';
+import { fetchProjects, fetchConversations, fetchTools } from '@/lib/api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Skeleton } from '@/components/ui/skeleton';
+import { fetchKnowledgeCount } from '@/lib/api/knowledge';
 
 const Dashboard = () => {
   const { user, loading: authLoading } = useRequireAuth();
@@ -27,6 +28,18 @@ const Dashboard = () => {
     enabled: !!user
   });
 
+  const { data: tools = [], isLoading: toolsLoading } = useQuery({
+    queryKey: ['tools'],
+    queryFn: fetchTools,
+    enabled: !!user
+  });
+
+  const { data: knowledgeCount = 0, isLoading: knowledgeLoading } = useQuery({
+    queryKey: ['knowledgeCount'],
+    queryFn: fetchKnowledgeCount,
+    enabled: !!user
+  });
+
   // Sort conversations by date for recent activity
   const sortedConversations = [...conversations].sort(
     (a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()
@@ -39,9 +52,9 @@ const Dashboard = () => {
   
   const projectCount = projects.length;
   const conversationCount = conversations.length;
-  const tagCount = 0; // We'll implement tags separately
+  const toolCount = tools.length;
 
-  const isLoading = authLoading || projectsLoading || conversationsLoading;
+  const isLoading = authLoading || projectsLoading || conversationsLoading || toolsLoading || knowledgeLoading;
 
   return (
     <MainLayout>
@@ -50,8 +63,8 @@ const Dashboard = () => {
         
         {isLoading ? (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[...Array(3)].map((_, i) => (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
                 <Skeleton key={i} className="h-24 w-full" />
               ))}
             </div>
@@ -59,7 +72,7 @@ const Dashboard = () => {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <StatCard 
                 title="Total Projects" 
                 value={projectCount} 
@@ -73,10 +86,16 @@ const Dashboard = () => {
                 description="From various platforms"
               />
               <StatCard 
-                title="Available Tags" 
-                value={tagCount} 
-                icon={<Tags size={16} />} 
-                description="For organizing content"
+                title="Knowledge Files" 
+                value={knowledgeCount} 
+                icon={<Database size={16} />} 
+                description="Project documentation"
+              />
+              <StatCard 
+                title="Tools Added" 
+                value={toolCount} 
+                icon={<Wrench size={16} />} 
+                description="Available tools"
               />
             </div>
             
@@ -86,7 +105,7 @@ const Dashboard = () => {
                 <TabsTrigger value="ai-tools">
                   <span className="flex items-center gap-2">
                     <Brain size={16} />
-                    AI Tools
+                    Tools
                   </span>
                 </TabsTrigger>
               </TabsList>

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Home, BookOpen, MessageCircle, Lightbulb, Menu, UserCircle, LogOut, Wrench } from 'lucide-react';
+import { Home, BookOpen, Lightbulb, Menu, UserCircle, LogOut, Wrench } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -25,7 +25,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const navItems = [
     { icon: Home, label: 'Dashboard', path: '/' },
     { icon: BookOpen, label: 'Projects', path: '/projects' },
-    { icon: MessageCircle, label: 'Conversations', path: '/conversations' },
     { icon: Wrench, label: 'Tools', path: '/tools' },
     { icon: Lightbulb, label: 'Prompting', path: '/prompting' },
   ];
@@ -91,7 +90,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             to="/"
             className="flex items-center gap-2 text-lg font-semibold md:text-xl"
           >
-            <MessageCircle className="h-5 w-5" />
+            <BookOpen className="h-5 w-5" />
             <span className="hidden md:inline-block">Prompt Copilot</span>
           </Link>
           <div className="ml-auto flex gap-2 items-center">

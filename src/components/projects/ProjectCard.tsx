@@ -11,11 +11,19 @@ interface ProjectCardProps {
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
+  // Extract the emoji from the project name if it exists
+  const hasEmoji = project.name.match(/^(\p{Emoji}|[\u{1F300}-\u{1F6FF}])\s/u);
+  const emoji = hasEmoji ? hasEmoji[0].trim() : null;
+  const displayName = hasEmoji ? project.name.replace(hasEmoji[0], '') : project.name;
+
   return (
     <Link to={`/projects/${project.id}`}>
       <Card className="h-full convo-card">
         <CardContent className="pt-6">
-          <div className="mb-2 text-xl font-semibold">{project.name}</div>
+          <div className="mb-2 text-xl font-semibold flex items-center">
+            {emoji && <span className="mr-2 text-2xl">{emoji}</span>}
+            {displayName}
+          </div>
           <p className="text-sm text-muted-foreground line-clamp-2 h-10">
             {project.description}
           </p>
