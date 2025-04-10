@@ -59,13 +59,6 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
       // Extract the UUID from URL if it's a full URL
       const shareId = extractShareId(projectShareLink);
       
-      // Validate that it looks like a UUID
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(shareId)) {
-        setValidationError('Invalid project ID format. Please provide a valid share link or ID.');
-        return;
-      }
-      
       // Submit the share ID to join the project
       joinProjectMutation.mutate(shareId);
       
@@ -116,6 +109,7 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
                 disabled={joinProjectMutation.isPending}
                 required
                 className="flex-1"
+                autoFocus
               />
             </div>
             

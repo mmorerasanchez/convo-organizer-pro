@@ -98,23 +98,82 @@ export const joinProjectByShareLink = async (shareLink: string): Promise<Project
   
   const userId = sessionData.session.user.id;
   
-  // First check if the project exists by share link
+  // First try to find the project by share_link
   const { data: projectData, error: projectError } = await supabase
     .from('projects')
     .select('*')
     .eq('share_link', shareLink)
-    .single();
+    .maybeSingle();
     
-  if (projectError) {
-    console.error('Error finding project:', projectError);
-    if (projectError.code === 'PGRST116') {
-      throw new Error('Project not found or share link is invalid');
-    }
+  if (projectError && projectError.code !== 'PGRST116') {
+    console.error('Error finding project by share_link:', projectError);
     throw projectError;
   }
   
+  // If not found by share_link, try finding by project ID directly
+  // This handles cases where the user might paste a project ID instead of a share link
   if (!projectData) {
-    throw new Error('Project not found or share link is invalid');
+    const { data: directProject, error: directProjectError } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('id', shareLink)
+      .maybeSingle();
+      
+    if (directProjectError && directProjectError.code !== 'PGRST116') {
+      console.error('Error finding project by ID:', directProjectError);
+      throw directProjectError;
+    }
+    
+    if (!directProject) {
+      console.error('Project not found with share link or ID:', shareLink);
+      throw new Error('Project not found or share link is invalid');
+    }
+    
+    console.log(`Found project by direct ID: ${directProject.id}`);
+    
+    // Check if the project is already shared with the user
+    const { data: existingShare, error: shareCheckError } = await supabase
+      .from('project_shares')
+      .select('id')
+      .eq('project_id', directProject.id)
+      .eq('shared_with_user_id', userId)
+      .maybeSingle();
+      
+    if (shareCheckError && shareCheckError.code !== 'PGRST116') {
+      console.error('Error checking existing share:', shareCheckError);
+      throw shareCheckError;
+    }
+    
+    // If the project is not already shared with the user, create a share record
+    if (!existingShare) {
+      const { error: shareError } = await supabase
+        .from('project_shares')
+        .insert([
+          {
+            project_id: directProject.id,
+            shared_with_user_id: userId
+          }
+        ]);
+        
+      if (shareError) {
+        console.error('Error creating share record:', shareError);
+        throw shareError;
+      }
+      
+      console.log(`Successfully shared project with user: ${userId}`);
+    } else {
+      console.log(`Project already shared with user: ${userId}`);
+    }
+    
+    return {
+      id: directProject.id,
+      name: directProject.name,
+      description: directProject.description || '',
+      createdAt: directProject.created_at,
+      updatedAt: directProject.updated_at,
+      conversationCount: 0, // We don't have this information yet
+      shareLink: directProject.share_link
+    };
   }
   
   console.log(`Found project with ID: ${projectData.id}`);
@@ -125,7 +184,7 @@ export const joinProjectByShareLink = async (shareLink: string): Promise<Project
     .select('id')
     .eq('project_id', projectData.id)
     .eq('shared_with_user_id', userId)
-    .single();
+    .maybeSingle();
     
   if (shareCheckError && shareCheckError.code !== 'PGRST116') {
     console.error('Error checking existing share:', shareCheckError);
@@ -172,15 +231,37 @@ export const extractShareId = (input: string): string => {
   // Check if it's a URL and extract the UUID from it
   let shareId = input.trim();
   
-  // If it contains a slash, it's likely a URL
-  if (shareId.includes('/')) {
-    const segments = shareId.split('/');
-    // Get the last segment (which should be the UUID)
-    shareId = segments[segments.length - 1];
+  try {
+    // If it looks like a URL, try to parse it
+    if (shareId.startsWith('http') || shareId.includes('/')) {
+      // Try to create a URL object to parse it properly
+      const url = new URL(shareId);
+      
+      // Get the path segments
+      const pathSegments = url.pathname.split('/').filter(Boolean);
+      
+      // Look for 'shared' in the path to extract the UUID that follows
+      const sharedIndex = pathSegments.findIndex(segment => 
+        segment === 'shared' || segment === 'projects' || segment === 'project'
+      );
+      
+      if (sharedIndex >= 0 && sharedIndex < pathSegments.length - 1) {
+        // Get the segment after 'shared', 'projects', or 'project'
+        shareId = pathSegments[sharedIndex + 1];
+      } else {
+        // If we can't find a specific pattern, just use the last segment
+        shareId = pathSegments[pathSegments.length - 1];
+      }
+    }
     
     // Remove any trailing slashes or query params
     shareId = shareId.split('?')[0].split('#')[0].replace(/\/$/, '');
+    
+    console.log(`Extracted share ID: ${shareId}`);
+    return shareId;
+  } catch (error) {
+    // If URL parsing fails, just return the trimmed input
+    console.log(`URL parsing failed, using original input: ${shareId}`);
+    return shareId;
   }
-  
-  return shareId;
 };
