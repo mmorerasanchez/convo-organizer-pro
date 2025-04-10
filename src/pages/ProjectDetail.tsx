@@ -52,6 +52,9 @@ const ProjectDetail = () => {
   
   const error = projectError || (activeTab === "conversations" && conversationsError) || (activeTab === "knowledge" && knowledgeError);
   
+  // Check if this is a shared project by looking at the URL pattern
+  const isSharedProject = window.location.pathname.includes('/projects/shared/');
+  
   if (isLoadingProject) {
     return (
       <MainLayout>
@@ -94,7 +97,7 @@ const ProjectDetail = () => {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <ProjectDetailHeader project={project} />
+        <ProjectDetailHeader project={project} isShared={isSharedProject} />
         
         <ProjectTabs
           projectId={project.id}

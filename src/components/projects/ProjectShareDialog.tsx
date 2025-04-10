@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Share, Copy, Check } from 'lucide-react';
+import { Share, Copy, Check, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMutation } from '@tanstack/react-query';
 import { generateShareLink, shareProjectWithUser } from '@/lib/api';
@@ -21,7 +21,7 @@ const ProjectShareDialog: React.FC<ProjectShareDialogProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const [email, setEmail] = useState('');
-  const [shareLink, setShareLink] = useState<string | null>(null);
+  const [shareLink, setShareLink] = useState<string | null>(project.shareLink ? `${window.location.origin}/projects/shared/${project.shareLink}` : null);
   const [open, setOpen] = useState(false);
   
   const generateShareLinkMutation = useMutation({

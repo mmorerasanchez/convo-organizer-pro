@@ -10,6 +10,7 @@ import { fetchProjects, getSharedProjects } from '@/lib/api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
+import { Users } from 'lucide-react';
 
 const Projects = () => {
   useRequireAuth();
@@ -59,7 +60,10 @@ const Projects = () => {
         <div>
           <div className="space-y-2">
             <Separator />
-            <h2 className="text-2xl font-semibold mt-4">Shared Projects</h2>
+            <div className="flex items-center gap-2 mt-4">
+              <Users className="h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-semibold">Shared Projects</h2>
+            </div>
             <p className="text-muted-foreground">Projects that have been shared with you by other users.</p>
           </div>
           
@@ -73,7 +77,7 @@ const Projects = () => {
             sharedProjects.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
                 {sharedProjects.map((project) => (
-                  <ProjectCard key={project.id} project={project} />
+                  <ProjectCard key={project.id} project={project} isShared={true} />
                 ))}
               </div>
             ) : (

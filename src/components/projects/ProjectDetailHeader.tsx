@@ -1,30 +1,33 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Project } from '@/lib/types';
-import ProjectShareDialog from '@/components/projects/ProjectShareDialog';
-import EditProjectDialog from '@/components/projects/EditProjectDialog';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Edit, Trash, Share, Users } from 'lucide-react';
+import EditProjectDialog from './EditProjectDialog';
 import DeleteDialog from '@/components/common/DeleteDialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteProject } from '@/lib/api';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import ProjectShareDialog from './ProjectShareDialog';
 
 interface ProjectDetailHeaderProps {
   project: Project;
+  isShared?: boolean;
 }
 
-const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project }) => {
-  const navigate = useNavigate();
+const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project, isShared = false }) => {
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   
-  const deleteProjectMutation = useMutation({
-    mutationFn: () => deleteProject(project.id),
+  const deleteMutation = useMutation({
+    mutationFn: deleteProject,
     onSuccess: () => {
+      toast.success("Project deleted successfully");
       queryClient.invalidateQueries({ queryKey: ['projects'] });
-      toast.success('Project deleted successfully');
       navigate('/projects');
     },
     onError: (error: Error) => {
@@ -33,42 +36,69 @@ const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project }) =>
   });
   
   const handleDelete = () => {
-    deleteProjectMutation.mutate();
+    deleteMutation.mutate(project.id);
   };
-
+  
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-2">
-          <Link to="/projects">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
-          <h1 className="text-3xl font-bold tracking-tight">{project.name}</h1>
+          <Button variant="ghost" size="icon" as={Link} to="/projects">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div className="flex items-center gap-2">
+            <h1 className="text-3xl font-bold">{project.name}</h1>
+            {isShared && <Users className="h-5 w-5 text-primary" title="Shared Project" />}
+          </div>
         </div>
+        
         <div className="flex items-center gap-2">
           <ProjectShareDialog project={project} />
-          <EditProjectDialog project={project} />
+          
           <Button 
-            variant="destructive" 
-            size="icon" 
-            onClick={handleDelete}
-            disabled={deleteProjectMutation.isPending}
+            variant="outline" 
+            size="sm" 
+            className="gap-2"
+            onClick={() => setShowEditDialog(true)}
           >
-            <span className="sr-only">Delete</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-trash-2">
-              <path d="M3 6h18" />
-              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-              <line x1="10" x2="10" y1="11" y2="17" />
-              <line x1="14" x2="14" y1="11" y2="17" />
-            </svg>
+            <Edit className="h-4 w-4" />
+            Edit
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-2 text-destructive hover:text-destructive"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            <Trash className="h-4 w-4" />
+            Delete
           </Button>
         </div>
       </div>
       
-      <p className="text-muted-foreground">{project.description}</p>
+      {project.description && (
+        <p className="text-muted-foreground">{project.description}</p>
+      )}
+      
+      {showEditDialog && (
+        <EditProjectDialog 
+          project={project} 
+          open={showEditDialog}
+          onOpenChange={setShowEditDialog}
+        />
+      )}
+      
+      {showDeleteDialog && (
+        <DeleteDialog
+          title="Delete Project"
+          description="Are you sure you want to delete this project? This action cannot be undone and all project data, including conversations and knowledge, will be permanently deleted."
+          open={showDeleteDialog}
+          onOpenChange={setShowDeleteDialog}
+          onConfirm={handleDelete}
+          isLoading={deleteMutation.isPending}
+        />
+      )}
     </div>
   );
 };
