@@ -1,16 +1,16 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Project } from '@/lib/types';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Edit, Trash, Share, Users } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Edit, MoreHorizontal, Share, Trash, Users, ArrowLeft } from 'lucide-react';
+import { Project } from '@/lib/types';
+import ProjectShareDialog from './ProjectShareDialog';
 import EditProjectDialog from './EditProjectDialog';
 import DeleteDialog from '@/components/common/DeleteDialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteProject } from '@/lib/api';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import ProjectShareDialog from './ProjectShareDialog';
 
 interface ProjectDetailHeaderProps {
   project: Project;
@@ -18,16 +18,18 @@ interface ProjectDetailHeaderProps {
 }
 
 const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project, isShared = false }) => {
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const queryClient = useQueryClient();
+  
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
   const deleteMutation = useMutation({
-    mutationFn: deleteProject,
+    mutationFn: () => deleteProject(project.id),
     onSuccess: () => {
-      toast.success("Project deleted successfully");
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      toast.success(`Project "${project.name}" deleted`);
       navigate('/projects');
     },
     onError: (error: Error) => {
@@ -36,9 +38,9 @@ const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project, isSh
   });
   
   const handleDelete = () => {
-    deleteMutation.mutate(project.id);
+    deleteMutation.mutate();
   };
-  
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -54,33 +56,50 @@ const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project, isSh
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          <ProjectShareDialog project={project} />
-          
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="gap-2"
-            onClick={() => setShowEditDialog(true)}
-          >
-            <Edit className="h-4 w-4" />
-            Edit
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="gap-2 text-destructive hover:text-destructive"
-            onClick={() => setShowDeleteDialog(true)}
-          >
-            <Trash className="h-4 w-4" />
-            Delete
-          </Button>
-        </div>
+        {!isShared && (
+          <div className="flex items-center space-x-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+              onClick={() => setShowShareDialog(true)}
+            >
+              <Share className="h-4 w-4" />
+              Share
+            </Button>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit Project
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  className="text-red-600" 
+                  onClick={() => setShowDeleteDialog(true)}
+                >
+                  <Trash className="mr-2 h-4 w-4" />
+                  Delete Project
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
       </div>
       
-      {project.description && (
-        <p className="text-muted-foreground">{project.description}</p>
+      <p className="text-muted-foreground">{project.description}</p>
+      
+      {showShareDialog && (
+        <ProjectShareDialog 
+          project={project}
+          trigger={undefined}
+        />
       )}
       
       {showEditDialog && (
@@ -95,6 +114,7 @@ const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project, isSh
           itemType="project"
           itemName={project.name}
           onDelete={handleDelete}
+          isDeleting={deleteMutation.isPending}
           trigger={undefined}
         />
       )}

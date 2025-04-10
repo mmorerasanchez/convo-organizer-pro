@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import MainLayout from '@/components/layout/MainLayout';
@@ -14,6 +14,7 @@ import NewConversationDialog from '@/components/conversations/NewConversationDia
 import KnowledgeList from '@/components/knowledge/KnowledgeList';
 import KnowledgeEmptyState from '@/components/knowledge/KnowledgeEmptyState';
 import NewKnowledgeDialog from '@/components/knowledge/NewKnowledgeDialog';
+import { toast } from 'sonner';
 
 const SharedProjectDetail = () => {
   useRequireAuth();
@@ -26,14 +27,25 @@ const SharedProjectDetail = () => {
     queryFn: async () => {
       try {
         // Fetch project using the share link
-        return await fetchProjectById(shareLink || '');
+        const result = await fetchProjectById(shareLink || '');
+        if (!result) {
+          toast.error('Project not found or share link is invalid');
+        }
+        return result;
       } catch (error) {
         console.error('Error fetching shared project:', error);
+        toast.error('Error loading shared project');
         throw error;
       }
     },
     enabled: !!shareLink
   });
+
+  useEffect(() => {
+    if (shareLink && !isLoadingProject && !project) {
+      toast.error('Project not found or share link is invalid');
+    }
+  }, [shareLink, isLoadingProject, project]);
 
   const { data: conversations = [], isLoading: isLoadingConversations } = useQuery({
     queryKey: ['conversations', 'project', project?.id],

@@ -21,6 +21,23 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const extractShareId = (input: string): string => {
+    // Check if it's a URL and extract the UUID from it
+    let shareId = input.trim();
+    
+    // If it contains a slash, it's likely a URL
+    if (shareId.includes('/')) {
+      const segments = shareId.split('/');
+      // Get the last segment (which should be the UUID)
+      shareId = segments[segments.length - 1];
+      
+      // Remove any trailing slashes or query params
+      shareId = shareId.split('?')[0].split('#')[0].replace(/\/$/, '');
+    }
+    
+    return shareId;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -33,13 +50,7 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
     
     try {
       // Extract the UUID from URL if it's a full URL
-      let shareId = projectShareLink.trim();
-      
-      // Check if it's a URL and extract the UUID from it
-      if (shareId.includes('/')) {
-        const parts = shareId.split('/');
-        shareId = parts[parts.length - 1];
-      }
+      const shareId = extractShareId(projectShareLink);
       
       // Validate that it looks like a UUID
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -50,8 +61,10 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
       // Navigate to the shared project view
       navigate(`/projects/shared/${shareId}`);
       setOpen(false);
+      toast.success('Joining project...');
       
     } catch (error) {
+      console.error('Error joining project:', error);
       toast.error('Failed to join project. Please check the project ID and try again.');
     } finally {
       setIsLoading(false);
@@ -86,6 +99,9 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
               onChange={(e) => setProjectShareLink(e.target.value)}
               required
             />
+            <p className="text-xs text-muted-foreground">
+              Example: https://yourapp.com/projects/shared/uuid or just paste the UUID directly
+            </p>
           </div>
           
           <DialogFooter>
