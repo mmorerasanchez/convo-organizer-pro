@@ -7,17 +7,19 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
 interface DeleteDialogProps {
-  itemType: 'project' | 'conversation';
+  itemType: 'project' | 'conversation' | 'knowledge';
   itemName: string;
   trigger?: React.ReactNode;
   redirectPath?: string;
+  onDelete?: () => void;
 }
 
 const DeleteDialog: React.FC<DeleteDialogProps> = ({
   itemType,
   itemName,
   trigger,
-  redirectPath
+  redirectPath,
+  onDelete
 }) => {
   const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -26,16 +28,22 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({
   const handleDelete = () => {
     setIsDeleting(true);
     
-    // For the prototype we're just simulating a successful deletion
-    setTimeout(() => {
-      toast.success(`${itemType.charAt(0).toUpperCase() + itemType.slice(1)} deleted successfully`);
+    if (onDelete) {
+      onDelete();
       setIsDeleting(false);
       setOpen(false);
-      
-      if (redirectPath) {
-        navigate(redirectPath);
-      }
-    }, 500);
+    } else {
+      // For the prototype we're just simulating a successful deletion
+      setTimeout(() => {
+        toast.success(`${itemType.charAt(0).toUpperCase() + itemType.slice(1)} deleted successfully`);
+        setIsDeleting(false);
+        setOpen(false);
+        
+        if (redirectPath) {
+          navigate(redirectPath);
+        }
+      }, 500);
+    }
   };
   
   const triggerButton = trigger || (

@@ -4,7 +4,7 @@ import { Knowledge } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
-import { Eye, Download, Pencil, Trash2, FileText, FileImage, FilePdf, FileArchive, FileCode } from 'lucide-react';
+import { Eye, Download, Pencil, Trash2, FileText, FileImage, File, FileArchive, FileCode } from 'lucide-react';
 import EditKnowledgeDialog from './EditKnowledgeDialog';
 import DeleteDialog from '@/components/common/DeleteDialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -53,7 +53,7 @@ const KnowledgeList: React.FC<KnowledgeListProps> = ({ knowledgeItems }) => {
 
   const getFileIcon = (fileType: string) => {
     if (fileType.startsWith('image/')) return <FileImage className="w-8 h-8 text-blue-500" />;
-    if (fileType.includes('pdf')) return <FilePdf className="w-8 h-8 text-red-500" />;
+    if (fileType.includes('pdf')) return <File className="w-8 h-8 text-red-500" />;
     if (fileType.includes('zip') || fileType.includes('rar') || fileType.includes('tar')) 
       return <FileArchive className="w-8 h-8 text-yellow-500" />;
     if (fileType.includes('code') || fileType.includes('json') || fileType.includes('xml') || fileType.includes('html')) 
@@ -111,8 +111,8 @@ const KnowledgeList: React.FC<KnowledgeListProps> = ({ knowledgeItems }) => {
             <div className="flex items-center space-x-1">
               <EditKnowledgeDialog knowledge={item} />
               <DeleteDialog
-                title="Delete knowledge item"
-                description={`Are you sure you want to delete "${item.title}"? This action cannot be undone.`}
+                itemType="knowledge"
+                itemName={item.title}
                 trigger={
                   <Button 
                     variant="ghost" 
@@ -123,7 +123,8 @@ const KnowledgeList: React.FC<KnowledgeListProps> = ({ knowledgeItems }) => {
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 }
-                onConfirm={() => handleDelete(item.id)}
+                redirectPath={undefined}
+                onDelete={() => handleDelete(item.id)}
               />
             </div>
           </CardFooter>

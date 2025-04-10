@@ -32,14 +32,10 @@ export const fetchKnowledgeById = async (id: string): Promise<Knowledge> => {
     .from('knowledge')
     .select('*')
     .eq('id', id)
-    .maybeSingle();
+    .single();
 
   if (error) {
     throw new Error(`Error fetching knowledge item: ${error.message}`);
-  }
-
-  if (!data) {
-    throw new Error('Knowledge item not found');
   }
 
   return {
@@ -148,14 +144,10 @@ export const deleteKnowledge = async (id: string): Promise<void> => {
     .from('knowledge')
     .select('file_path')
     .eq('id', id)
-    .maybeSingle();
+    .single();
 
   if (fetchError) {
     throw new Error(`Error fetching knowledge file path: ${fetchError.message}`);
-  }
-
-  if (!knowledgeData) {
-    throw new Error('Knowledge item not found');
   }
 
   // Delete the database entry
