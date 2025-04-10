@@ -56,15 +56,25 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
     }
     
     try {
+      // Check for common invalid inputs
+      const trimmedInput = projectShareLink.trim();
+      if (trimmedInput === 'shared' || trimmedInput === 'projects/shared') {
+        setValidationError('Please enter a complete project share link or project ID');
+        return;
+      }
+      
       // Extract the UUID from URL if it's a full URL
       const shareId = extractShareId(projectShareLink);
+      console.log('Extracted share ID:', shareId);
       
       // Submit the share ID to join the project
       joinProjectMutation.mutate(shareId);
-      
     } catch (error) {
       console.error('Error validating project link:', error);
-      setValidationError('Failed to process the link. Please check the format and try again.');
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Failed to process the link. Please check the format and try again.';
+      setValidationError(errorMessage);
     }
   };
 
