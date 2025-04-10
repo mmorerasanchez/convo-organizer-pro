@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MessageCircle, Book } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Book, Link as LinkIcon, AlertCircle } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { fetchConversationsByProjectId, fetchProjectById, fetchKnowledgeByProjectId } from '@/lib/api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
@@ -15,6 +15,7 @@ import KnowledgeList from '@/components/knowledge/KnowledgeList';
 import KnowledgeEmptyState from '@/components/knowledge/KnowledgeEmptyState';
 import NewKnowledgeDialog from '@/components/knowledge/NewKnowledgeDialog';
 import { toast } from 'sonner';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const SharedProjectDetail = () => {
   useRequireAuth();
@@ -26,10 +27,14 @@ const SharedProjectDetail = () => {
     queryKey: ['shared-project', shareLink],
     queryFn: async () => {
       try {
+        console.log(`Fetching project with share link: ${shareLink}`);
         // Fetch project using the share link
         const result = await fetchProjectById(shareLink || '');
         if (!result) {
+          console.error('Project not found with share link:', shareLink);
           toast.error('Project not found or share link is invalid');
+        } else {
+          console.log(`Successfully fetched project: ${result.id}`);
         }
         return result;
       } catch (error) {
@@ -38,7 +43,8 @@ const SharedProjectDetail = () => {
         throw error;
       }
     },
-    enabled: !!shareLink
+    enabled: !!shareLink,
+    retry: 1
   });
 
   useEffect(() => {
@@ -63,17 +69,47 @@ const SharedProjectDetail = () => {
     (isLoadingConversations && activeTab === "conversations") || 
     (isLoadingKnowledge && activeTab === "knowledge");
 
-  if (projectError || (!isLoading && !project)) {
+  if (projectError) {
     return (
       <MainLayout>
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-bold mb-4">Project Not Found</h2>
+        <div className="max-w-3xl mx-auto text-center py-12">
+          <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-4">Unable to Access Project</h2>
+          <Alert variant="destructive" className="mb-6">
+            <AlertTitle>Error Loading Project</AlertTitle>
+            <AlertDescription>
+              {projectError instanceof Error ? projectError.message : 'The shared project link is invalid or you do not have permission to access it.'}
+            </AlertDescription>
+          </Alert>
           <p className="text-muted-foreground mb-6">
-            The shared project link you provided is invalid or has expired.
+            Please check that you've entered the correct share link or ask the project owner to share it with you again.
           </p>
           <Button onClick={() => navigate('/projects')}>
             Back to Projects
           </Button>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (!isLoadingProject && !project) {
+    return (
+      <MainLayout>
+        <div className="max-w-3xl mx-auto text-center py-12">
+          <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-4">Project Not Found</h2>
+          <p className="text-muted-foreground mb-6">
+            The shared project link you provided is invalid or has expired.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Button onClick={() => navigate('/projects')}>
+              Back to Projects
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/projects')}>
+              <LinkIcon className="h-4 w-4 mr-2" />
+              Try Another Share Link
+            </Button>
+          </div>
         </div>
       </MainLayout>
     );
@@ -98,8 +134,9 @@ const SharedProjectDetail = () => {
             <p className="text-muted-foreground">{project?.description}</p>
             
             <div className="mt-4 flex items-center gap-2">
-              <div className="text-sm text-muted-foreground">
-                Shared project view
+              <div className="flex items-center text-sm text-muted-foreground bg-primary/10 px-3 py-1 rounded-full">
+                <UsersIcon className="h-3 w-3 mr-1" />
+                <span>Shared project</span>
               </div>
             </div>
           </div>

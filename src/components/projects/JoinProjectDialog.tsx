@@ -3,9 +3,12 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { UsersIcon } from 'lucide-react';
+import { UsersIcon, Link } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { joinProjectByShareLink, extractShareId } from '@/lib/api';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface JoinProjectDialogProps {
   variant?: 'default' | 'card';
@@ -18,35 +21,39 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [projectShareLink, setProjectShareLink] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const extractShareId = (input: string): string => {
-    // Check if it's a URL and extract the UUID from it
-    let shareId = input.trim();
-    
-    // If it contains a slash, it's likely a URL
-    if (shareId.includes('/')) {
-      const segments = shareId.split('/');
-      // Get the last segment (which should be the UUID)
-      shareId = segments[segments.length - 1];
+  // Set up mutation for joining a project
+  const joinProjectMutation = useMutation({
+    mutationFn: (shareId: string) => joinProjectByShareLink(shareId),
+    onSuccess: (project) => {
+      // Invalidate shared projects query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ['shared-projects'] });
       
-      // Remove any trailing slashes or query params
-      shareId = shareId.split('?')[0].split('#')[0].replace(/\/$/, '');
+      // Show success message
+      toast.success(`Successfully joined project "${project.name}"`);
+      
+      // Close the dialog and navigate to the project
+      setOpen(false);
+      navigate(`/projects/${project.id}`);
+    },
+    onError: (error: Error) => {
+      console.error('Error joining project:', error);
+      toast.error(error.message || 'Failed to join project');
+      setValidationError(error.message || 'Invalid project share link');
     }
-    
-    return shareId;
-  };
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setValidationError(null);
     
     if (!projectShareLink.trim()) {
-      toast.error('Please enter a project share link');
+      setValidationError('Please enter a project share link or ID');
       return;
     }
-    
-    setIsLoading(true);
     
     try {
       // Extract the UUID from URL if it's a full URL
@@ -55,19 +62,16 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
       // Validate that it looks like a UUID
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       if (!uuidRegex.test(shareId)) {
-        throw new Error('Invalid project ID format');
+        setValidationError('Invalid project ID format. Please provide a valid share link or ID.');
+        return;
       }
       
-      // Navigate to the shared project view
-      navigate(`/projects/shared/${shareId}`);
-      setOpen(false);
-      toast.success('Joining project...');
+      // Submit the share ID to join the project
+      joinProjectMutation.mutate(shareId);
       
     } catch (error) {
-      console.error('Error joining project:', error);
-      toast.error('Failed to join project. Please check the project ID and try again.');
-    } finally {
-      setIsLoading(false);
+      console.error('Error validating project link:', error);
+      setValidationError('Failed to process the link. Please check the format and try again.');
     }
   };
 
@@ -79,7 +83,14 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
   );
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(newOpen) => {
+      setOpen(newOpen);
+      if (!newOpen) {
+        // Reset state when dialog closes
+        setProjectShareLink('');
+        setValidationError(null);
+      }
+    }}>
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
@@ -93,23 +104,38 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Input
-              placeholder="Project Share Link or ID"
-              value={projectShareLink}
-              onChange={(e) => setProjectShareLink(e.target.value)}
-              required
-            />
+            <div className="flex items-center space-x-2">
+              <Link className="h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Project Share Link or ID"
+                value={projectShareLink}
+                onChange={(e) => {
+                  setProjectShareLink(e.target.value);
+                  setValidationError(null);
+                }}
+                disabled={joinProjectMutation.isPending}
+                required
+                className="flex-1"
+              />
+            </div>
+            
             <p className="text-xs text-muted-foreground">
               Example: https://yourapp.com/projects/shared/uuid or just paste the UUID directly
             </p>
+            
+            {validationError && (
+              <Alert variant="destructive" className="py-2">
+                <AlertDescription>{validationError}</AlertDescription>
+              </Alert>
+            )}
           </div>
           
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={joinProjectMutation.isPending}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Joining...' : 'Join Project'}
+            <Button type="submit" disabled={joinProjectMutation.isPending}>
+              {joinProjectMutation.isPending ? 'Joining...' : 'Join Project'}
             </Button>
           </DialogFooter>
         </form>
