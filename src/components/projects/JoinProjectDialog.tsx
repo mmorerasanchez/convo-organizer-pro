@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { UsersIcon, Link } from 'lucide-react';
+import { UsersIcon, Link, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -46,7 +46,7 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
     }
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError(null);
     
@@ -56,14 +56,14 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
     }
     
     try {
-      // Check for common invalid inputs
+      // Validate the input before attempting to extract
       const trimmedInput = projectShareLink.trim();
       if (trimmedInput === 'shared' || trimmedInput === 'projects/shared') {
         setValidationError('Please enter a complete project share link or project ID');
         return;
       }
       
-      // Extract the UUID from URL if it's a full URL
+      // Extract the ID from URL if it's a full URL
       const shareId = extractShareId(projectShareLink);
       console.log('Extracted share ID:', shareId);
       
@@ -124,11 +124,12 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
             </div>
             
             <p className="text-xs text-muted-foreground">
-              Example: https://yourapp.com/projects/shared/uuid or just paste the UUID directly
+              Example: https://yourapp.com/projects/shared/abc123 or just paste the project code directly
             </p>
             
             {validationError && (
               <Alert variant="destructive" className="py-2">
+                <AlertCircle className="h-4 w-4 mr-2" />
                 <AlertDescription>{validationError}</AlertDescription>
               </Alert>
             )}

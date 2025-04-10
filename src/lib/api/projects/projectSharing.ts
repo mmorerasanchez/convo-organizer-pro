@@ -88,6 +88,10 @@ export const shareProjectWithUser = async (projectId: string, email: string): Pr
 export const joinProjectByShareLink = async (shareLink: string): Promise<Project> => {
   console.log(`Attempting to join project with share link: ${shareLink}`);
   
+  if (!shareLink || shareLink.trim() === '' || shareLink.trim() === 'shared') {
+    throw new Error('Invalid project share link provided');
+  }
+  
   // Get the current user session
   const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
   
@@ -232,8 +236,19 @@ export const joinProjectByShareLink = async (shareLink: string): Promise<Project
  * Extracts share ID from various URL formats or plain IDs
  */
 export const extractShareId = (input: string): string => {
+  // Early validation to prevent processing invalid inputs
+  if (!input || input.trim() === '') {
+    throw new Error('Share link cannot be empty');
+  }
+  
+  // Reject known invalid inputs early
+  const trimmedInput = input.trim();
+  if (trimmedInput === 'shared' || trimmedInput === 'projects/shared') {
+    throw new Error('Invalid share link format. Please provide the complete share link or project ID');
+  }
+  
   // Check if it's a URL and extract the UUID from it
-  let shareId = input.trim();
+  let shareId = trimmedInput;
   
   try {
     // If it looks like a URL, try to parse it
@@ -248,26 +263,28 @@ export const extractShareId = (input: string): string => {
         const pathSegments = url.pathname.split('/').filter(Boolean);
         console.log('URL path segments:', pathSegments);
         
-        // Filter out non-UUID segments like 'shared', 'projects', etc.
-        // Look for the likely UUID in the path
+        // Find the ID - it should be after 'shared' in the URL
+        let foundSharedIndex = false;
         for (let i = 0; i < pathSegments.length; i++) {
-          const segment = pathSegments[i];
-          // Skip known route segments
-          if (['shared', 'projects', 'project'].includes(segment)) {
-            continue;
+          if (pathSegments[i] === 'shared') {
+            foundSharedIndex = true;
+            // The next segment should be the ID
+            if (i + 1 < pathSegments.length) {
+              shareId = pathSegments[i + 1];
+              console.log('Found ID after "shared":', shareId);
+              break;
+            }
           }
-          
-          // If the segment looks like a UUID (basic check), use it
-          if (isValidUuid(segment)) {
-            shareId = segment;
-            console.log('Found UUID in path:', shareId);
-            break;
-          }
-          
-          // If it's the last segment and we haven't found a UUID yet, use it
-          if (i === pathSegments.length - 1) {
-            shareId = segment;
-            console.log('Using last path segment as ID:', shareId);
+        }
+        
+        // If we didn't find 'shared' in the path, look for UUID pattern
+        if (!foundSharedIndex) {
+          for (const segment of pathSegments) {
+            if (isValidUuid(segment)) {
+              shareId = segment;
+              console.log('Found UUID in path:', shareId);
+              break;
+            }
           }
         }
       } catch (parseError) {
@@ -282,8 +299,18 @@ export const extractShareId = (input: string): string => {
         } else {
           // Just get the last path segment
           const segments = shareId.split('/').filter(Boolean);
-          shareId = segments[segments.length - 1];
-          console.log('Using last segment after split:', shareId);
+          if (segments.length > 0) {
+            const lastSegment = segments[segments.length - 1];
+            // Verify it's not 'shared'
+            if (lastSegment !== 'shared') {
+              shareId = lastSegment;
+              console.log('Using last segment after split:', shareId);
+            } else if (segments.length > 1) {
+              // If the last segment is 'shared', try the one before
+              shareId = segments[segments.length - 2];
+              console.log('Using segment before "shared":', shareId);
+            }
+          }
         }
       }
     }
@@ -293,9 +320,9 @@ export const extractShareId = (input: string): string => {
     
     console.log(`Final extracted share ID: ${shareId}`);
     
-    // If the shareId is "shared", this is likely an error
-    if (shareId === 'shared') {
-      throw new Error('Invalid share link format. Expected a UUID, got "shared"');
+    // Validate the extracted ID
+    if (!shareId || shareId === 'shared' || shareId === 'projects') {
+      throw new Error('Invalid share link format. Please provide a complete share link or project ID');
     }
     
     return shareId;
@@ -312,3 +339,45 @@ function isValidUuid(str: string): boolean {
   const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidPattern.test(str);
 }
+
+/**
+ * Create a short code for sharing projects
+ * This is an alternative to UUID-based sharing
+ */
+export const generateShortShareCode = async (projectId: string): Promise<string> => {
+  // Get the current user session
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  
+  if (sessionError) throw sessionError;
+  if (!sessionData.session || !sessionData.session.user) {
+    throw new Error('User not authenticated');
+  }
+  
+  // First check if the user owns this project
+  const { data: projectData, error: projectError } = await supabase
+    .from('projects')
+    .select('id')
+    .eq('id', projectId)
+    .eq('user_id', sessionData.session.user.id)
+    .single();
+    
+  if (projectError) throw projectError;
+  if (!projectData) throw new Error('Project not found or not owned by you');
+  
+  // Generate a random 8-character alphanumeric code
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let shareCode = '';
+  for (let i = 0; i < 8; i++) {
+    shareCode += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  
+  // Save the share code in the projects table
+  const { error: updateError } = await supabase
+    .from('projects')
+    .update({ share_link: shareCode })
+    .eq('id', projectId);
+    
+  if (updateError) throw updateError;
+  
+  return shareCode;
+};
