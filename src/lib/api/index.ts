@@ -4,3 +4,4 @@ export * from './projects';
 export * from './conversations';
 export * from './tags';
 export * from './tools';
+export * from './knowledge';

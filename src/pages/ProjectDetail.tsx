@@ -1,27 +1,37 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import ConversationCard from '@/components/conversations/ConversationCard';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MessageCircle, Plus } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Plus, Book } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import NewConversationDialog from '@/components/conversations/NewConversationDialog';
 import EditProjectDialog from '@/components/projects/EditProjectDialog';
 import DeleteDialog from '@/components/common/DeleteDialog';
 import { useQuery } from '@tanstack/react-query';
-import { fetchProjectById, fetchConversationsByProjectId, deleteProject } from '@/lib/api';
+import { 
+  fetchProjectById, 
+  fetchConversationsByProjectId, 
+  deleteProject,
+  fetchKnowledgeByProjectId 
+} from '@/lib/api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import ProjectShareDialog from '@/components/projects/ProjectShareDialog';
+import KnowledgeList from '@/components/knowledge/KnowledgeList';
+import KnowledgeEmptyState from '@/components/knowledge/KnowledgeEmptyState';
+import NewKnowledgeDialog from '@/components/knowledge/NewKnowledgeDialog';
 
 const ProjectDetail = () => {
   useRequireAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState("conversations");
   
   const { 
     data: project, 
@@ -43,6 +53,16 @@ const ProjectDetail = () => {
     enabled: !!id
   });
   
+  const {
+    data: knowledgeItems = [],
+    isLoading: isLoadingKnowledge,
+    error: knowledgeError
+  } = useQuery({
+    queryKey: ['knowledge', 'project', id],
+    queryFn: () => fetchKnowledgeByProjectId(id || ''),
+    enabled: !!id && activeTab === "knowledge"
+  });
+  
   const deleteProjectMutation = useMutation({
     mutationFn: () => deleteProject(id || ''),
     onSuccess: () => {
@@ -55,10 +75,10 @@ const ProjectDetail = () => {
     }
   });
   
-  const isLoading = isLoadingProject || isLoadingConversations;
-  const error = projectError || conversationsError;
+  const isLoading = isLoadingProject || (isLoadingConversations && activeTab === "conversations") || (isLoadingKnowledge && activeTab === "knowledge");
+  const error = projectError || (activeTab === "conversations" && conversationsError) || (activeTab === "knowledge" && knowledgeError);
   
-  if (isLoading) {
+  if (isLoadingProject) {
     return (
       <MainLayout>
         <div className="space-y-6">
@@ -136,32 +156,77 @@ const ProjectDetail = () => {
         
         <p className="text-muted-foreground">{project.description}</p>
         
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Conversations</h2>
-          <NewConversationDialog projectId={project.id} />
-        </div>
-        
-        {conversations.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {conversations.map((conversation) => (
-              <ConversationCard key={conversation.id} conversation={conversation} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16 empty-state rounded-lg">
-            <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">No conversations yet</h3>
-            <p className="text-muted-foreground mb-4">
-              Start adding conversations to this project
-            </p>
-            <NewConversationDialog projectId={project.id} trigger={
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Conversation
-              </Button>
-            } />
-          </div>
-        )}
+        <Tabs 
+          defaultValue="conversations"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
+          <TabsList className="mb-4">
+            <TabsTrigger value="conversations" className="flex items-center gap-1">
+              <MessageCircle className="h-4 w-4" />
+              <span>Conversations</span>
+            </TabsTrigger>
+            <TabsTrigger value="knowledge" className="flex items-center gap-1">
+              <Book className="h-4 w-4" />
+              <span>Knowledge</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="conversations" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Conversations</h2>
+              <NewConversationDialog projectId={project.id} />
+            </div>
+            
+            {isLoadingConversations ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="h-40 w-full" />
+                ))}
+              </div>
+            ) : conversations.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {conversations.map((conversation) => (
+                  <ConversationCard key={conversation.id} conversation={conversation} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16 empty-state rounded-lg">
+                <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium mb-2">No conversations yet</h3>
+                <p className="text-muted-foreground mb-4">
+                  Start adding conversations to this project
+                </p>
+                <NewConversationDialog projectId={project.id} trigger={
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Conversation
+                  </Button>
+                } />
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="knowledge" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Knowledge & Documentation</h2>
+              <NewKnowledgeDialog projectId={project.id} />
+            </div>
+            
+            {isLoadingKnowledge ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="h-40 w-full" />
+                ))}
+              </div>
+            ) : knowledgeItems.length > 0 ? (
+              <KnowledgeList knowledgeItems={knowledgeItems} />
+            ) : (
+              <KnowledgeEmptyState projectId={project.id} />
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </MainLayout>
   );

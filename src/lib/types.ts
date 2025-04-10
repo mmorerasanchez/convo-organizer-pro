@@ -27,6 +27,19 @@ export interface Project {
   shareLink?: string;
 }
 
+export interface Knowledge {
+  id: string;
+  title: string;
+  description: string | null;
+  filePath: string;
+  fileType: string;
+  fileSize: number;
+  fileName: string;
+  createdAt: string;
+  updatedAt: string;
+  projectId: string;
+}
+
 export interface AITool {
   id: string;
   name: string;
