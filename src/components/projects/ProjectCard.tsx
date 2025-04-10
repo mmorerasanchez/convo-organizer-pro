@@ -27,7 +27,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, isShared = false }) 
               {displayName}
             </span>
             {isShared && (
-              <Users size={18} className="text-primary" title="Shared Project" />
+              <Users size={18} className="text-primary" aria-label="Shared Project" />
             )}
           </div>
           <p className="text-sm text-muted-foreground line-clamp-2 h-10">

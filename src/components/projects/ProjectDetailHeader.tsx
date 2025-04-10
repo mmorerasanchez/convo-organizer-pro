@@ -43,12 +43,14 @@ const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project, isSh
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" as={Link} to="/projects">
-            <ArrowLeft className="h-4 w-4" />
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/projects">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
           </Button>
           <div className="flex items-center gap-2">
             <h1 className="text-3xl font-bold">{project.name}</h1>
-            {isShared && <Users className="h-5 w-5 text-primary" title="Shared Project" />}
+            {isShared && <Users className="h-5 w-5 text-primary" aria-label="Shared Project" />}
           </div>
         </div>
         
@@ -84,19 +86,16 @@ const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project, isSh
       {showEditDialog && (
         <EditProjectDialog 
           project={project} 
-          open={showEditDialog}
-          onOpenChange={setShowEditDialog}
+          trigger={undefined}
         />
       )}
       
       {showDeleteDialog && (
         <DeleteDialog
-          title="Delete Project"
-          description="Are you sure you want to delete this project? This action cannot be undone and all project data, including conversations and knowledge, will be permanently deleted."
-          open={showDeleteDialog}
-          onOpenChange={setShowDeleteDialog}
-          onConfirm={handleDelete}
-          isLoading={deleteMutation.isPending}
+          itemType="project"
+          itemName={project.name}
+          onDelete={handleDelete}
+          trigger={undefined}
         />
       )}
     </div>

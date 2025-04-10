@@ -22,7 +22,7 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
 }) => {
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   
   const queryClient = useQueryClient();
   
