@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MessageCircle, Book, Link as LinkIcon, AlertCircle } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Book, Link as LinkIcon, AlertCircle, Users } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { fetchConversationsByProjectId, fetchProjectById, fetchKnowledgeByProjectId } from '@/lib/api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
@@ -135,7 +135,7 @@ const SharedProjectDetail = () => {
             
             <div className="mt-4 flex items-center gap-2">
               <div className="flex items-center text-sm text-muted-foreground bg-primary/10 px-3 py-1 rounded-full">
-                <UsersIcon className="h-3 w-3 mr-1" />
+                <Users className="h-3 w-3 mr-1" />
                 <span>Shared project</span>
               </div>
             </div>
