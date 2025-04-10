@@ -12,6 +12,7 @@ interface DeleteDialogProps {
   trigger?: React.ReactNode;
   redirectPath?: string;
   onDelete?: () => void;
+  isDeleting?: boolean; // Make isDeleting optional
 }
 
 const DeleteDialog: React.FC<DeleteDialogProps> = ({
@@ -19,24 +20,34 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({
   itemName,
   trigger,
   redirectPath,
-  onDelete
+  onDelete,
+  isDeleting: externalIsDeleting // Accept the prop from outside
 }) => {
   const [open, setOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [internalIsDeleting, setInternalIsDeleting] = useState(false);
   const navigate = useNavigate();
   
+  // Use external isDeleting state if provided, otherwise use internal state
+  const isDeleting = externalIsDeleting !== undefined ? externalIsDeleting : internalIsDeleting;
+  
   const handleDelete = () => {
-    setIsDeleting(true);
+    if (externalIsDeleting === undefined) {
+      setInternalIsDeleting(true);
+    }
     
     if (onDelete) {
       onDelete();
-      setIsDeleting(false);
+      if (externalIsDeleting === undefined) {
+        setInternalIsDeleting(false);
+      }
       setOpen(false);
     } else {
       // For the prototype we're just simulating a successful deletion
       setTimeout(() => {
         toast.success(`${itemType.charAt(0).toUpperCase() + itemType.slice(1)} deleted successfully`);
-        setIsDeleting(false);
+        if (externalIsDeleting === undefined) {
+          setInternalIsDeleting(false);
+        }
         setOpen(false);
         
         if (redirectPath) {
