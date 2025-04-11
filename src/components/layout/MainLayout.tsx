@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Home, Lightbulb, Menu, UserCircle, LogOut, Wrench, Sparkles } from 'lucide-react';
+import { Home, Lightbulb, Menu, UserCircle, LogOut, Wrench, Sparkles, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
