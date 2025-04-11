@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Home, BookOpen, Lightbulb, Menu, UserCircle, LogOut, Wrench, Sparkles } from 'lucide-react';
+import { Home, Lightbulb, Menu, UserCircle, LogOut, Wrench, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -75,7 +75,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <SheetContent side="left" className="w-60 sm:max-w-xs pr-0">
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5" />
                   <Link
                     to="/"
                     className="text-xl font-mono font-bold tracking-tight"
@@ -83,10 +82,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   >
                     promptito
                   </Link>
-                  <Badge variant="outline" className="ml-1 bg-gray-100 text-gray-600 border-gray-300 text-xs px-1.5 py-0.5 h-5 rounded-md font-medium">
-                    <Sparkles className="h-3 w-3 mr-1" />
-                    BETA
-                  </Badge>
+                  <div>
+                    <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-2 py-1 rounded-md font-medium flex flex-col items-center">
+                      <div className="flex items-center">
+                        <Sparkles className="h-3 w-3 mr-1" />
+                        BETA
+                      </div>
+                      <span className="text-[10px] mt-0.5">made with AI</span>
+                    </Badge>
+                  </div>
                 </div>
                 <nav className="flex flex-col gap-1">
                   {renderNavLinks()}
@@ -98,12 +102,16 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             to="/"
             className="flex items-center gap-2 font-mono text-lg font-semibold md:text-xl"
           >
-            <BookOpen className="h-5 w-5" />
-            <span className="hidden md:inline-block">promptito</span>
-            <Badge variant="outline" className="ml-1 bg-gray-100 text-gray-600 border-gray-300 text-xs px-1.5 py-0.5 h-5 rounded-md font-medium">
-              <Sparkles className="h-3 w-3 mr-1" />
-              BETA
-            </Badge>
+            <span>promptito</span>
+            <div>
+              <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-2 py-1 rounded-md font-medium flex flex-col items-center">
+                <div className="flex items-center">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  BETA
+                </div>
+                <span className="text-[10px] mt-0.5">made with AI</span>
+              </Badge>
+            </div>
           </Link>
           <div className="ml-auto flex gap-2 items-center">
             {user ? (
