@@ -4,6 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 export const getKnowledgeFileUrl = async (filePath: string): Promise<string> => {
   try {
     console.log('Getting signed URL for file:', filePath);
+    
+    // Check authentication
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      console.error('Authentication required to access files');
+      throw new Error('Authentication required to access files');
+    }
+    
     const { data, error } = await supabase.storage
       .from('knowledge')
       .createSignedUrl(filePath, 3600); // URL valid for 1 hour
@@ -13,6 +21,7 @@ export const getKnowledgeFileUrl = async (filePath: string): Promise<string> => 
       throw new Error(`Error generating file URL: ${error.message}`);
     }
 
+    console.log('Generated signed URL successfully');
     return data.signedUrl;
   } catch (error) {
     console.error('Get file URL error:', error);
@@ -23,6 +32,14 @@ export const getKnowledgeFileUrl = async (filePath: string): Promise<string> => 
 export const downloadKnowledgeFile = async (filePath: string, fileName: string): Promise<void> => {
   try {
     console.log('Downloading file:', filePath);
+    
+    // Check authentication
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      console.error('Authentication required to download files');
+      throw new Error('Authentication required to download files');
+    }
+    
     const { data, error } = await supabase.storage
       .from('knowledge')
       .download(filePath);

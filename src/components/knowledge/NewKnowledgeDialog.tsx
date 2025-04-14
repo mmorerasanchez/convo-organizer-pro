@@ -45,9 +45,15 @@ const NewKnowledgeDialog: React.FC<NewKnowledgeDialogProps> = ({ projectId, trig
   });
 
   const addKnowledgeMutation = useMutation({
-    mutationFn: (values: FormValues) => 
-      addKnowledge(projectId, values.title, values.description || null, values.file),
+    mutationFn: (values: FormValues) => {
+      console.log('Starting upload mutation with values:', values);
+      if (!user) {
+        throw new Error('Authentication required');
+      }
+      return addKnowledge(projectId, values.title, values.description || null, values.file);
+    },
     onSuccess: () => {
+      console.log('Upload completed successfully');
       queryClient.invalidateQueries({ queryKey: ['knowledge', 'project', projectId] });
       toast.success('Knowledge added successfully');
       setOpen(false);
@@ -66,12 +72,14 @@ const NewKnowledgeDialog: React.FC<NewKnowledgeDialogProps> = ({ projectId, trig
       return;
     }
     
+    console.log('Submitting form with values:', values);
     addKnowledgeMutation.mutate(values);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      console.log('File selected:', file.name, file.size, file.type);
       setSelectedFile(file);
       form.setValue('file', file);
     }
@@ -163,6 +171,9 @@ const NewKnowledgeDialog: React.FC<NewKnowledgeDialogProps> = ({ projectId, trig
                   <FormDescription>
                     Upload any file relevant to your project.
                   </FormDescription>
+                  {form.formState.errors.file && (
+                    <p className="text-sm text-red-500 mt-1">{form.formState.errors.file.message}</p>
+                  )}
                 </FormItem>
               )}
             />

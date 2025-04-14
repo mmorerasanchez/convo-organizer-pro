@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Knowledge } from "@/lib/types";
 import { mapKnowledgeData } from "./utils";
@@ -9,6 +10,14 @@ export const addKnowledge = async (
   file: File
 ): Promise<Knowledge> => {
   try {
+    // Check authentication first
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      throw new Error('Authentication required to upload files');
+    }
+
+    console.log('Starting knowledge creation process', { projectId, title, fileSize: file.size });
+
     // 1. Upload file to storage
     const filePath = `${projectId}/${crypto.randomUUID()}-${file.name}`;
     
@@ -49,6 +58,7 @@ export const addKnowledge = async (
       throw new Error(`Error creating knowledge entry: ${error.message}`);
     }
 
+    console.log('Knowledge entry created successfully:', data);
     return mapKnowledgeData(data);
   } catch (error) {
     console.error('Knowledge creation error:', error);
@@ -61,53 +71,73 @@ export const updateKnowledge = async (
   title: string,
   description: string | null
 ): Promise<Knowledge> => {
-  const { data, error } = await supabase
-    .from('knowledge')
-    .update({
-      title,
-      description,
-      updated_at: new Date().toISOString()
-    })
-    .eq('id', id)
-    .select()
-    .single();
+  try {
+    console.log('Updating knowledge entry:', { id, title });
+    const { data, error } = await supabase
+      .from('knowledge')
+      .update({
+        title,
+        description,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
 
-  if (error) {
-    throw new Error(`Error updating knowledge: ${error.message}`);
+    if (error) {
+      console.error('Knowledge update error:', error);
+      throw new Error(`Error updating knowledge: ${error.message}`);
+    }
+
+    console.log('Knowledge entry updated successfully:', data);
+    return mapKnowledgeData(data);
+  } catch (error) {
+    console.error('Knowledge update error:', error);
+    throw error;
   }
-
-  return mapKnowledgeData(data);
 };
 
 export const deleteKnowledge = async (id: string): Promise<void> => {
-  // First get the file path
-  const { data: knowledgeData, error: fetchError } = await supabase
-    .from('knowledge')
-    .select('file_path')
-    .eq('id', id)
-    .single();
+  try {
+    // First get the file path
+    console.log('Fetching knowledge entry for deletion:', id);
+    const { data: knowledgeData, error: fetchError } = await supabase
+      .from('knowledge')
+      .select('file_path')
+      .eq('id', id)
+      .single();
 
-  if (fetchError) {
-    throw new Error(`Error fetching knowledge file path: ${fetchError.message}`);
-  }
+    if (fetchError) {
+      console.error('Error fetching knowledge file path:', fetchError);
+      throw new Error(`Error fetching knowledge file path: ${fetchError.message}`);
+    }
 
-  // Delete the database entry
-  const { error: deleteError } = await supabase
-    .from('knowledge')
-    .delete()
-    .eq('id', id);
+    // Delete the database entry
+    console.log('Deleting knowledge entry from database:', id);
+    const { error: deleteError } = await supabase
+      .from('knowledge')
+      .delete()
+      .eq('id', id);
 
-  if (deleteError) {
-    throw new Error(`Error deleting knowledge entry: ${deleteError.message}`);
-  }
+    if (deleteError) {
+      console.error('Error deleting knowledge entry:', deleteError);
+      throw new Error(`Error deleting knowledge entry: ${deleteError.message}`);
+    }
 
-  // Delete the file from storage
-  const { error: storageError } = await supabase.storage
-    .from('knowledge')
-    .remove([knowledgeData.file_path]);
+    // Delete the file from storage
+    console.log('Deleting file from storage:', knowledgeData.file_path);
+    const { error: storageError } = await supabase.storage
+      .from('knowledge')
+      .remove([knowledgeData.file_path]);
 
-  if (storageError) {
-    console.error(`Error deleting knowledge file: ${storageError.message}`);
-    // We don't throw here since the database record is already deleted
+    if (storageError) {
+      console.error(`Error deleting knowledge file: ${storageError.message}`);
+      // We don't throw here since the database record is already deleted
+    }
+    
+    console.log('Knowledge entry and file deleted successfully');
+  } catch (error) {
+    console.error('Knowledge deletion error:', error);
+    throw error;
   }
 };
