@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Knowledge } from "@/lib/types";
 import { mapKnowledgeData } from "./utils";
@@ -9,39 +8,52 @@ export const addKnowledge = async (
   description: string | null,
   file: File
 ): Promise<Knowledge> => {
-  // 1. Upload file to storage
-  const filePath = `${projectId}/${crypto.randomUUID()}-${file.name}`;
-  
-  const { error: uploadError } = await supabase.storage
-    .from('knowledge')
-    .upload(filePath, file);
+  try {
+    // 1. Upload file to storage
+    const filePath = `${projectId}/${crypto.randomUUID()}-${file.name}`;
+    
+    console.log('Uploading file to storage path:', filePath);
+    const { error: uploadError, data: uploadData } = await supabase.storage
+      .from('knowledge')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
 
-  if (uploadError) {
-    throw new Error(`Error uploading file: ${uploadError.message}`);
+    if (uploadError) {
+      console.error('File upload error:', uploadError);
+      throw new Error(`Error uploading file: ${uploadError.message}`);
+    }
+
+    console.log('File uploaded successfully:', uploadData);
+
+    // 2. Create knowledge entry in the database
+    const { data, error } = await supabase
+      .from('knowledge')
+      .insert({
+        title,
+        description,
+        file_path: filePath,
+        file_type: file.type,
+        file_size: file.size,
+        file_name: file.name,
+        project_id: projectId
+      })
+      .select()
+      .single();
+
+    if (error) {
+      // Attempt to clean up the uploaded file if database insertion fails
+      console.error('Database insertion error:', error);
+      await supabase.storage.from('knowledge').remove([filePath]);
+      throw new Error(`Error creating knowledge entry: ${error.message}`);
+    }
+
+    return mapKnowledgeData(data);
+  } catch (error) {
+    console.error('Knowledge creation error:', error);
+    throw error;
   }
-
-  // 2. Create knowledge entry in the database
-  const { data, error } = await supabase
-    .from('knowledge')
-    .insert({
-      title,
-      description,
-      file_path: filePath,
-      file_type: file.type,
-      file_size: file.size,
-      file_name: file.name,
-      project_id: projectId
-    })
-    .select()
-    .single();
-
-  if (error) {
-    // Attempt to clean up the uploaded file if database insertion fails
-    await supabase.storage.from('knowledge').remove([filePath]);
-    throw new Error(`Error creating knowledge entry: ${error.message}`);
-  }
-
-  return mapKnowledgeData(data);
 };
 
 export const updateKnowledge = async (

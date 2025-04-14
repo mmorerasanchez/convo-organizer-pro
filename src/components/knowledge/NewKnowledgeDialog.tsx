@@ -12,6 +12,7 @@ import { FileUp, Plus } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { addKnowledge } from '@/lib/api';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -33,6 +34,7 @@ const NewKnowledgeDialog: React.FC<NewKnowledgeDialogProps> = ({ projectId, trig
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -53,11 +55,17 @@ const NewKnowledgeDialog: React.FC<NewKnowledgeDialogProps> = ({ projectId, trig
       setSelectedFile(null);
     },
     onError: (error: Error) => {
+      console.error('Upload error:', error);
       toast.error(`Error adding knowledge: ${error.message}`);
     }
   });
 
   const onSubmit = (values: FormValues) => {
+    if (!user) {
+      toast.error('You must be logged in to upload files');
+      return;
+    }
+    
     addKnowledgeMutation.mutate(values);
   };
 
