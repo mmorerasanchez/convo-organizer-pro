@@ -20,12 +20,9 @@ const Auth = () => {
         <div className="flex items-center justify-center mb-2">
           <h1 className="text-3xl font-mono font-bold tracking-tight text-gray-800">promptito</h1>
           <div className="ml-2">
-            <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-2 py-1 rounded-md font-medium flex flex-col items-center">
-              <div className="flex items-center">
-                <Sparkles className="h-3 w-3 mr-1" />
-                BETA
-              </div>
-              <span className="text-[10px] mt-0.5">made with AI</span>
+            <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-2 py-1 rounded-md font-medium flex items-center">
+              <Sparkles className="h-3 w-3 mr-1" />
+              BETA made with AI
             </Badge>
           </div>
         </div>
