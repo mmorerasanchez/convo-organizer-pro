@@ -3,6 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const getKnowledgeFileUrl = async (filePath: string): Promise<string> => {
   try {
+    // Validate input
+    if (!filePath || typeof filePath !== 'string') {
+      throw new Error('Invalid file path provided');
+    }
+    
     console.log('Getting signed URL for file:', filePath);
     
     // Check authentication
@@ -31,6 +36,15 @@ export const getKnowledgeFileUrl = async (filePath: string): Promise<string> => 
 
 export const downloadKnowledgeFile = async (filePath: string, fileName: string): Promise<void> => {
   try {
+    // Validate inputs
+    if (!filePath || typeof filePath !== 'string') {
+      throw new Error('Invalid file path provided');
+    }
+    
+    if (!fileName || typeof fileName !== 'string') {
+      throw new Error('Invalid file name provided');
+    }
+    
     console.log('Downloading file:', filePath);
     
     // Check authentication
@@ -49,11 +63,12 @@ export const downloadKnowledgeFile = async (filePath: string, fileName: string):
       throw new Error(`Error downloading file: ${error.message}`);
     }
 
-    // Create a download link
+    // Create a download link with sanitized filename
     const url = URL.createObjectURL(data);
+    const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-_]/g, '_');
     const link = document.createElement('a');
     link.href = url;
-    link.download = fileName;
+    link.download = sanitizedFileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

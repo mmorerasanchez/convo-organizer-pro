@@ -9,25 +9,53 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { InfoIcon } from 'lucide-react';
+import { InfoIcon, AlertCircle } from 'lucide-react';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+
+// Validation schema for authentication forms
+const authSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number")
+});
 
 const AuthForm = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   // Get the current origin for redirection
   const origin = window.location.origin;
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  // Setup form for sign in
+  const signInForm = useForm<z.infer<typeof authSchema>>({
+    resolver: zodResolver(authSchema),
+    defaultValues: {
+      email: "",
+      password: ""
+    }
+  });
+
+  // Setup form for sign up
+  const signUpForm = useForm<z.infer<typeof authSchema>>({
+    resolver: zodResolver(authSchema),
+    defaultValues: {
+      email: "",
+      password: ""
+    }
+  });
+
+  const handleSignUp = async (values: z.infer<typeof authSchema>) => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const { error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: values.email,
+        password: values.password,
         options: {
           emailRedirectTo: origin,
         }
@@ -36,21 +64,21 @@ const AuthForm = () => {
       if (error) throw error;
       
       toast.success("Sign up successful! Please check your email for verification.");
+      signUpForm.reset();
     } catch (error: any) {
       toast.error(error.message || "An error occurred during sign up");
+      console.error("Sign up error:", error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSignIn = async (values: z.infer<typeof authSchema>) => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: values.email,
+        password: values.password,
       });
       
       if (error) throw error;
@@ -59,8 +87,9 @@ const AuthForm = () => {
       navigate('/');
     } catch (error: any) {
       toast.error(error.message || "An error occurred during sign in");
+      console.error("Sign in error:", error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -75,99 +104,138 @@ const AuthForm = () => {
         </CardHeader>
         
         <TabsContent value="signin">
-          <form onSubmit={handleSignIn}>
-            <CardContent className="space-y-4">
-              <CardDescription>
-                Enter your credentials to sign in to your account
-              </CardDescription>
-              
-              <div className="space-y-2">
-                <Label htmlFor="signin-email">Email</Label>
-                <Input 
-                  id="signin-email"
-                  type="email" 
-                  placeholder="your.email@example.com" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required 
+          <Form {...signInForm}>
+            <form onSubmit={signInForm.handleSubmit(handleSignIn)}>
+              <CardContent className="space-y-4">
+                <CardDescription>
+                  Enter your credentials to sign in to your account
+                </CardDescription>
+                
+                <FormField
+                  control={signInForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="email" 
+                          placeholder="your.email@example.com" 
+                          autoComplete="username"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="signin-password">Password</Label>
-                <Input 
-                  id="signin-password"
-                  type="password" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required 
+                
+                <FormField
+                  control={signInForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="password"
+                          autoComplete="current-password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-            </CardContent>
-            
-            <CardFooter>
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={loading}
-              >
-                {loading ? "Signing in..." : "Sign In"}
-              </Button>
-            </CardFooter>
-          </form>
+              </CardContent>
+              
+              <CardFooter>
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Signing in..." : "Sign In"}
+                </Button>
+              </CardFooter>
+            </form>
+          </Form>
         </TabsContent>
         
         <TabsContent value="signup">
-          <form onSubmit={handleSignUp}>
-            <CardContent className="space-y-4">
-              <CardDescription>
-                Create a new account to get started
-              </CardDescription>
-              
-              <Alert className="bg-blue-50 text-blue-800 border-blue-200 mb-4">
-                <InfoIcon className="h-4 w-4 mr-2" />
-                <AlertDescription>
-                  After signing up, you'll need to confirm your email before signing in.
-                </AlertDescription>
-              </Alert>
-              
-              <div className="space-y-2">
-                <Label htmlFor="signup-email">Email</Label>
-                <Input 
-                  id="signup-email"
-                  type="email" 
-                  placeholder="your.email@example.com" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required 
+          <Form {...signUpForm}>
+            <form onSubmit={signUpForm.handleSubmit(handleSignUp)}>
+              <CardContent className="space-y-4">
+                <CardDescription>
+                  Create a new account to get started
+                </CardDescription>
+                
+                <Alert className="bg-blue-50 text-blue-800 border-blue-200 mb-4">
+                  <InfoIcon className="h-4 w-4 mr-2" />
+                  <AlertDescription>
+                    After signing up, you'll need to confirm your email before signing in.
+                  </AlertDescription>
+                </Alert>
+                
+                <FormField
+                  control={signUpForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="email" 
+                          placeholder="your.email@example.com" 
+                          autoComplete="email"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="signup-password">Password</Label>
-                <Input 
-                  id="signup-password"
-                  type="password" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required 
+                
+                <FormField
+                  control={signUpForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="password"
+                          autoComplete="new-password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Password must be at least 6 characters
-                </p>
-              </div>
-            </CardContent>
-            
-            <CardFooter>
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={loading}
-              >
-                {loading ? "Creating account..." : "Sign Up"}
-              </Button>
-            </CardFooter>
-          </form>
+                
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p>Password requirements:</p>
+                  <ul className="list-disc pl-4">
+                    <li>At least 8 characters</li>
+                    <li>At least one uppercase letter</li>
+                    <li>At least one lowercase letter</li>
+                    <li>At least one number</li>
+                  </ul>
+                </div>
+              </CardContent>
+              
+              <CardFooter>
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Creating account..." : "Sign Up"}
+                </Button>
+              </CardFooter>
+            </form>
+          </Form>
         </TabsContent>
       </Tabs>
     </Card>

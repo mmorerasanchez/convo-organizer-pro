@@ -2,6 +2,24 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Knowledge } from "@/lib/types";
 import { mapKnowledgeData } from "./utils";
+import { toast } from "sonner";
+
+// Maximum file size: 10MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+// Allowed file types
+const ALLOWED_FILE_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'text/plain',
+  'text/csv',
+  'application/json',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'image/jpeg',
+  'image/png',
+  'image/gif'
+];
 
 export const addKnowledge = async (
   projectId: string,
@@ -16,10 +34,28 @@ export const addKnowledge = async (
       throw new Error('Authentication required to upload files');
     }
 
-    console.log('Starting knowledge creation process', { projectId, title, fileSize: file.size });
+    // Input validation
+    if (!title.trim()) {
+      throw new Error('Title is required');
+    }
+    
+    if (!projectId.trim()) {
+      throw new Error('Project ID is required');
+    }
+
+    // File validation
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error(`File size exceeds the maximum allowed size (${MAX_FILE_SIZE / (1024 * 1024)}MB)`);
+    }
+
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      throw new Error(`File type '${file.type}' is not supported. Please upload an allowed file type.`);
+    }
+
+    console.log('Starting knowledge creation process', { projectId, title, fileSize: file.size, fileType: file.type });
 
     // 1. Upload file to storage
-    const filePath = `${projectId}/${crypto.randomUUID()}-${file.name}`;
+    const filePath = `${projectId}/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9.-_]/g, '_')}`;
     
     console.log('Uploading file to storage path:', filePath);
     const { error: uploadError, data: uploadData } = await supabase.storage
@@ -36,16 +72,16 @@ export const addKnowledge = async (
 
     console.log('File uploaded successfully:', uploadData);
 
-    // 2. Create knowledge entry in the database
+    // 2. Create knowledge entry in the database - sanitize inputs
     const { data, error } = await supabase
       .from('knowledge')
       .insert({
-        title,
-        description,
+        title: title.trim(),
+        description: description ? description.trim() : null,
         file_path: filePath,
         file_type: file.type,
         file_size: file.size,
-        file_name: file.name,
+        file_name: file.name.replace(/[^a-zA-Z0-9.-_]/g, '_'),
         project_id: projectId
       })
       .select()
@@ -72,12 +108,27 @@ export const updateKnowledge = async (
   description: string | null
 ): Promise<Knowledge> => {
   try {
+    // Check authentication first
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      throw new Error('Authentication required to update knowledge entries');
+    }
+
+    // Input validation
+    if (!title.trim()) {
+      throw new Error('Title is required');
+    }
+    
+    if (!id.trim()) {
+      throw new Error('Knowledge ID is required');
+    }
+    
     console.log('Updating knowledge entry:', { id, title });
     const { data, error } = await supabase
       .from('knowledge')
       .update({
-        title,
-        description,
+        title: title.trim(),
+        description: description ? description.trim() : null,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
@@ -99,6 +150,16 @@ export const updateKnowledge = async (
 
 export const deleteKnowledge = async (id: string): Promise<void> => {
   try {
+    // Check authentication first
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      throw new Error('Authentication required to delete knowledge entries');
+    }
+
+    if (!id.trim()) {
+      throw new Error('Knowledge ID is required');
+    }
+    
     // First get the file path
     console.log('Fetching knowledge entry for deletion:', id);
     const { data: knowledgeData, error: fetchError } = await supabase
