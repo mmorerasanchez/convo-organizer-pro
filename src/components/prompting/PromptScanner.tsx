@@ -100,7 +100,12 @@ const PromptScanner = () => {
       {apiError && (
         <Alert variant="destructive">
           <AlertDescription>
-            Error: {apiError}. Please make sure you have an active internet connection and try again.
+            {apiError.includes("quota") 
+              ? "OpenAI API quota exceeded. The service is temporarily unavailable. Please try again later."
+              : apiError.includes("internet") || apiError.includes("connection") 
+                ? "Error: Please make sure you have an active internet connection and try again."
+                : `Error: ${apiError}. Please try again later.`
+            }
           </AlertDescription>
         </Alert>
       )}

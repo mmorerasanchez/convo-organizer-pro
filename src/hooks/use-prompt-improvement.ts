@@ -33,26 +33,62 @@ export function usePromptImprovement() {
         throw new Error(error.message || 'Failed to improve prompt');
       }
       
-      if (!data || !data.improvedPrompt) {
+      if (!data) {
+        throw new Error('No response data returned');
+      }
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      if (!data.improvedPrompt) {
         throw new Error('No improvement data returned');
       }
       
-      toast({
-        title: userFeedback ? "Prompt Refined" : "Prompt Enhanced",
-        description: userFeedback 
-          ? "Your prompt has been refined based on your feedback."
-          : "Your prompt has been enhanced using best practices.",
-      });
+      // Show warning if it's a fallback response
+      if (data.warning) {
+        toast({
+          title: "Limited Improvement",
+          description: data.warning,
+          variant: "default"
+        });
+      } else {
+        toast({
+          title: userFeedback ? "Prompt Refined" : "Prompt Enhanced",
+          description: userFeedback 
+            ? "Your prompt has been refined based on your feedback."
+            : "Your prompt has been enhanced using best practices.",
+        });
+      }
 
       return data.improvedPrompt;
     } catch (error) {
       console.error('Error improving prompt:', error);
-      setApiError(error instanceof Error ? error.message : 'An unexpected error occurred');
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to improve your prompt. Please try again.",
-      });
+      
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      setApiError(errorMessage);
+      
+      // Different toast messages for different error types
+      if (errorMessage.includes("quota")) {
+        toast({
+          variant: "destructive",
+          title: "API Quota Exceeded",
+          description: "OpenAI API quota exceeded. The service is temporarily unavailable. Please try again later.",
+        });
+      } else if (errorMessage.includes("internet") || errorMessage.includes("network") || errorMessage.includes("connection")) {
+        toast({
+          variant: "destructive",
+          title: "Network Error",
+          description: "Please check your internet connection and try again.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to improve your prompt. Please try again.",
+        });
+      }
+      
       return null;
     } finally {
       setIsProcessing(false);
@@ -62,7 +98,7 @@ export function usePromptImprovement() {
   return {
     isProcessing,
     apiError,
-    setApiError,  // Now exposing the setter
+    setApiError,  // Exposing the setter
     feedbackHistory,
     setFeedbackHistory,
     improvePrompt,
