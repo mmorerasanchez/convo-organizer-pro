@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -5,7 +6,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Brain, Copy, CheckCircle2, ArrowLeft, RefreshCw, ThumbsUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const PromptScanner = () => {
@@ -13,13 +13,11 @@ const PromptScanner = () => {
   const [improvedPrompt, setImprovedPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const [feedback, setFeedback] = useState('');
+  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
+  const [currentFeedback, setCurrentFeedback] = useState('');
   const [feedbackHistory, setFeedbackHistory] = useState<Array<{feedback: string, improvedPrompt: string}>>([]);
   const [apiError, setApiError] = useState<string | null>(null);
   const { toast } = useToast();
-  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
-  const [currentFeedback, setCurrentFeedback] = useState('');
 
   const handleImprovePrompt = async (originalPrompt: string, userFeedback?: string) => {
     if (!originalPrompt.trim()) return;
@@ -82,44 +80,6 @@ const PromptScanner = () => {
     handleImprovePrompt(promptInput);
   };
 
-  const handleTryAgain = () => {
-    setFeedbackOpen(true);
-  };
-
-  const handleSubmitFeedback2 = () => {
-    if (feedback.trim()) {
-      // Store the current improvement in history before getting a new one
-      setFeedbackHistory([
-        ...feedbackHistory,
-        {
-          feedback,
-          improvedPrompt
-        }
-      ]);
-      
-      handleImprovePrompt(promptInput, feedback);
-      setFeedbackOpen(false);
-      setFeedback('');
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Feedback Required",
-        description: "Please provide feedback to help improve the prompt.",
-      });
-    }
-  };
-
-  const handleAccept = () => {
-    toast({
-      title: "Prompt Accepted",
-      description: "The improved prompt has been copied to your clipboard and is ready to use.",
-    });
-    
-    navigator.clipboard.writeText(improvedPrompt);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   const handleRevertToPrevious = () => {
     if (feedbackHistory.length > 0) {
       const previousState = feedbackHistory[feedbackHistory.length - 1];
@@ -135,25 +95,22 @@ const PromptScanner = () => {
     }
   };
 
+  const handleAccept = () => {
+    toast({
+      title: "Prompt Accepted",
+      description: "The improved prompt has been copied to your clipboard and is ready to use.",
+    });
+    
+    navigator.clipboard.writeText(improvedPrompt);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const handleClear = () => {
     setPromptInput('');
     setImprovedPrompt('');
     setFeedbackHistory([]);
     setApiError(null);
-  };
-
-  const handleCopy = () => {
-    if (!improvedPrompt) return;
-    
-    navigator.clipboard.writeText(improvedPrompt);
-    setCopied(true);
-    
-    toast({
-      title: "Copied to clipboard",
-      description: "The improved prompt has been copied to your clipboard.",
-    });
-    
-    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -219,7 +176,11 @@ const PromptScanner = () => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={handleCopy}
+                  onClick={() => {
+                    navigator.clipboard.writeText(improvedPrompt);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
                   className="gap-2"
                 >
                   {copied ? <CheckCircle2 size={16} /> : <Copy size={16} />}
