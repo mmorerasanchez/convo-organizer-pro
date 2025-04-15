@@ -62,6 +62,7 @@ export function usePromptImprovement() {
   return {
     isProcessing,
     apiError,
+    setApiError,  // Now exposing the setter
     feedbackHistory,
     setFeedbackHistory,
     improvePrompt,

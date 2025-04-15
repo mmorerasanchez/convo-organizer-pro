@@ -17,6 +17,7 @@ const PromptScanner = () => {
   const {
     isProcessing,
     apiError,
+    setApiError,
     feedbackHistory,
     setFeedbackHistory,
     improvePrompt,
