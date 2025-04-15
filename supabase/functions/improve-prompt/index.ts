@@ -9,6 +9,40 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Best practices from our prompting guide
+const promptingBestPractices = `
+# Prompt Engineering Best Practices
+
+## General Guidelines
+- Be specific and clear about what you want
+- Provide context about the task and desired outcome
+- Specify your desired output format (e.g., bullet points, paragraphs, JSON)
+- Break complex tasks into step-by-step instructions
+- Use examples when possible to guide the model
+
+## Structure
+- Start with a clear instruction or question
+- Include relevant context or background information
+- Define roles when appropriate (e.g., "You are an expert in...")
+- Use delimiters to separate different parts of your prompt (e.g., """content""")
+- Consider using a Chain-of-Thought approach for complex reasoning tasks
+
+## Style & Format
+- Use imperative language for instructions (e.g., "Explain", "Analyze", "List")
+- Be specific about length requirements (e.g., "Write a 300-word essay")
+- Ask for structured outputs when appropriate (e.g., headings, bullet points)
+- Request specific tone or writing style if needed (e.g., "academic", "conversational")
+- For code generation, specify programming language, libraries, and constraints
+
+## Common Improvements
+- Replace vague terms with specific requests
+- Add context about intended audience or use case
+- Include parameters like length, tone, and depth
+- Add step-by-step guidance for complex tasks
+- Request explanations for generated content
+- Include specific examples of desired outputs
+`;
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -41,6 +75,17 @@ serve(async (req) => {
     console.log("Calling OpenAI API");
     
     try {
+      // Create a system prompt that incorporates both expert guidance and our best practices
+      const systemPrompt = `You are an expert prompt engineer who helps improve prompts for AI language models.
+      
+Apply the following best practices when improving prompts:
+${promptingBestPractices}
+
+${feedback ? `Additionally, consider this specific feedback: ${feedback}` : ''}
+
+Your task is to improve the given prompt by making it more effective, clearer, and following the best practices above.
+Explain the reasoning behind your improvements.`;
+
       // Attempt to use the OpenAI API
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -51,7 +96,7 @@ serve(async (req) => {
         body: JSON.stringify({
           model: 'gpt-4o-mini',
           messages: [
-            { role: 'system', content: 'You are an expert prompt engineer who helps improve prompts for AI language models.' },
+            { role: 'system', content: systemPrompt },
             { role: 'user', content: `Please improve this prompt: ${originalPrompt}` }
           ],
           temperature: 0.7,

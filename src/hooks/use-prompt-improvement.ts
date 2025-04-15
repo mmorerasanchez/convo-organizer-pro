@@ -56,12 +56,21 @@ export function usePromptImprovement() {
         toast({
           title: userFeedback ? "Prompt Refined" : "Prompt Enhanced",
           description: userFeedback 
-            ? "Your prompt has been refined based on your feedback."
-            : "Your prompt has been enhanced using best practices.",
+            ? "Your prompt has been refined based on your feedback and best practices."
+            : "Your prompt has been enhanced using our prompting guide and expert techniques.",
         });
       }
 
-      return data.improvedPrompt;
+      // Extract just the improved prompt if the response contains explanation
+      let finalImprovedPrompt = data.improvedPrompt;
+      if (finalImprovedPrompt.includes("Improved prompt:")) {
+        const promptSection = finalImprovedPrompt.split("Improved prompt:")[1];
+        if (promptSection) {
+          finalImprovedPrompt = promptSection.trim();
+        }
+      }
+
+      return finalImprovedPrompt;
     } catch (error) {
       console.error('Error improving prompt:', error);
       
