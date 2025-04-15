@@ -3,84 +3,130 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, Copy, CheckCircle2 } from 'lucide-react';
+import { Brain, Copy, CheckCircle2, ArrowLeft, RefreshCw, ThumbsUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const PromptScanner = () => {
   const [promptInput, setPromptInput] = useState('');
   const [improvedPrompt, setImprovedPrompt] = useState('');
-  const [isScanning, setIsScanning] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedback, setFeedback] = useState('');
+  const [feedbackHistory, setFeedbackHistory] = useState<Array<{feedback: string, improvedPrompt: string}>>([]);
+  const [apiError, setApiError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleScanPrompt = () => {
-    if (!promptInput.trim()) return;
+  const handleImprovePrompt = async (originalPrompt: string, userFeedback?: string) => {
+    if (!originalPrompt.trim()) return;
     
-    setIsScanning(true);
+    setIsProcessing(true);
+    setApiError(null);
     
-    // Simulate processing time
-    setTimeout(() => {
-      const improved = improvePrompt(promptInput);
-      setImprovedPrompt(improved);
-      setIsScanning(false);
+    try {
+      const response = await fetch('https://lovable.app/functions/v1/improve-prompt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          originalPrompt,
+          feedback: userFeedback,
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to improve prompt');
+      }
+      
+      const data = await response.json();
+      setImprovedPrompt(data.improvedPrompt);
       
       toast({
-        title: "Prompt Enhanced",
-        description: "Your prompt has been analyzed and improved based on best practices.",
+        title: userFeedback ? "Prompt Refined" : "Prompt Enhanced",
+        description: userFeedback 
+          ? "Your prompt has been refined based on your feedback."
+          : "Your prompt has been enhanced using best practices.",
       });
-    }, 1500);
+    } catch (error) {
+      console.error('Error improving prompt:', error);
+      setApiError(error instanceof Error ? error.message : 'An unexpected error occurred');
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to improve your prompt. Please try again.",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  // This function applies the best practices from the guide to improve the prompt
-  const improvePrompt = (prompt: string) => {
-    let improved = prompt.trim();
-    
-    // 1. Add clear instruction if not present
-    if (!improved.match(/^(summarize|explain|describe|list|create|write|generate|analyze|compare|evaluate|predict)/i)) {
-      // Check if it's likely a question
-      if (improved.endsWith('?')) {
-        improved = `Answer the following question with detailed explanations: ${improved}`;
-      } else {
-        improved = `Process the following input and provide a comprehensive response: ${improved}`;
-      }
+  const handleInitialScan = () => {
+    handleImprovePrompt(promptInput);
+  };
+
+  const handleTryAgain = () => {
+    setFeedbackOpen(true);
+  };
+
+  const handleSubmitFeedback = () => {
+    if (feedback.trim()) {
+      // Store the current improvement in history before getting a new one
+      setFeedbackHistory([
+        ...feedbackHistory,
+        {
+          feedback,
+          improvedPrompt
+        }
+      ]);
+      
+      handleImprovePrompt(promptInput, feedback);
+      setFeedbackOpen(false);
+      setFeedback('');
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Feedback Required",
+        description: "Please provide feedback to help improve the prompt.",
+      });
     }
+  };
+
+  const handleAccept = () => {
+    toast({
+      title: "Prompt Accepted",
+      description: "The improved prompt has been copied to your clipboard and is ready to use.",
+    });
     
-    // 2. Add context or role if not present
-    if (!improved.includes("you are") && !improved.includes("act as")) {
-      improved = `You are an expert assistant helping with the following task. ${improved}`;
+    navigator.clipboard.writeText(improvedPrompt);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleRevertToPrevious = () => {
+    if (feedbackHistory.length > 0) {
+      const previousState = feedbackHistory[feedbackHistory.length - 1];
+      setImprovedPrompt(previousState.improvedPrompt);
+      
+      // Remove the last item from history
+      setFeedbackHistory(feedbackHistory.slice(0, -1));
+      
+      toast({
+        title: "Reverted to Previous Version",
+        description: "You've returned to the previous prompt improvement.",
+      });
     }
-    
-    // 3. Add output formatting if not specified
-    if (!improved.toLowerCase().includes("format") && 
-        !improved.includes("bullet") && 
-        !improved.includes("point") &&
-        !improved.includes("list")) {
-      improved += "\n\nFormat your response as follows:\n1. Main points in a numbered list\n2. Follow with a brief summary\n3. End with one key takeaway";
-    }
-    
-    // 4. Add step-by-step reasoning for complex questions
-    if (improved.includes("why") || 
-        improved.includes("how") || 
-        improved.includes("explain") || 
-        improved.includes("analyze")) {
-      improved += "\n\nThink step by step and explain your reasoning clearly.";
-    }
-    
-    // 5. Improve specificity
-    improved = improved.replace(/something about/gi, "a detailed explanation of");
-    improved = improved.replace(/tell me about/gi, "provide a comprehensive analysis of");
-    
-    // 6. Add length guidance if not present
-    if (!improved.includes("words") && !improved.includes("sentences") && !improved.includes("paragraphs")) {
-      improved += "\n\nAim for a response between 3-5 paragraphs, depending on the complexity of the topic.";
-    }
-    
-    return improved;
   };
 
   const handleClear = () => {
     setPromptInput('');
     setImprovedPrompt('');
+    setFeedbackHistory([]);
+    setApiError(null);
   };
 
   const handleCopy = () => {
@@ -98,67 +144,149 @@ const PromptScanner = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Original Prompt</CardTitle>
-          <CardDescription>
-            Enter your informal prompt to get suggestions for improvement
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Textarea 
-            placeholder="Enter your prompt here... (e.g., 'Tell me about climate change')"
-            className="min-h-[200px]"
-            value={promptInput}
-            onChange={(e) => setPromptInput(e.target.value)}
-          />
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="outline" onClick={handleClear}>Clear</Button>
-          <Button 
-            onClick={handleScanPrompt} 
-            disabled={!promptInput.trim() || isScanning}
-            className="gap-2"
-          >
-            <Brain size={16} />
-            {isScanning ? 'Analyzing...' : 'Scan & Improve'}
-          </Button>
-        </CardFooter>
-      </Card>
+    <div className="space-y-6">
+      {apiError && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription>
+            {apiError}
+          </AlertDescription>
+        </Alert>
+      )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Improved Prompt</CardTitle>
-          <CardDescription>
-            Enhanced based on prompt engineering best practices
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Textarea 
-            placeholder="Your improved prompt will appear here..."
-            className="min-h-[200px]"
-            value={improvedPrompt}
-            readOnly
-          />
-        </CardContent>
-        <CardFooter className="flex justify-between items-center">
-          <p className="text-sm text-muted-foreground">
-            The scanner applies best practices from the prompting guide to enhance your prompt's effectiveness.
-          </p>
-          {improvedPrompt && (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Original Prompt</CardTitle>
+            <CardDescription>
+              Enter your informal prompt to get AI-powered improvement suggestions
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Textarea 
+              placeholder="Enter your prompt here... (e.g., 'Tell me about climate change')"
+              className="min-h-[200px]"
+              value={promptInput}
+              onChange={(e) => setPromptInput(e.target.value)}
+            />
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button variant="outline" onClick={handleClear}>Clear</Button>
             <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleCopy}
+              onClick={handleInitialScan} 
+              disabled={!promptInput.trim() || isProcessing}
               className="gap-2"
             >
-              {copied ? <CheckCircle2 size={16} /> : <Copy size={16} />}
-              {copied ? 'Copied' : 'Copy'}
+              {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Brain className="h-4 w-4" />}
+              {isProcessing ? 'Processing...' : 'Scan & Improve'}
             </Button>
-          )}
-        </CardFooter>
-      </Card>
+          </CardFooter>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Improved Prompt</CardTitle>
+            <CardDescription>
+              Enhanced based on prompt engineering best practices
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Textarea 
+              placeholder="Your improved prompt will appear here..."
+              className="min-h-[200px]"
+              value={improvedPrompt}
+              readOnly
+            />
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4">
+            <div className="w-full flex justify-between items-center">
+              <p className="text-sm text-muted-foreground">
+                Not satisfied? Provide feedback for further improvement.
+              </p>
+              {improvedPrompt && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleCopy}
+                  className="gap-2"
+                >
+                  {copied ? <CheckCircle2 size={16} /> : <Copy size={16} />}
+                  {copied ? 'Copied' : 'Copy'}
+                </Button>
+              )}
+            </div>
+            
+            {improvedPrompt && (
+              <div className="w-full flex justify-between gap-4">
+                {feedbackHistory.length > 0 && (
+                  <Button 
+                    variant="outline" 
+                    onClick={handleRevertToPrevious}
+                    className="gap-2"
+                  >
+                    <ArrowLeft size={16} />
+                    Previous Version
+                  </Button>
+                )}
+                
+                <Button 
+                  variant="outline" 
+                  onClick={handleTryAgain}
+                  className="gap-2"
+                  disabled={isProcessing}
+                >
+                  <RefreshCw size={16} />
+                  Try Again
+                </Button>
+                
+                <Button 
+                  onClick={handleAccept}
+                  className="gap-2"
+                  disabled={isProcessing}
+                >
+                  <ThumbsUp size={16} />
+                  Accept
+                </Button>
+              </div>
+            )}
+          </CardFooter>
+        </Card>
+      </div>
+
+      <Dialog open={feedbackOpen} onOpenChange={setFeedbackOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Provide Feedback</DialogTitle>
+            <DialogDescription>
+              Tell us how you'd like the prompt improved to get better results.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <label htmlFor="feedback" className="text-sm font-medium block mb-2">
+              Your Feedback
+            </label>
+            <Textarea
+              id="feedback"
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              placeholder="e.g., 'Make it more specific to data science,' 'Add more technical details,' etc."
+              className="min-h-[100px]"
+            />
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setFeedbackOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSubmitFeedback}
+              disabled={!feedback.trim()}
+            >
+              Submit Feedback
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

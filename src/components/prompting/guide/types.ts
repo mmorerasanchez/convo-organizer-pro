@@ -11,3 +11,12 @@ export interface Chapter {
   description: string;
   slides: Slide[];
 }
+
+export interface PromptImprovement {
+  originalPrompt: string;
+  improvedPrompt: string;
+  feedbackHistory?: Array<{
+    feedback: string;
+    improvedPrompt: string;
+  }>;
+}

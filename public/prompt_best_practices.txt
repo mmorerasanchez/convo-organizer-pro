@@ -1,0 +1,31 @@
+
+# Prompt Engineering Best Practices
+
+## General Guidelines
+- Be specific and clear about what you want
+- Provide context about the task and desired outcome
+- Specify your desired output format (e.g., bullet points, paragraphs, JSON)
+- Break complex tasks into step-by-step instructions
+- Use examples when possible to guide the model
+
+## Structure
+- Start with a clear instruction or question
+- Include relevant context or background information
+- Define roles when appropriate (e.g., "You are an expert in...")
+- Use delimiters to separate different parts of your prompt (e.g., """content""")
+- Consider using a Chain-of-Thought approach for complex reasoning tasks
+
+## Style & Format
+- Use imperative language for instructions (e.g., "Explain", "Analyze", "List")
+- Be specific about length requirements (e.g., "Write a 300-word essay")
+- Ask for structured outputs when appropriate (e.g., headings, bullet points)
+- Request specific tone or writing style if needed (e.g., "academic", "conversational")
+- For code generation, specify programming language, libraries, and constraints
+
+## Common Improvements
+- Replace vague terms with specific requests
+- Add context about intended audience or use case
+- Include parameters like length, tone, and depth
+- Add step-by-step guidance for complex tasks
+- Request explanations for generated content
+- Include specific examples of desired outputs
