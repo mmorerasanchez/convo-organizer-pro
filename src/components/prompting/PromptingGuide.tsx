@@ -1,10 +1,8 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
-// Define the structure for our guide content
 interface Slide {
   title: string;
   content: React.ReactNode;
@@ -20,7 +18,6 @@ const PromptingGuide = () => {
   const [currentChapter, setCurrentChapter] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Define the comprehensive guide content
   const chapters: Chapter[] = [
     {
       title: "Introduction to Prompt Engineering",
@@ -32,15 +29,15 @@ const PromptingGuide = () => {
             <div className="space-y-3">
               <p>
                 A prompt is the input text you provide to an AI model to guide it in generating the desired output. 
-                Think of it as the script or instruction that tells the model what to do. Prompts can be as simple 
-                as a single word or sentence, or as complex as a multi-part instruction with embedded examples.
+                Think of it as a script or instruction that tells the model what to do. Prompts can be as simple 
+                as a single sentence or as complex as a multi-part directive filled with examples and formatting instructions.
               </p>
               <div className="bg-muted p-3 rounded-md">
                 <p className="font-medium">Basic Example:</p>
                 <p>Prompt: "The sky is"</p>
                 <p>Output: "blue."</p>
                 <p className="text-sm text-muted-foreground mt-2">
-                  This illustrates the basic idea: a minimal prompt leads to a continuation based on the model's training.
+                  This illustrates how even simple prompts can elicit meaningful responses.
                 </p>
               </div>
             </div>
@@ -51,17 +48,18 @@ const PromptingGuide = () => {
           content: (
             <div className="space-y-3">
               <p>
-                Originally, AI systems were limited to rigid, rule-based interactions. With the advent of large 
-                language models, prompt engineering has evolved into a critical skill, influencing how well an LM 
-                can understand and perform tasks. Researchers and developers now experiment with different prompting 
-                techniques to improve performance, safety, and specificity across a wide range of applications.
+                Originally, AI systems were constrained by rule-based interactions. With the advent of large 
+                language models, prompt engineering has evolved into a critical skill that determines how well 
+                an LM can perform tasks—both mundane and complex.
               </p>
               <div className="bg-muted p-3 rounded-md">
-                <p className="font-medium">Evolution:</p>
-                <p>
-                  Early experiments showed that small changes in prompt wording could yield vastly different outputs, 
-                  leading to the development of systematic techniques such as zero-shot, few-shot, and chain-of-thought prompting.
-                </p>
+                <p className="font-medium">Evolution Highlights:</p>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>Rule-based systems gave way to flexible LMs that adapt to textual inputs.</li>
+                  <li>Small prompt changes were found to yield drastically different outputs.</li>
+                  <li>Development of systematic techniques like zero-shot, few-shot, and chain-of-thought.</li>
+                  <li>Advanced strategies like ReAct emerged for complex reasoning tasks.</li>
+                </ul>
               </div>
             </div>
           )
@@ -77,7 +75,8 @@ const PromptingGuide = () => {
           content: (
             <div className="space-y-3">
               <p>
-                The instruction is the command or directive that specifies what you want the AI to do. It should be clear and direct.
+                The instruction is the command or directive specifying what you want the AI to do. 
+                Clarity and directness are critical.
               </p>
               <div className="bg-muted p-3 rounded-md">
                 <p className="font-medium">Examples of Instructions:</p>
@@ -95,72 +94,17 @@ const PromptingGuide = () => {
           content: (
             <div className="space-y-3">
               <p>
-                Providing context means including additional information that helps the AI understand the task better. 
-                This can include background details, the purpose of the prompt, or even the style in which the output should be generated.
+                Providing context means supplying any additional information that helps the AI understand 
+                the task better—this may include the purpose, audience, background details, or constraints 
+                on style and length.
               </p>
               <div className="bg-muted p-3 rounded-md">
                 <p className="font-medium">Why Context Matters:</p>
-                <p>
-                  Context sets boundaries and clarifies ambiguous instructions. For example, asking "Explain antibiotics" 
-                  might lead to a generic answer, whereas adding "Explain antibiotics for a high school biology student in 
-                  two sentences" refines the expected output.
-                </p>
-              </div>
-            </div>
-          )
-        },
-        {
-          title: "Input Data",
-          content: (
-            <div className="space-y-3">
-              <p>
-                This is the actual content or data that the AI needs to work on. In many prompts, especially those for 
-                summarization or extraction tasks, you'll provide a block of text or data.
-              </p>
-              <div className="bg-muted p-3 rounded-md">
-                <p className="font-medium">Example:</p>
-                <p>
-                  In a summarization task, the input might be a long article or paragraph that you want to be condensed.
-                </p>
-              </div>
-            </div>
-          )
-        },
-        {
-          title: "Output Indicator",
-          content: (
-            <div className="space-y-3">
-              <p>
-                An output indicator tells the model what form the answer should take. This might include formatting 
-                instructions (e.g., "Provide a list in bullet points") or specify the desired output length or style.
-              </p>
-              <div className="bg-muted p-3 rounded-md">
-                <p className="font-medium">Example:</p>
-                <p>"List the steps in a numbered format."</p>
-              </div>
-            </div>
-          )
-        },
-        {
-          title: "Prompt Structure and Formatting",
-          content: (
-            <div className="space-y-3">
-              <p>
-                Formatting can be crucial for effective prompt delivery. Different tasks benefit from distinct structures:
-              </p>
-              <div className="bg-muted p-3 rounded-md space-y-2">
-                <div>
-                  <p className="font-medium">Question/Answer (QA) Format:</p>
-                  <p>Use labels like "Q:" and "A:" to clearly delineate the inquiry and expected response.</p>
-                </div>
-                <div>
-                  <p className="font-medium">Role-Based Prompts:</p>
-                  <p>Define roles to shape behavior. For example, "You are an AI research assistant…" sets the tone and expectations.</p>
-                </div>
-                <div>
-                  <p className="font-medium">Separator Usage:</p>
-                  <p>Use clear delimiters (e.g., "###") to separate instructions, context, and input data.</p>
-                </div>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>It focuses the output on what truly matters</li>
+                  <li>It can reduce ambiguous or generic responses</li>
+                  <li>Helps maintain consistency across multiple prompts</li>
+                </ul>
               </div>
             </div>
           )
@@ -518,10 +462,8 @@ const PromptingGuide = () => {
     }
   ];
 
-  // Calculate total slides for chapter
   const totalSlides = chapters[currentChapter].slides.length;
 
-  // Navigation functions
   const goToPreviousSlide = () => {
     if (currentSlide > 0) {
       setCurrentSlide(currentSlide - 1);
@@ -551,13 +493,11 @@ const PromptingGuide = () => {
     }
   };
 
-  // Get current content
   const currentChapterData = chapters[currentChapter];
   const currentSlideData = currentChapterData.slides[currentSlide];
 
   return (
     <div className="space-y-4">
-      {/* Chapter selector */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {chapters.map((chapter, index) => (
           <Card 
@@ -580,27 +520,31 @@ const PromptingGuide = () => {
         ))}
       </div>
 
-      {/* Current slide content */}
       <Card className="mt-6">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-muted-foreground">
-                Chapter {currentChapter + 1} · Slide {currentSlide + 1} of {totalSlides}
+                Chapter {currentChapter + 1} · Slide {currentSlide + 1} of {chapters[currentChapter].slides.length}
               </div>
-              <CardTitle className="mt-1">{currentSlideData.title}</CardTitle>
+              <CardTitle className="mt-1">{chapters[currentChapter].slides[currentSlide].title}</CardTitle>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          {currentSlideData.content}
+          {chapters[currentChapter].slides[currentSlide].content}
         </CardContent>
         <CardFooter className="flex justify-between border-t p-4">
           <div className="flex space-x-2">
             <Button 
               variant="outline" 
               size="icon" 
-              onClick={goToPreviousChapter}
+              onClick={() => {
+                if (currentChapter > 0) {
+                  setCurrentChapter(currentChapter - 1);
+                  setCurrentSlide(0);
+                }
+              }}
               disabled={currentChapter === 0}
             >
               <ChevronsLeft className="h-4 w-4" />
@@ -608,7 +552,11 @@ const PromptingGuide = () => {
             <Button 
               variant="outline" 
               size="icon" 
-              onClick={goToPreviousSlide}
+              onClick={() => {
+                if (currentSlide > 0) {
+                  setCurrentSlide(currentSlide - 1);
+                }
+              }}
               disabled={currentChapter === 0 && currentSlide === 0}
             >
               <ChevronLeft className="h-4 w-4" />
@@ -618,15 +566,27 @@ const PromptingGuide = () => {
             <Button 
               variant="outline" 
               size="icon" 
-              onClick={goToNextSlide}
-              disabled={currentChapter === chapters.length - 1 && currentSlide === totalSlides - 1}
+              onClick={() => {
+                if (currentSlide < chapters[currentChapter].slides.length - 1) {
+                  setCurrentSlide(currentSlide + 1);
+                } else if (currentChapter < chapters.length - 1) {
+                  setCurrentChapter(currentChapter + 1);
+                  setCurrentSlide(0);
+                }
+              }}
+              disabled={currentChapter === chapters.length - 1 && currentSlide === chapters[currentChapter].slides.length - 1}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
             <Button 
               variant="outline" 
               size="icon" 
-              onClick={goToNextChapter}
+              onClick={() => {
+                if (currentChapter < chapters.length - 1) {
+                  setCurrentChapter(currentChapter + 1);
+                  setCurrentSlide(0);
+                }
+              }}
               disabled={currentChapter === chapters.length - 1}
             >
               <ChevronsRight className="h-4 w-4" />
