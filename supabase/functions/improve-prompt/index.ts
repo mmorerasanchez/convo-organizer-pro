@@ -38,54 +38,6 @@ serve(async (req) => {
       );
     }
 
-    // Best practices content - hardcoded to avoid network fetch issues
-    const bestPractices = `
-# Prompt Engineering Best Practices
-
-## General Guidelines
-- Be specific and clear about what you want
-- Provide context about the task and desired outcome
-- Specify your desired output format (e.g., bullet points, paragraphs, JSON)
-- Break complex tasks into step-by-step instructions
-- Use examples when possible to guide the model
-
-## Structure
-- Start with a clear instruction or question
-- Include relevant context or background information
-- Define roles when appropriate (e.g., "You are an expert in...")
-- Use delimiters to separate different parts of your prompt (e.g., """content""")
-- Consider using a Chain-of-Thought approach for complex reasoning tasks
-
-## Style & Format
-- Use imperative language for instructions (e.g., "Explain", "Analyze", "List")
-- Be specific about length requirements (e.g., "Write a 300-word essay")
-- Ask for structured outputs when appropriate (e.g., headings, bullet points)
-- Request specific tone or writing style if needed (e.g., "academic", "conversational")
-- For code generation, specify programming language, libraries, and constraints
-
-## Common Improvements
-- Replace vague terms with specific requests
-- Add context about intended audience or use case
-- Include parameters like length, tone, and depth
-- Add step-by-step guidance for complex tasks
-- Request explanations for generated content
-- Include specific examples of desired outputs
-`;
-
-    // Configure the system message with best practices
-    const systemMessage = `You are an expert prompt engineer who helps improve prompts for AI language models. 
-Your task is to enhance the user's prompt by applying these best practices:
-
-${bestPractices}
-
-Respond ONLY with the improved prompt text, without any explanations, introductions, or additional notes.`;
-
-    // Configure the user message with their prompt and feedback if any
-    let userMessage = `Please improve this prompt: ${originalPrompt}`;
-    if (feedback) {
-      userMessage += `\n\nI'd like further improvements based on this feedback: ${feedback}`;
-    }
-
     console.log("Calling OpenAI API");
     
     try {
@@ -99,35 +51,28 @@ Respond ONLY with the improved prompt text, without any explanations, introducti
         body: JSON.stringify({
           model: 'gpt-4o-mini',
           messages: [
-            { role: 'system', content: systemMessage },
-            { role: 'user', content: userMessage }
+            { role: 'system', content: 'You are an expert prompt engineer who helps improve prompts for AI language models.' },
+            { role: 'user', content: `Please improve this prompt: ${originalPrompt}` }
           ],
           temperature: 0.7,
           max_tokens: 1000,
         }),
       });
 
+      console.log("OpenAI API response status:", response.status);
+
       if (!response.ok) {
         const errorData = await response.json();
         console.error("OpenAI API error:", errorData);
         
-        // Check if it's a quota error
-        const isQuotaError = errorData.error && 
-                            (errorData.error.type === "insufficient_quota" || 
-                             errorData.error.code === "insufficient_quota" ||
-                             errorData.error.message.includes("quota"));
-        
-        if (isQuotaError) {
-          return new Response(
-            JSON.stringify({ 
-              error: "OpenAI API quota exceeded. Please check your billing information or try again later.",
-              errorType: "quota_exceeded"
-            }),
-            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-        
-        throw new Error(`OpenAI API error: ${JSON.stringify(errorData)}`);
+        // Detailed error logging
+        return new Response(
+          JSON.stringify({ 
+            error: "OpenAI API call failed",
+            details: errorData
+          }),
+          { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
 
       const data = await response.json();
@@ -141,41 +86,19 @@ Respond ONLY with the improved prompt text, without any explanations, introducti
     } catch (apiError) {
       console.error("Error calling OpenAI API:", apiError);
       
-      // Provide a fallback response with basic improvements to the prompt
-      console.log("Using fallback prompt improvement method");
-      
-      // Simple fallback improvement logic
-      let improvedPrompt = originalPrompt;
-      
-      // Add structure if it doesn't appear to have any
-      if (!originalPrompt.includes("\n\n")) {
-        improvedPrompt = `${originalPrompt}\n\nPlease provide the following in your response:
-- Clear step-by-step instructions
-- Examples where applicable
-- Formatted output that is easy to read`;
-      }
-      
-      // If it seems too short, suggest expanding
-      if (originalPrompt.split(" ").length < 15 && !feedback) {
-        improvedPrompt = `${originalPrompt}\n\nAdditional context to consider:
-- The specific use case or problem being solved
-- Desired format for the response
-- Any constraints or requirements that must be met`;
-      }
-      
       return new Response(
         JSON.stringify({ 
-          improvedPrompt,
-          warning: "This is a fallback improvement due to OpenAI API issues. For better results, please try again later."
+          error: "An unexpected error occurred while processing your prompt",
+          details: apiError.message
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
   } catch (error) {
     console.error('Error improving prompt:', error);
     return new Response(
       JSON.stringify({ 
-        error: "An unexpected error occurred while processing your prompt. Please try again.",
+        error: "An unexpected error occurred while processing your prompt",
         details: error.message
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
