@@ -1,3 +1,4 @@
+
 import { type Chapter } from './types';
 import React from 'react';
 
@@ -91,6 +92,40 @@ export const chapters: Chapter[] = [
               </div>
             </div>
           )
+        },
+        {
+          title: "Input Data",
+          content: (
+            <div className="space-y-3">
+              <p>
+                This is the data or text that the AI should operate on. In many tasks (e.g., summarization, 
+                translation, classification), you provide the text or other data to be processed.
+              </p>
+              <div className="bg-muted p-3 rounded-md">
+                <p className="font-medium">Best Practices:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Clearly separate input data from instructions</li>
+                  <li>Format data in a way that's easy for the model to process</li>
+                  <li>Consider using delimiters (triple quotes, brackets, etc.) for clarity</li>
+                </ul>
+              </div>
+            </div>
+          )
+        },
+        {
+          title: "Output Indicator",
+          content: (
+            <div className="space-y-3">
+              <p>
+                An output indicator tells the model what format or style the answer should take 
+                (e.g., bullet points, JSON, code snippet, short paragraph).
+              </p>
+              <div className="bg-muted p-3 rounded-md">
+                <p className="font-medium">Example:</p>
+                <p>"Produce the answer in valid JSON format."</p>
+              </div>
+            </div>
+          )
         }
       ]
     },
@@ -180,26 +215,6 @@ export const chapters: Chapter[] = [
               </div>
             </div>
           )
-        },
-        {
-          title: "Advanced Prompting for Domain-Specific Tasks",
-          content: (
-            <div className="space-y-3">
-              <p>
-                Some tasks, such as code generation or text-to-image creation, require specialized prompting strategies:
-              </p>
-              <div className="bg-muted p-3 rounded-md space-y-2">
-                <div>
-                  <p className="font-medium">Code Generation:</p>
-                  <p>Include code comments and structure the prompt as a code block.</p>
-                </div>
-                <div>
-                  <p className="font-medium">Text-to-Image:</p>
-                  <p>Describe visual elements (subject, style, lighting) in a succinct and descriptive manner.</p>
-                </div>
-              </div>
-            </div>
-          )
         }
       ]
     },
@@ -275,40 +290,12 @@ export const chapters: Chapter[] = [
               </div>
             </div>
           )
-        },
-        {
-          title: "Optimize Prompt Length",
-          content: (
-            <div className="space-y-3">
-              <p>
-                Longer prompts can provide more context and lead to better outputs, but they must remain relevant. 
-                Avoid adding unnecessary details that do not contribute to the task.
-              </p>
-              <div className="bg-muted p-3 rounded-md">
-                <p className="font-medium">Consideration:</p>
-                <p>
-                  Always balance the amount of context with clarity to avoid overwhelming the model.
-                </p>
-              </div>
-            </div>
-          )
-        },
-        {
-          title: "Test Across Different Models and Use Cases",
-          content: (
-            <div className="space-y-3">
-              <p>
-                Different language models might interpret the same prompt differently. Regularly test your prompts 
-                across various platforms and for multiple scenarios to ensure robustness.
-              </p>
-            </div>
-          )
         }
       ]
     },
     {
-      title: "Practical Examples Across Tasks",
-      description: "Real-world examples of effective prompts for different purposes",
+      title: "Domain-Specific Prompt Engineering",
+      description: "Tailored approaches for different types of tasks",
       slides: [
         {
           title: "Text Summarization",
@@ -329,25 +316,6 @@ export const chapters: Chapter[] = [
           )
         },
         {
-          title: "Information Extraction",
-          content: (
-            <div className="space-y-3">
-              <div className="bg-muted p-3 rounded-md">
-                <p className="font-medium">Prompt:</p>
-                <p>
-                  "Extract the names of all the organizations mentioned in the following text:
-                  'The research was conducted at the Champalimaud Centre for the Unknown in Lisbon and sponsored by Global Health Inc.'
-                  Output in the format: Organization: [name1, name2]"
-                </p>
-                <p className="font-medium mt-2">Expected Output:</p>
-                <p>
-                  "Organization: [Champalimaud Centre for the Unknown, Global Health Inc.]"
-                </p>
-              </div>
-            </div>
-          )
-        },
-        {
           title: "Code Generation",
           content: (
             <div className="space-y-3">
@@ -361,29 +329,6 @@ export const chapters: Chapter[] = [
                 <p>
                   A commented JavaScript function that iterates over the array and doubles each value.
                 </p>
-              </div>
-            </div>
-          )
-        },
-        {
-          title: "Chain-of-Thought Reasoning",
-          content: (
-            <div className="space-y-3">
-              <div className="bg-muted p-3 rounded-md">
-                <p className="font-medium">Prompt:</p>
-                <p>
-                  "What is the product of 23 and 47?
-                  Let's think through this step by step."
-                </p>
-                <p className="font-medium mt-2">Expected Output:</p>
-                <p>
-                  A breakdown that might include:
-                </p>
-                <ul className="list-disc pl-5">
-                  <li>Multiply 20 by 47</li>
-                  <li>Multiply 3 by 47</li>
-                  <li>Sum the two results to arrive at the final answer</li>
-                </ul>
               </div>
             </div>
           )
