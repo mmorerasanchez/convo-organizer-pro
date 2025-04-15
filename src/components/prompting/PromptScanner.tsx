@@ -23,16 +23,28 @@ const PromptScanner = () => {
   } = usePromptImprovement();
 
   const handleImprovePrompt = async (feedback?: string) => {
-    const result = await improvePrompt(promptInput, feedback);
-    if (result) {
-      if (improvedPrompt) {
-        setFeedbackHistory([...feedbackHistory, { feedback: feedback || '', improvedPrompt }]);
+    try {
+      const result = await improvePrompt(promptInput, feedback);
+      if (result) {
+        if (improvedPrompt) {
+          setFeedbackHistory([...feedbackHistory, { feedback: feedback || '', improvedPrompt }]);
+        }
+        setImprovedPrompt(result);
       }
-      setImprovedPrompt(result);
+    } catch (error) {
+      console.error('Error in handleImprovePrompt:', error);
     }
   };
 
   const handleInitialScan = () => {
+    if (!promptInput.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please enter a prompt to improve.",
+      });
+      return;
+    }
     handleImprovePrompt();
   };
 
@@ -40,6 +52,7 @@ const PromptScanner = () => {
     setPromptInput('');
     setImprovedPrompt('');
     setFeedbackHistory([]);
+    setApiError(null);
   };
 
   const handleRevertToPrevious = () => {
@@ -56,12 +69,21 @@ const PromptScanner = () => {
   };
 
   const handleAccept = () => {
-    toast({
-      title: "Prompt Accepted",
-      description: "The improved prompt has been copied to your clipboard and is ready to use.",
-    });
+    if (!improvedPrompt) return;
     
-    navigator.clipboard.writeText(improvedPrompt);
+    navigator.clipboard.writeText(improvedPrompt).then(() => {
+      toast({
+        title: "Prompt Accepted",
+        description: "The improved prompt has been copied to your clipboard and is ready to use.",
+      });
+    }).catch(err => {
+      console.error('Failed to copy to clipboard:', err);
+      toast({
+        variant: "destructive",
+        title: "Copy Failed",
+        description: "Unable to copy to clipboard. Please try again or copy manually.",
+      });
+    });
   };
 
   const handleSubmitFeedback = () => {
@@ -76,7 +98,9 @@ const PromptScanner = () => {
     <div className="space-y-6">
       {apiError && (
         <Alert variant="destructive">
-          <AlertDescription>{apiError}</AlertDescription>
+          <AlertDescription>
+            Error: {apiError}. Please make sure you have an active internet connection and try again.
+          </AlertDescription>
         </Alert>
       )}
 

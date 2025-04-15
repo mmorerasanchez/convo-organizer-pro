@@ -16,7 +16,11 @@ serve(async (req) => {
   }
 
   try {
+    console.log("Request received at improve-prompt function");
+    
+    // Parse request
     const { originalPrompt, feedback } = await req.json();
+    console.log("Request payload:", { originalPrompt, feedback });
 
     if (!originalPrompt) {
       return new Response(
@@ -25,12 +29,39 @@ serve(async (req) => {
       );
     }
 
-    // Fetch the best practices file
-    const bestPracticesResponse = await fetch('https://lovable.app/prompt_best_practices.txt');
-    if (!bestPracticesResponse.ok) {
-      throw new Error(`Failed to fetch best practices: ${bestPracticesResponse.statusText}`);
-    }
-    const bestPractices = await bestPracticesResponse.text();
+    // Best practices content - hardcoded to avoid network fetch issues
+    const bestPractices = `
+# Prompt Engineering Best Practices
+
+## General Guidelines
+- Be specific and clear about what you want
+- Provide context about the task and desired outcome
+- Specify your desired output format (e.g., bullet points, paragraphs, JSON)
+- Break complex tasks into step-by-step instructions
+- Use examples when possible to guide the model
+
+## Structure
+- Start with a clear instruction or question
+- Include relevant context or background information
+- Define roles when appropriate (e.g., "You are an expert in...")
+- Use delimiters to separate different parts of your prompt (e.g., """content""")
+- Consider using a Chain-of-Thought approach for complex reasoning tasks
+
+## Style & Format
+- Use imperative language for instructions (e.g., "Explain", "Analyze", "List")
+- Be specific about length requirements (e.g., "Write a 300-word essay")
+- Ask for structured outputs when appropriate (e.g., headings, bullet points)
+- Request specific tone or writing style if needed (e.g., "academic", "conversational")
+- For code generation, specify programming language, libraries, and constraints
+
+## Common Improvements
+- Replace vague terms with specific requests
+- Add context about intended audience or use case
+- Include parameters like length, tone, and depth
+- Add step-by-step guidance for complex tasks
+- Request explanations for generated content
+- Include specific examples of desired outputs
+`;
 
     // Configure the system message with best practices
     const systemMessage = `You are an expert prompt engineer who helps improve prompts for AI language models. 
@@ -46,6 +77,7 @@ Respond ONLY with the improved prompt text, without any explanations, introducti
       userMessage += `\n\nI'd like further improvements based on this feedback: ${feedback}`;
     }
 
+    console.log("Calling OpenAI API");
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -65,11 +97,13 @@ Respond ONLY with the improved prompt text, without any explanations, introducti
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error("OpenAI API error:", errorData);
       throw new Error(`OpenAI API error: ${JSON.stringify(errorData)}`);
     }
 
     const data = await response.json();
     const improvedPrompt = data.choices[0].message.content.trim();
+    console.log("Improved prompt generated successfully");
 
     return new Response(
       JSON.stringify({ improvedPrompt }),

@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PromptImprovement {
   feedback: string;
@@ -20,23 +21,21 @@ export function usePromptImprovement() {
     setApiError(null);
     
     try {
-      const response = await fetch('https://lovable.app/functions/v1/improve-prompt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Use Supabase client to call edge function
+      const { data, error } = await supabase.functions.invoke('improve-prompt', {
+        body: {
           originalPrompt,
-          feedback: userFeedback,
-        }),
+          feedback: userFeedback || '',
+        },
       });
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to improve prompt');
+      if (error) {
+        throw new Error(error.message || 'Failed to improve prompt');
       }
       
-      const data = await response.json();
+      if (!data || !data.improvedPrompt) {
+        throw new Error('No improvement data returned');
+      }
       
       toast({
         title: userFeedback ? "Prompt Refined" : "Prompt Enhanced",
