@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -19,6 +18,8 @@ const PromptScanner = () => {
   const [feedbackHistory, setFeedbackHistory] = useState<Array<{feedback: string, improvedPrompt: string}>>([]);
   const [apiError, setApiError] = useState<string | null>(null);
   const { toast } = useToast();
+  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
+  const [currentFeedback, setCurrentFeedback] = useState('');
 
   const handleImprovePrompt = async (originalPrompt: string, userFeedback?: string) => {
     if (!originalPrompt.trim()) return;
@@ -65,6 +66,18 @@ const PromptScanner = () => {
     }
   };
 
+  const handleOpenFeedbackDialog = () => {
+    setFeedbackDialogOpen(true);
+  };
+
+  const handleSubmitFeedback = () => {
+    if (currentFeedback.trim()) {
+      handleImprovePrompt(promptInput, currentFeedback);
+      setFeedbackDialogOpen(false);
+      setCurrentFeedback('');
+    }
+  };
+
   const handleInitialScan = () => {
     handleImprovePrompt(promptInput);
   };
@@ -73,7 +86,7 @@ const PromptScanner = () => {
     setFeedbackOpen(true);
   };
 
-  const handleSubmitFeedback = () => {
+  const handleSubmitFeedback2 = () => {
     if (feedback.trim()) {
       // Store the current improvement in history before getting a new one
       setFeedbackHistory([
@@ -230,7 +243,7 @@ const PromptScanner = () => {
                 
                 <Button 
                   variant="outline" 
-                  onClick={handleTryAgain}
+                  onClick={handleOpenFeedbackDialog}
                   className="gap-2"
                   disabled={isProcessing}
                 >
@@ -252,35 +265,29 @@ const PromptScanner = () => {
         </Card>
       </div>
 
-      <Dialog open={feedbackOpen} onOpenChange={setFeedbackOpen}>
+      <Dialog open={feedbackDialogOpen} onOpenChange={setFeedbackDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Provide Feedback</DialogTitle>
+            <DialogTitle>Provide Improvement Feedback</DialogTitle>
             <DialogDescription>
-              Tell us how you'd like the prompt improved to get better results.
+              Help us understand how you'd like the prompt to be improved.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="py-4">
-            <label htmlFor="feedback" className="text-sm font-medium block mb-2">
-              Your Feedback
-            </label>
-            <Textarea
-              id="feedback"
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              placeholder="e.g., 'Make it more specific to data science,' 'Add more technical details,' etc."
-              className="min-h-[100px]"
-            />
-          </div>
+          <Textarea
+            value={currentFeedback}
+            onChange={(e) => setCurrentFeedback(e.target.value)}
+            placeholder="e.g., Make it more concise, Add more context, Change the tone..."
+            className="mt-4 min-h-[100px]"
+          />
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setFeedbackOpen(false)}>
+            <Button variant="outline" onClick={() => setFeedbackDialogOpen(false)}>
               Cancel
             </Button>
             <Button 
               onClick={handleSubmitFeedback}
-              disabled={!feedback.trim()}
+              disabled={!currentFeedback.trim()}
             >
               Submit Feedback
             </Button>
