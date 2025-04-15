@@ -1,7 +1,9 @@
 
+import React from 'react';
+
 export interface Slide {
   title: string;
-  content: React.ReactNode;
+  content: string;
 }
 
 export interface Chapter {
@@ -9,4 +11,3 @@ export interface Chapter {
   description: string;
   slides: Slide[];
 }
-

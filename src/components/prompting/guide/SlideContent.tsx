@@ -10,7 +10,7 @@ interface SlideContentProps {
   slideIndex: number;
   totalSlides: number;
   title: string;
-  content: React.ReactNode;
+  content: string;
   onPrevSlide: () => void;
   onNextSlide: () => void;
   onPrevChapter: () => void;
@@ -29,6 +29,59 @@ const SlideContent = ({
   onPrevChapter,
   onNextChapter,
 }: SlideContentProps) => {
+  // Function to render markdown-like content
+  const renderContent = (text: string) => {
+    // Split the content by lines
+    const lines = text.trim().split('\n');
+    
+    return (
+      <div className="space-y-4">
+        {lines.map((line, index) => {
+          const trimmedLine = line.trim();
+          
+          // Handle headers (##)
+          if (trimmedLine.startsWith('## ')) {
+            return (
+              <h3 key={index} className="text-lg font-semibold mt-4">
+                {trimmedLine.substring(3)}
+              </h3>
+            );
+          }
+          
+          // Handle list items (-)
+          if (trimmedLine.startsWith('- ')) {
+            return (
+              <div key={index} className="flex space-x-2 ml-4">
+                <span className="text-muted-foreground">•</span>
+                <span>{trimmedLine.substring(2)}</span>
+              </div>
+            );
+          }
+          
+          // Handle bold text (**)
+          if (trimmedLine.includes('**')) {
+            const parts = trimmedLine.split(/\*\*(.*?)\*\*/g);
+            return (
+              <p key={index} className={trimmedLine === '' ? 'my-2' : ''}>
+                {parts.map((part, i) => (
+                  i % 2 === 0 ? part : <strong key={i}>{part}</strong>
+                ))}
+              </p>
+            );
+          }
+          
+          // Normal paragraph
+          if (trimmedLine !== '') {
+            return <p key={index}>{trimmedLine}</p>;
+          }
+          
+          // Empty line
+          return <div key={index} className="h-2"></div>;
+        })}
+      </div>
+    );
+  };
+
   return (
     <Card className="mt-6">
       <CardHeader>
@@ -41,7 +94,11 @@ const SlideContent = ({
           </div>
         </div>
       </CardHeader>
-      <CardContent>{content}</CardContent>
+      <CardContent>
+        <div className="prose max-w-none dark:prose-invert">
+          {renderContent(content)}
+        </div>
+      </CardContent>
       <CardFooter className="flex justify-between border-t p-4">
         <div className="flex space-x-2">
           <Button 
@@ -85,4 +142,3 @@ const SlideContent = ({
 };
 
 export default SlideContent;
-
