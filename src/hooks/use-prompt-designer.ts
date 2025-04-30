@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import React from 'react';
 
 export interface PromptState {
   id?: string;
@@ -90,7 +91,7 @@ export function usePromptDesigner() {
       if (!user) throw new Error('User not authenticated');
       
       // Insert the prompt first
-      const { data: promptData, error: promptError } = await supabase
+      const { data: newPrompt, error: promptError } = await supabase
         .from('prompts')
         .insert({
           title: promptData.title,
@@ -106,7 +107,7 @@ export function usePromptDesigner() {
       const { data: versionData, error: versionError } = await supabase
         .from('prompt_versions')
         .insert({
-          prompt_id: promptData.id,
+          prompt_id: newPrompt.id,
           version_number: 1,
           field_values: promptData.fieldValues,
           temperature: promptData.temperature,
@@ -119,7 +120,7 @@ export function usePromptDesigner() {
         
       if (versionError) throw versionError;
       
-      return { ...promptData, version: versionData };
+      return { ...newPrompt, version: versionData };
     },
     onSuccess: () => {
       toast.success('Prompt created successfully');
@@ -261,6 +262,3 @@ export function usePromptDesigner() {
     compilePromptText
   };
 }
-
-// Add missing React import
-import React from 'react';
