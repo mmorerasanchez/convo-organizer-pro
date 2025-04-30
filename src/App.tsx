@@ -13,6 +13,7 @@ import ConversationDetail from "./pages/ConversationDetail";
 import Prompting from "./pages/Prompting";
 import Tools from "./pages/Tools";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/prompting" element={<Prompting />} />
             <Route path="/tools" element={<Tools />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

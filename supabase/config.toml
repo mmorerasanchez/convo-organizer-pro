@@ -3,3 +3,8 @@ project_id = "whigwajpngjkxohfhvup"
 
 [functions.improve-prompt]
 verify_jwt = false
+
+[auth.external.google]
+enabled = true
+client_id = "env(GOOGLE_CLIENT_ID)"
+client_secret = "env(GOOGLE_CLIENT_SECRET)"
