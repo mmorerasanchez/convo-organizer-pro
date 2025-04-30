@@ -104,6 +104,56 @@ export type Database = {
           },
         ]
       }
+      framework_fields: {
+        Row: {
+          framework_id: string | null
+          help_text: string | null
+          id: string
+          label: string | null
+          ordinal: number | null
+        }
+        Insert: {
+          framework_id?: string | null
+          help_text?: string | null
+          id?: string
+          label?: string | null
+          ordinal?: number | null
+        }
+        Update: {
+          framework_id?: string | null
+          help_text?: string | null
+          id?: string
+          label?: string | null
+          ordinal?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "framework_fields_framework_id_fkey"
+            columns: ["framework_id"]
+            isOneToOne: false
+            referencedRelation: "frameworks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      frameworks: {
+        Row: {
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       knowledge: {
         Row: {
           created_at: string
@@ -150,6 +200,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      models: {
+        Row: {
+          context_window: number | null
+          display_name: string | null
+          id: string
+          provider: string | null
+        }
+        Insert: {
+          context_window?: number | null
+          display_name?: string | null
+          id?: string
+          provider?: string | null
+        }
+        Update: {
+          context_window?: number | null
+          display_name?: string | null
+          id?: string
+          provider?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -241,6 +312,130 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prompt_tests: {
+        Row: {
+          cost_usd: number | null
+          created_at: string | null
+          id: string
+          raw_response: string | null
+          response_ms: number | null
+          tokens_in: number | null
+          tokens_out: number | null
+          version_id: string | null
+        }
+        Insert: {
+          cost_usd?: number | null
+          created_at?: string | null
+          id?: string
+          raw_response?: string | null
+          response_ms?: number | null
+          tokens_in?: number | null
+          tokens_out?: number | null
+          version_id?: string | null
+        }
+        Update: {
+          cost_usd?: number | null
+          created_at?: string | null
+          id?: string
+          raw_response?: string | null
+          response_ms?: number | null
+          tokens_in?: number | null
+          tokens_out?: number | null
+          version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_tests_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "prompt_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prompt_versions: {
+        Row: {
+          compiled_text: string | null
+          created_at: string | null
+          field_values: Json | null
+          id: string
+          max_tokens: number | null
+          model_id: string | null
+          prompt_id: string | null
+          temperature: number | null
+          version_number: number | null
+        }
+        Insert: {
+          compiled_text?: string | null
+          created_at?: string | null
+          field_values?: Json | null
+          id?: string
+          max_tokens?: number | null
+          model_id?: string | null
+          prompt_id?: string | null
+          temperature?: number | null
+          version_number?: number | null
+        }
+        Update: {
+          compiled_text?: string | null
+          created_at?: string | null
+          field_values?: Json | null
+          id?: string
+          max_tokens?: number | null
+          model_id?: string | null
+          prompt_id?: string | null
+          temperature?: number | null
+          version_number?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_versions_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prompt_versions_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prompts: {
+        Row: {
+          created_at: string | null
+          framework_id: string | null
+          id: string
+          owner_id: string | null
+          title: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          framework_id?: string | null
+          id?: string
+          owner_id?: string | null
+          title?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          framework_id?: string | null
+          id?: string
+          owner_id?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompts_framework_id_fkey"
+            columns: ["framework_id"]
+            isOneToOne: false
+            referencedRelation: "frameworks"
             referencedColumns: ["id"]
           },
         ]
