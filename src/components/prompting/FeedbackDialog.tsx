@@ -21,10 +21,10 @@ export function FeedbackDialog({
 }: FeedbackDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Provide Improvement Feedback</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="sm:max-w-[500px] p-6 gap-6">
+        <DialogHeader className="pb-2">
+          <DialogTitle className="text-xl font-semibold">Provide Improvement Feedback</DialogTitle>
+          <DialogDescription className="text-base text-muted-foreground">
             Help us understand how you'd like the prompt to be improved.
           </DialogDescription>
         </DialogHeader>
@@ -33,16 +33,21 @@ export function FeedbackDialog({
           value={feedback}
           onChange={(e) => onFeedbackChange(e.target.value)}
           placeholder="e.g., Make it more concise, Add more context, Change the tone..."
-          className="mt-4 min-h-[100px]"
+          className="min-h-[120px] border rounded-md"
         />
         
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="flex gap-3 pt-2">
+          <Button 
+            variant="outline" 
+            onClick={() => onOpenChange(false)} 
+            className="h-10"
+          >
             Cancel
           </Button>
           <Button 
             onClick={onSubmit}
             disabled={!feedback.trim()}
+            className="bg-primary hover:bg-primary/90 h-10"
           >
             Submit Feedback
           </Button>

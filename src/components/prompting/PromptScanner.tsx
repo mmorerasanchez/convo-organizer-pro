@@ -98,7 +98,7 @@ const PromptScanner = () => {
   return (
     <div className="space-y-6">
       {apiError && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="rounded-lg border shadow-sm">
           <AlertDescription>
             {apiError.includes("quota") 
               ? "OpenAI API quota exceeded. The service is temporarily unavailable. Please try again later."
@@ -110,7 +110,7 @@ const PromptScanner = () => {
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <PromptInputCard
           promptInput={promptInput}
           onChange={setPromptInput}

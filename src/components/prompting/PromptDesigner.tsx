@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
 import { useFrameworks, useFrameworkFields, useModels } from '@/hooks/use-frameworks';
-import { usePromptDesigner, PromptState } from '@/hooks/use-prompt-designer';
+import { usePromptDesigner } from '@/hooks/use-prompt-designer';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Brain, Save, Copy, Trash, PlusCircle, RefreshCw } from 'lucide-react';
 
@@ -168,10 +168,10 @@ const PromptDesigner = () => {
   if (!user) {
     return (
       <div className="space-y-4">
-        <Card>
+        <Card className="border shadow-sm">
           <CardHeader>
-            <CardTitle>Authentication Required</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg font-medium">Authentication Required</CardTitle>
+            <CardDescription className="text-base">
               Please log in to use the Prompt Designer.
             </CardDescription>
           </CardHeader>
@@ -184,41 +184,42 @@ const PromptDesigner = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">Prompt Designer</h2>
-          <p className="text-muted-foreground">Create, test, and iterate on prompts using proven frameworks</p>
+          <h2 className="text-xl font-semibold mb-1">Prompt Designer</h2>
+          <p className="text-muted-foreground text-sm">Create, test, and iterate on prompts using proven frameworks</p>
         </div>
-        <Button onClick={handleNewPrompt} className="gap-2">
+        <Button onClick={handleNewPrompt} className="gap-2 h-9 bg-white border hover:bg-muted/50 text-foreground shadow-sm">
           <PlusCircle size={16} />
           New Prompt
         </Button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Editor Section */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* Prompt Metadata */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Prompt Settings</CardTitle>
+          <Card className="border shadow-sm overflow-hidden">
+            <CardHeader className="bg-white pb-2">
+              <CardTitle className="text-lg font-medium">Prompt Settings</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-5 pt-6">
               <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
+                <Label htmlFor="title" className="text-sm font-medium">Title</Label>
                 <Input 
                   id="title" 
                   value={activePrompt.title} 
                   onChange={(e) => setActivePrompt({ ...activePrompt, title: e.target.value })} 
                   placeholder="Enter a title for your prompt"
+                  className="h-9 border"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="framework">Framework</Label>
+                <Label htmlFor="framework" className="text-sm font-medium">Framework</Label>
                 <Select 
                   value={activePrompt.frameworkId || undefined} 
                   onValueChange={(value) => setActivePrompt({ ...activePrompt, frameworkId: value })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9 border">
                     <SelectValue placeholder="Select a framework" />
                   </SelectTrigger>
                   <SelectContent>
@@ -230,19 +231,19 @@ const PromptDesigner = () => {
                   </SelectContent>
                 </Select>
                 {activePrompt.frameworkId && (
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {frameworks?.find(f => f.id === activePrompt.frameworkId)?.description}
                   </p>
                 )}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="model">Model</Label>
+                <Label htmlFor="model" className="text-sm font-medium">Model</Label>
                 <Select 
                   value={activePrompt.modelId || undefined} 
                   onValueChange={(value) => setActivePrompt({ ...activePrompt, modelId: value })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9 border">
                     <SelectValue placeholder="Select a model" />
                   </SelectTrigger>
                   <SelectContent>
@@ -254,7 +255,7 @@ const PromptDesigner = () => {
                   </SelectContent>
                 </Select>
                 {activePrompt.modelId && (
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Provider: {models?.find(m => m.id === activePrompt.modelId)?.provider}
                     {" | "}
                     Context: {models?.find(m => m.id === activePrompt.modelId)?.context_window} tokens
@@ -264,7 +265,7 @@ const PromptDesigner = () => {
               
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <Label htmlFor="temperature">Temperature: {activePrompt.temperature.toFixed(1)}</Label>
+                  <Label htmlFor="temperature" className="text-sm font-medium">Temperature: {activePrompt.temperature.toFixed(1)}</Label>
                 </div>
                 <Slider 
                   id="temperature"
@@ -281,7 +282,7 @@ const PromptDesigner = () => {
               
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <Label htmlFor="maxTokens">Max Tokens: {activePrompt.maxTokens}</Label>
+                  <Label htmlFor="maxTokens" className="text-sm font-medium">Max Tokens: {activePrompt.maxTokens}</Label>
                 </div>
                 <Slider 
                   id="maxTokens"
@@ -297,17 +298,17 @@ const PromptDesigner = () => {
           
           {/* Framework Fields */}
           {activePrompt.frameworkId && frameworkFields?.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Framework Fields</CardTitle>
-                <CardDescription>
+            <Card className="border shadow-sm overflow-hidden">
+              <CardHeader className="bg-white pb-2">
+                <CardTitle className="text-lg font-medium">Framework Fields</CardTitle>
+                <CardDescription className="text-sm">
                   Fill out the sections for the {frameworks?.find(f => f.id === activePrompt.frameworkId)?.name} framework
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 pt-6">
                 {frameworkFields.map((field) => (
                   <div key={field.id} className="space-y-2">
-                    <Label htmlFor={`field-${field.id}`}>
+                    <Label htmlFor={`field-${field.id}`} className="text-sm font-medium">
                       {field.label}
                       {field.help_text && (
                         <span className="text-xs text-muted-foreground ml-2">({field.help_text})</span>
@@ -318,22 +319,22 @@ const PromptDesigner = () => {
                       placeholder={`Enter ${field.label.toLowerCase()}`}
                       value={activePrompt.fieldValues[field.label] || ''}
                       onChange={(e) => handleFieldChange(field.label, e.target.value)}
-                      className="min-h-[100px]"
+                      className="min-h-[100px] border"
                     />
                   </div>
                 ))}
               </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" onClick={handleDeletePrompt} disabled={!activePrompt.id} className="gap-2">
+              <CardFooter className="flex justify-between bg-muted/20 px-6 py-4 border-t">
+                <Button variant="outline" onClick={handleDeletePrompt} disabled={!activePrompt.id} className="gap-2 h-9 text-sm">
                   <Trash size={16} />
                   Delete
                 </Button>
-                <div className="flex space-x-2">
-                  <Button variant="outline" onClick={handleSavePrompt} className="gap-2">
+                <div className="flex space-x-3">
+                  <Button variant="outline" onClick={handleSavePrompt} className="gap-2 h-9 text-sm">
                     <Save size={16} />
                     Save Version
                   </Button>
-                  <Button onClick={handleTestPrompt} disabled={isTestingPrompt} className="gap-2">
+                  <Button onClick={handleTestPrompt} disabled={isTestingPrompt} className="gap-2 h-9 text-sm bg-primary hover:bg-primary/90">
                     {isTestingPrompt ? (
                       <RefreshCw size={16} className="animate-spin" />
                     ) : (
@@ -348,22 +349,22 @@ const PromptDesigner = () => {
         </div>
         
         {/* Preview Section */}
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Compiled Prompt</CardTitle>
-              <CardDescription>
+        <div className="space-y-6">
+          <Card className="border shadow-sm overflow-hidden">
+            <CardHeader className="bg-white pb-2">
+              <CardTitle className="text-lg font-medium">Compiled Prompt</CardTitle>
+              <CardDescription className="text-sm">
                 This is how your prompt will be sent to the model
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="bg-muted p-4 rounded-md overflow-auto max-h-[300px]">
+            <CardContent className="pt-6">
+              <div className="bg-background p-4 rounded-md overflow-auto max-h-[300px] border">
                 <pre className="font-mono text-sm whitespace-pre-wrap">
                   {compilePromptText(activePrompt.fieldValues)}
                 </pre>
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="bg-muted/20 px-6 py-4 border-t">
               <Button 
                 variant="outline" 
                 onClick={() => {
@@ -373,7 +374,7 @@ const PromptDesigner = () => {
                     description: "The compiled prompt has been copied to your clipboard."
                   });
                 }}
-                className="gap-2"
+                className="gap-2 h-9 text-sm"
               >
                 <Copy size={16} />
                 Copy to Clipboard
@@ -381,21 +382,21 @@ const PromptDesigner = () => {
             </CardFooter>
           </Card>
           
-          <Card>
-            <CardHeader>
-              <CardTitle>Model Response</CardTitle>
-              <CardDescription>
+          <Card className="border shadow-sm overflow-hidden">
+            <CardHeader className="bg-white pb-2">
+              <CardTitle className="text-lg font-medium">Model Response</CardTitle>
+              <CardDescription className="text-sm">
                 The output from the model based on your prompt
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="bg-muted p-4 rounded-md overflow-auto max-h-[300px]">
+            <CardContent className="pt-6">
+              <div className="bg-background p-4 rounded-md overflow-auto max-h-[300px] border">
                 {promptResponse ? (
                   <div className="font-mono text-sm whitespace-pre-wrap">
                     {promptResponse}
                   </div>
                 ) : (
-                  <div className="text-muted-foreground italic">
+                  <div className="text-muted-foreground italic text-sm">
                     Test your prompt to see the response here
                   </div>
                 )}

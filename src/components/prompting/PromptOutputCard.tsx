@@ -33,22 +33,22 @@ export function PromptOutputCard({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Improved Prompt</CardTitle>
-        <CardDescription>
+    <Card className="overflow-hidden border shadow-sm">
+      <CardHeader className="bg-white pb-0">
+        <CardTitle className="text-lg font-medium">Improved Prompt</CardTitle>
+        <CardDescription className="text-sm text-muted-foreground">
           Enhanced based on prompt engineering best practices
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <Textarea 
           placeholder="Your improved prompt will appear here..."
-          className="min-h-[200px]"
+          className="min-h-[200px] bg-background border rounded-md font-mono text-sm"
           value={improvedPrompt}
           readOnly
         />
       </CardContent>
-      <CardFooter className="flex flex-col space-y-4">
+      <CardFooter className="flex flex-col space-y-4 bg-muted/20 px-6 py-4 border-t">
         <div className="w-full flex justify-between items-center">
           <p className="text-sm text-muted-foreground">
             Not satisfied? Provide feedback for further improvement.
@@ -58,9 +58,9 @@ export function PromptOutputCard({
               variant="outline" 
               size="sm" 
               onClick={handleCopy}
-              className="gap-2"
+              className="gap-2 h-8 text-xs"
             >
-              {copied ? <CheckCircle2 size={16} /> : <Copy size={16} />}
+              {copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}
               {copied ? 'Copied' : 'Copy'}
             </Button>
           )}
@@ -72,7 +72,7 @@ export function PromptOutputCard({
               <Button 
                 variant="outline" 
                 onClick={onRevert}
-                className="gap-2"
+                className="gap-2 text-sm h-9"
               >
                 <ArrowLeft size={16} />
                 Previous Version
@@ -82,7 +82,7 @@ export function PromptOutputCard({
             <Button 
               variant="outline" 
               onClick={onTryAgain}
-              className="gap-2"
+              className="gap-2 text-sm h-9"
               disabled={isProcessing}
             >
               <RefreshCw size={16} />
@@ -91,7 +91,7 @@ export function PromptOutputCard({
             
             <Button 
               onClick={onAccept}
-              className="gap-2"
+              className="gap-2 bg-primary hover:bg-primary/90 text-sm h-9"
               disabled={isProcessing}
             >
               <ThumbsUp size={16} />
