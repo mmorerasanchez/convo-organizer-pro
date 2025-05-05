@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { CircleInfo } from 'lucide-react';
+import { CircleHelp } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface TokenUsageDisplayProps {
@@ -25,7 +25,7 @@ export function TokenUsageDisplay({ currentUsage, limit }: TokenUsageDisplayProp
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <CircleInfo className="h-4 w-4 text-muted-foreground cursor-help" />
+            <CircleHelp className="h-4 w-4 text-muted-foreground cursor-help" />
           </TooltipTrigger>
           <TooltipContent side="top" align="center" className="max-w-[250px]">
             <p>Free tier usage limit. Upgrade for unlimited tokens.</p>

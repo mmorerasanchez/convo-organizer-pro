@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useRouter } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { 
   Dialog, 
   DialogContent, 
@@ -22,7 +22,7 @@ interface PromptManagerModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   activePrompt: PromptState;
-  onSave: () => Promise<void>;
+  onSave: () => Promise<boolean | void>;
 }
 
 export function PromptManagerModal({ 
@@ -37,7 +37,7 @@ export function PromptManagerModal({
   const [showNewProjectForm, setShowNewProjectForm] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
-  const router = useRouter();
+  const navigate = useNavigate();
 
   // Fetch user's projects
   const { data: projects = [] } = useQuery({
@@ -66,7 +66,7 @@ export function PromptManagerModal({
       }
       
       // Save the prompt version
-      await onSave();
+      const saveResult = await onSave();
       
       // Handle project navigation if needed
       if (selectedProjectId) {
@@ -75,9 +75,9 @@ export function PromptManagerModal({
           description: "Your prompt has been saved successfully."
         });
         
-        // Optionally navigate to the project
+        // Optionally navigate to the selected project
         if (confirm("Would you like to navigate to the selected project?")) {
-          router.navigate(`/project/${selectedProjectId}`);
+          navigate(`/project/${selectedProjectId}`);
         }
       }
       

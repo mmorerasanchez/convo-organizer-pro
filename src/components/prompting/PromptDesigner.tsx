@@ -63,7 +63,7 @@ const PromptDesigner = () => {
   };
   
   // Handle prompt save
-  const handleSavePrompt = async () => {
+  const handleSavePrompt = async (): Promise<boolean> => {
     try {
       if (!activePrompt.frameworkId) {
         toast({
@@ -71,7 +71,7 @@ const PromptDesigner = () => {
           title: "Framework Required",
           description: "Please select a framework for your prompt."
         });
-        return;
+        return false;
       }
       
       if (activePrompt.id) {
