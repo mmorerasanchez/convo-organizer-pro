@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useFrameworks, useFrameworkFields, useModels } from '@/hooks/use-frameworks';
@@ -20,8 +19,8 @@ const PromptDesigner = () => {
   
   const [promptResponse, setPromptResponse] = useState<string>('');
   const [isTestingPrompt, setIsTestingPrompt] = useState(false);
-  const [tokenUsage, setTokenUsage] = useState(0);
-  const [tokenLimit] = useState(10); // Free tier limit
+  const [requestCount, setRequestCount] = useState(0);
+  const [requestLimit] = useState(10); // Free tier limit
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   
   const {
@@ -115,12 +114,12 @@ const PromptDesigner = () => {
       
       setPromptResponse(result.completion);
       
-      // Update token usage
-      setTokenUsage(prev => prev + result.tokens_in + result.tokens_out);
+      // Update request count instead of token usage
+      setRequestCount(prev => prev + 1);
       
       toast({
         title: "Response Generated",
-        description: `Response generated in ${result.response_ms}ms (${result.tokens_in} input tokens, ${result.tokens_out} output tokens)`
+        description: `Response generated in ${result.response_ms}ms`
       });
     } catch (error) {
       console.error("Error testing prompt:", error);
@@ -165,8 +164,8 @@ const PromptDesigner = () => {
     <div className="space-y-6">
       <PromptDesignerHeader 
         handleNewPrompt={handleNewPrompt} 
-        tokenUsage={tokenUsage}
-        tokenLimit={tokenLimit}
+        tokenUsage={requestCount}
+        tokenLimit={requestLimit}
       />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

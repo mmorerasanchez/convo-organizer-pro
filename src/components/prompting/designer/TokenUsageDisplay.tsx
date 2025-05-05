@@ -19,7 +19,7 @@ export function TokenUsageDisplay({ currentUsage, limit }: TokenUsageDisplayProp
         <span className={`mr-1 ${isOverLimit ? 'text-red-500' : isNearLimit ? 'text-amber-500' : ''}`}>
           {currentUsage}
         </span> 
-        / {limit} tokens
+        / {limit} requests
       </div>
       
       <TooltipProvider>
@@ -28,7 +28,7 @@ export function TokenUsageDisplay({ currentUsage, limit }: TokenUsageDisplayProp
             <CircleHelp className="h-4 w-4 text-muted-foreground cursor-help" />
           </TooltipTrigger>
           <TooltipContent side="top" align="center" className="max-w-[250px]">
-            <p>Free tier usage limit. Upgrade for unlimited tokens.</p>
+            <p>Free tier usage limit. Upgrade for unlimited requests.</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

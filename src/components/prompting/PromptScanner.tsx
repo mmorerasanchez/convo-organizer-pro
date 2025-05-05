@@ -13,8 +13,8 @@ const PromptScanner = () => {
   const [improvedPrompt, setImprovedPrompt] = useState('');
   const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
   const [currentFeedback, setCurrentFeedback] = useState('');
-  const [tokenUsage, setTokenUsage] = useState(0);
-  const [tokenLimit] = useState(10); // Free tier limit
+  const [requestCount, setRequestCount] = useState(0);
+  const [requestLimit] = useState(10); // Free tier limit
   const { toast } = useToast();
   
   const {
@@ -35,8 +35,8 @@ const PromptScanner = () => {
         }
         setImprovedPrompt(result);
         
-        // Increment token usage (approximation - we don't get actual token counts from the API)
-        setTokenUsage(prev => prev + Math.ceil(promptInput.length / 4) + Math.ceil(result.length / 4));
+        // Increment request count
+        setRequestCount(prev => prev + 1);
       }
     } catch (error) {
       console.error('Error in handleImprovePrompt:', error);
@@ -105,7 +105,7 @@ const PromptScanner = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Prompt Scanner</h2>
-        <TokenUsageDisplay currentUsage={tokenUsage} limit={tokenLimit} />
+        <TokenUsageDisplay currentUsage={requestCount} limit={requestLimit} />
       </div>
       
       {apiError && (
