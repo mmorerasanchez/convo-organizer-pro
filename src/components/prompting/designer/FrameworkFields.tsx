@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { PromptState } from '@/hooks/use-prompt-designer';
+import { PromptState } from '@/hooks/prompting';
 import { Zap } from 'lucide-react';
 
 interface FrameworkFieldsProps {

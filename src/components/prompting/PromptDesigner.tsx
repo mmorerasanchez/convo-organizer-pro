@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useFrameworks, useFrameworkFields, useModels } from '@/hooks/use-frameworks';
-import { usePromptDesigner } from '@/hooks/use-prompt-designer';
+import { usePromptDesigner } from '@/hooks/prompting';
 import { PromptDesignerHeader } from './designer/PromptDesignerHeader';
 import { PromptSettings } from './designer/PromptSettings';
 import { FrameworkFields } from './designer/FrameworkFields';
