@@ -72,7 +72,12 @@ export function PromptSettings({
             </SelectTrigger>
             <SelectContent>
               {models?.map((model) => (
-                <SelectItem key={model.id} value={model.id}>
+                <SelectItem 
+                  key={model.id} 
+                  value={model.id}
+                  disabled={model.provider !== 'OpenAI'}
+                  className={model.provider !== 'OpenAI' ? 'opacity-50' : ''}
+                >
                   {model.display_name}
                 </SelectItem>
               ))}

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useFrameworks, useFrameworkFields, useModels } from '@/hooks/use-frameworks';
 import { usePromptDesigner } from '@/hooks/use-prompt-designer';
@@ -9,6 +9,7 @@ import { FrameworkFields } from './designer/FrameworkFields';
 import { CompiledPromptPreview } from './designer/CompiledPromptPreview';
 import { ModelResponse } from './designer/ModelResponse';
 import { AuthenticationRequired } from './designer/AuthenticationRequired';
+import { PromptManagerModal } from './designer/PromptManagerModal';
 import { useToast } from '@/hooks/use-toast';
 
 const PromptDesigner = () => {
@@ -19,13 +20,15 @@ const PromptDesigner = () => {
   
   const [promptResponse, setPromptResponse] = useState<string>('');
   const [isTestingPrompt, setIsTestingPrompt] = useState(false);
+  const [tokenUsage, setTokenUsage] = useState(0);
+  const [tokenLimit] = useState(10); // Free tier limit
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
   
   const {
     activePrompt,
     setActivePrompt,
     createPrompt,
     saveVersion,
-    deletePrompt,
     testPrompt,
     compilePromptText
   } = usePromptDesigner();
@@ -33,7 +36,7 @@ const PromptDesigner = () => {
   const { data: frameworkFields } = useFrameworkFields(activePrompt.frameworkId);
   
   // If framework changes, reset field values
-  React.useEffect(() => {
+  useEffect(() => {
     if (activePrompt.frameworkId && frameworkFields && frameworkFields.length > 0) {
       const newFieldValues = { ...activePrompt.fieldValues };
       
@@ -76,8 +79,10 @@ const PromptDesigner = () => {
       } else {
         await createPrompt.mutateAsync(activePrompt);
       }
+      return true;
     } catch (error) {
       console.error("Error saving prompt:", error);
+      return false;
     }
   };
   
@@ -110,16 +115,19 @@ const PromptDesigner = () => {
       
       setPromptResponse(result.completion);
       
+      // Update token usage
+      setTokenUsage(prev => prev + result.tokens_in + result.tokens_out);
+      
       toast({
-        title: "Prompt Test Complete",
+        title: "Response Generated",
         description: `Response generated in ${result.response_ms}ms (${result.tokens_in} input tokens, ${result.tokens_out} output tokens)`
       });
     } catch (error) {
       console.error("Error testing prompt:", error);
       toast({
         variant: "destructive",
-        title: "Test Failed",
-        description: "Failed to test prompt. Check your inputs and try again."
+        title: "Generation Failed",
+        description: "Failed to generate response. Check your inputs and try again."
       });
     } finally {
       setIsTestingPrompt(false);
@@ -139,18 +147,6 @@ const PromptDesigner = () => {
     setPromptResponse('');
   };
   
-  // Handle prompt deletion
-  const handleDeletePrompt = async () => {
-    if (activePrompt.id && window.confirm('Are you sure you want to delete this prompt?')) {
-      try {
-        await deletePrompt.mutateAsync(activePrompt.id);
-        handleNewPrompt();
-      } catch (error) {
-        console.error("Error deleting prompt:", error);
-      }
-    }
-  };
-  
   // If loading auth, show spinner
   if (loading) {
     return (
@@ -167,7 +163,11 @@ const PromptDesigner = () => {
 
   return (
     <div className="space-y-6">
-      <PromptDesignerHeader handleNewPrompt={handleNewPrompt} />
+      <PromptDesignerHeader 
+        handleNewPrompt={handleNewPrompt} 
+        tokenUsage={tokenUsage}
+        tokenLimit={tokenLimit}
+      />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Editor Section */}
@@ -185,10 +185,11 @@ const PromptDesigner = () => {
               frameworkFields={frameworkFields}
               frameworks={frameworks}
               handleFieldChange={handleFieldChange}
-              handleDeletePrompt={handleDeletePrompt}
               handleSavePrompt={handleSavePrompt}
               handleTestPrompt={handleTestPrompt}
               isTestingPrompt={isTestingPrompt}
+              showSaveModal={() => setSaveModalOpen(true)}
+              handleNewPrompt={handleNewPrompt}
             />
           )}
         </div>
@@ -202,6 +203,13 @@ const PromptDesigner = () => {
           <ModelResponse promptResponse={promptResponse} />
         </div>
       </div>
+      
+      <PromptManagerModal
+        open={saveModalOpen}
+        onOpenChange={setSaveModalOpen}
+        activePrompt={activePrompt}
+        onSave={handleSavePrompt}
+      />
     </div>
   );
 };

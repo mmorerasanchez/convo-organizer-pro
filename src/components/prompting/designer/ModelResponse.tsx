@@ -23,7 +23,7 @@ export function ModelResponse({ promptResponse }: ModelResponseProps) {
             </div>
           ) : (
             <div className="text-muted-foreground italic text-sm">
-              Test your prompt to see the response here
+              Generate a response to see the output here
             </div>
           )}
         </div>

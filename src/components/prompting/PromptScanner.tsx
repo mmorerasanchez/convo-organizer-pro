@@ -6,12 +6,15 @@ import { PromptInputCard } from './PromptInputCard';
 import { PromptOutputCard } from './PromptOutputCard';
 import { FeedbackDialog } from './FeedbackDialog';
 import { useToast } from '@/hooks/use-toast';
+import { TokenUsageDisplay } from './designer/TokenUsageDisplay';
 
 const PromptScanner = () => {
   const [promptInput, setPromptInput] = useState('');
   const [improvedPrompt, setImprovedPrompt] = useState('');
   const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
   const [currentFeedback, setCurrentFeedback] = useState('');
+  const [tokenUsage, setTokenUsage] = useState(0);
+  const [tokenLimit] = useState(10); // Free tier limit
   const { toast } = useToast();
   
   const {
@@ -31,6 +34,9 @@ const PromptScanner = () => {
           setFeedbackHistory([...feedbackHistory, { feedback: feedback || '', improvedPrompt }]);
         }
         setImprovedPrompt(result);
+        
+        // Increment token usage (approximation - we don't get actual token counts from the API)
+        setTokenUsage(prev => prev + Math.ceil(promptInput.length / 4) + Math.ceil(result.length / 4));
       }
     } catch (error) {
       console.error('Error in handleImprovePrompt:', error);
@@ -97,6 +103,11 @@ const PromptScanner = () => {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Prompt Scanner</h2>
+        <TokenUsageDisplay currentUsage={tokenUsage} limit={tokenLimit} />
+      </div>
+      
       {apiError && (
         <Alert variant="destructive" className="rounded-lg border shadow-sm">
           <AlertDescription>
