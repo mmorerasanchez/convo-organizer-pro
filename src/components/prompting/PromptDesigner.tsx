@@ -61,9 +61,10 @@ const PromptDesigner = () => {
         onSaveToProject={() => setSaveToProjectDialogOpen(true)}
       />
       
-      {/* Fix: Properly implement the Dialog for PromptManagerModal */}
       <Dialog open={saveModalOpen} onOpenChange={setSaveModalOpen}>
         <PromptManagerModal
+          open={saveModalOpen}
+          onOpenChange={setSaveModalOpen}
           activePrompt={activePrompt}
           onSave={async () => {
             try {
@@ -81,7 +82,6 @@ const PromptDesigner = () => {
         />
       </Dialog>
       
-      {/* Fix: Properly implement the Dialog for SaveToProjectDialog */}
       <Dialog open={saveToProjectDialogOpen} onOpenChange={setSaveToProjectDialogOpen}>
         <SaveToProjectDialog
           open={saveToProjectDialogOpen}
