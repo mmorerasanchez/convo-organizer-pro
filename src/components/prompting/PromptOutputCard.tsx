@@ -1,136 +1,120 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Copy, CheckCircle2, ArrowLeft, RefreshCw, ThumbsUp, Save } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { SaveToProjectDialog } from './SaveToProjectDialog';
+import { ArrowLeft, Copy, Save } from 'lucide-react';
 
 interface PromptOutputCardProps {
   improvedPrompt: string;
   onTryAgain: () => void;
   onRevert: () => void;
   onAccept: () => void;
+  onSave: () => void;
   isProcessing: boolean;
   canRevert: boolean;
-  originalPrompt?: string;
+  originalPrompt: string;
 }
 
-export function PromptOutputCard({
-  improvedPrompt,
-  onTryAgain,
+export const PromptOutputCard = ({ 
+  improvedPrompt, 
+  onTryAgain, 
   onRevert,
   onAccept,
+  onSave,
   isProcessing,
   canRevert,
-  originalPrompt,
-}: PromptOutputCardProps) {
-  const [copied, setCopied] = useState(false);
-  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
-  const { toast } = useToast();
-
+  originalPrompt
+}: PromptOutputCardProps) => {
   const handleCopy = () => {
     navigator.clipboard.writeText(improvedPrompt);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-    toast({
-      title: "Copied to clipboard",
-      description: "The improved prompt has been copied to your clipboard.",
-      duration: 2000,
-    });
   };
 
   return (
-    <>
-      <Card className="overflow-hidden border">
-        <CardHeader className="pb-0">
-          <CardTitle className="text-base font-medium">Improved Prompt</CardTitle>
-          <CardDescription className="text-xs text-muted-foreground">
-            Enhanced based on prompt engineering best practices
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-4">
-          <Textarea 
-            placeholder="Your improved prompt will appear here..."
-            className="min-h-[180px] bg-background border rounded-md font-mono text-sm prompt-area"
-            value={improvedPrompt}
-            readOnly
-          />
-        </CardContent>
-        <CardFooter className="flex flex-col space-y-3 bg-muted/10 px-5 py-3 border-t">
-          <div className="w-full flex justify-between items-center">
-            <p className="text-xs text-muted-foreground">
-              Not satisfied? Provide feedback for further improvement.
+    <Card className="h-full flex flex-col">
+      <CardHeader className="bg-muted/50 pb-4">
+        <CardTitle className="text-md">Improved Prompt</CardTitle>
+        <CardDescription>
+          AI-generated improvement based on prompt engineering best practices
+        </CardDescription>
+      </CardHeader>
+      
+      <CardContent className="flex-grow">
+        {improvedPrompt ? (
+          <div className="whitespace-pre-wrap font-mono text-sm">
+            {improvedPrompt}
+          </div>
+        ) : (
+          <div className="flex h-full items-center justify-center text-muted-foreground text-center">
+            <p>
+              {isProcessing
+                ? "Processing your prompt..."
+                : "Enter a prompt and click 'Improve' to see suggestions."}
             </p>
-            {improvedPrompt && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleCopy}
-                className="gap-1.5 h-7 text-xs font-mono"
+          </div>
+        )}
+      </CardContent>
+      
+      {improvedPrompt && (
+        <CardFooter className="flex flex-wrap justify-between gap-2 border-t pt-4">
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onTryAgain}
+              className="h-8"
+              disabled={isProcessing || !originalPrompt}
+            >
+              Try Again
+            </Button>
+            
+            {canRevert && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onRevert}
+                className="h-8 gap-1"
+                disabled={isProcessing}
               >
-                {copied ? <CheckCircle2 size={12} /> : <Copy size={12} />}
-                {copied ? 'Copied' : 'Copy'}
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Revert
               </Button>
             )}
           </div>
           
-          {improvedPrompt && (
-            <div className="w-full flex justify-between gap-2">
-              {canRevert && (
-                <Button 
-                  variant="outline" 
-                  onClick={onRevert}
-                  className="gap-1.5 text-xs h-8 px-3 font-mono"
-                >
-                  <ArrowLeft size={14} />
-                  Previous
-                </Button>
-              )}
-              
-              <Button 
-                variant="outline" 
-                onClick={onTryAgain}
-                className="gap-1.5 text-xs h-8 px-3 font-mono"
-                disabled={isProcessing}
-              >
-                <RefreshCw size={14} />
-                Try Again
-              </Button>
-              
-              {improvedPrompt && (
-                <Button
-                  variant="outline"
-                  onClick={() => setSaveDialogOpen(true)}
-                  className="gap-1.5 text-xs h-8 px-3 font-mono"
-                  disabled={isProcessing}
-                >
-                  <Save size={14} />
-                  Save
-                </Button>
-              )}
-              
-              <Button 
-                onClick={onAccept}
-                className="gap-1.5 bg-primary hover:bg-primary/90 text-xs h-8 px-3 font-mono"
-                disabled={isProcessing}
-              >
-                <ThumbsUp size={14} />
-                Accept
-              </Button>
-            </div>
-          )}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCopy}
+              className="h-8 gap-1.5"
+              disabled={isProcessing}
+            >
+              <Copy className="h-3.5 w-3.5" />
+              Copy
+            </Button>
+            
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onSave}
+              className="h-8 gap-1.5"
+              disabled={isProcessing || !improvedPrompt}
+            >
+              <Save className="h-3.5 w-3.5" />
+              Save
+            </Button>
+            
+            <Button
+              onClick={onAccept}
+              size="sm"
+              className="h-8"
+              disabled={isProcessing || !improvedPrompt}
+            >
+              Accept
+            </Button>
+          </div>
         </CardFooter>
-      </Card>
-      
-      <SaveToProjectDialog
-        open={saveDialogOpen}
-        onOpenChange={setSaveDialogOpen}
-        promptTitle="Improved Prompt"
-        promptContent={originalPrompt || ""}
-        responseContent={improvedPrompt}
-      />
-    </>
+      )}
+    </Card>
   );
-}
+};

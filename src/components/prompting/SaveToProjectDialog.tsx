@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchProjects, createProject } from '@/lib/api/projects';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
@@ -44,9 +44,11 @@ export function SaveToProjectDialog({
   const [showNewProjectForm, setShowNewProjectForm] = useState(false);
   const [conversationTitle, setConversationTitle] = useState(promptTitle || 'Untitled Conversation');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   // Fetch user's projects
   const { data: projects = [] } = useQuery({
@@ -65,8 +67,12 @@ export function SaveToProjectDialog({
         description: `New project "${newProjectName}" created successfully.`
       });
       setShowNewProjectForm(false);
+      
+      // Invalidate projects query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ['projects-list'] });
     },
     onError: (error) => {
+      setError("Failed to create project. Please try again.");
       toast({
         variant: "destructive",
         title: "Error",
@@ -100,7 +106,7 @@ export function SaveToProjectDialog({
         content,
         response: response || "",
         platform: "prompt-designer", // Adding the required platform field
-        captured_at: now,  // Changed from created_at to captured_at
+        captured_at: now,  
         project_id: projectId || null,
         status: "active",
         user_id: user.id
@@ -124,6 +130,9 @@ export function SaveToProjectDialog({
         onSaveComplete();
       }
       
+      // Clear any previous errors
+      setError(null);
+      
       // Ask if user wants to navigate to the conversation
       if (confirm("Would you like to view the saved conversation?")) {
         navigate(`/conversations/${conversationId}`);
@@ -132,6 +141,7 @@ export function SaveToProjectDialog({
       onOpenChange(false);
     },
     onError: (error) => {
+      setError("Failed to save conversation. Please try again.");
       toast({
         variant: "destructive",
         title: "Save Failed",
@@ -144,6 +154,14 @@ export function SaveToProjectDialog({
   const handleSaveConversation = async () => {
     try {
       setIsProcessing(true);
+      setError(null);
+      
+      // Validate inputs
+      if (!conversationTitle.trim()) {
+        setError("Conversation title is required");
+        setIsProcessing(false);
+        return;
+      }
       
       // If creating new project
       if (showNewProjectForm && newProjectName.trim()) {
@@ -155,12 +173,13 @@ export function SaveToProjectDialog({
       
       // Save the conversation
       await saveConversationMutation.mutateAsync({
-        title: conversationTitle,
+        title: conversationTitle.trim(),
         content: promptContent,
         response: responseContent,
         projectId: selectedProjectId === 'none' ? undefined : selectedProjectId
       });
     } catch (error) {
+      setError("An unexpected error occurred. Please try again.");
       console.error("Error in save process:", error);
     } finally {
       setIsProcessing(false);
@@ -178,6 +197,12 @@ export function SaveToProjectDialog({
         </DialogHeader>
         
         <div className="space-y-4 py-4">
+          {error && (
+            <div className="bg-destructive/15 text-destructive p-3 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+          
           <div className="space-y-2">
             <Label htmlFor="title">Conversation Title</Label>
             <Input 

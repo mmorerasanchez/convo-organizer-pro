@@ -6,6 +6,7 @@ import { AuthenticationRequired } from './designer/AuthenticationRequired';
 import { PromptDesignerLayout } from './designer/PromptDesignerLayout';
 import { PromptManagerModal } from './designer/PromptManagerModal';
 import { AuthLoadingState } from './designer/AuthLoadingState';
+import { SaveToProjectDialog } from '../prompting/SaveToProjectDialog';
 
 const PromptDesigner = () => {
   const { user, loading } = useRequireAuth();
@@ -15,6 +16,7 @@ const PromptDesigner = () => {
   const [requestLimit] = useState(10); // Free tier limit
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [compiledPrompt, setCompiledPrompt] = useState('');
+  const [saveToProjectDialogOpen, setSaveToProjectDialogOpen] = useState(false);
   
   const {
     activePrompt,
@@ -73,6 +75,17 @@ const PromptDesigner = () => {
             console.error("Error saving prompt:", error);
             return false;
           }
+        }}
+      />
+      
+      <SaveToProjectDialog
+        open={saveToProjectDialogOpen}
+        onOpenChange={setSaveToProjectDialogOpen}
+        promptTitle={activePrompt.title || "Untitled Prompt"}
+        promptContent={compiledPrompt}
+        responseContent={promptResponse}
+        onSaveComplete={() => {
+          // Additional actions after saving if needed
         }}
       />
     </>

@@ -1,12 +1,15 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { PromptInputCard } from './PromptInputCard';
 import { PromptOutputCard } from './PromptOutputCard';
 import { FeedbackDialog } from './FeedbackDialog';
 import { PromptScannerHeader } from './scanner/PromptScannerHeader';
 import { usePromptScanner } from '@/hooks/use-prompt-scanner';
+import { SaveToProjectDialog } from './SaveToProjectDialog';
 
 const PromptScanner = () => {
+  const [saveToProjectDialogOpen, setSaveToProjectDialogOpen] = useState(false);
+  
   const {
     // State
     promptInput,
@@ -56,6 +59,7 @@ const PromptScanner = () => {
           isProcessing={isProcessing}
           canRevert={feedbackHistory.length > 0}
           originalPrompt={promptInput}
+          onSave={() => setSaveToProjectDialogOpen(true)}
         />
       </div>
 
@@ -65,6 +69,17 @@ const PromptScanner = () => {
         feedback={currentFeedback}
         onFeedbackChange={setCurrentFeedback}
         onSubmit={handleSubmitFeedback}
+      />
+      
+      <SaveToProjectDialog
+        open={saveToProjectDialogOpen}
+        onOpenChange={setSaveToProjectDialogOpen}
+        promptTitle="Improved Prompt"
+        promptContent={improvedPrompt}
+        responseContent={promptInput}
+        onSaveComplete={() => {
+          // Actions after saving if needed
+        }}
       />
     </div>
   );

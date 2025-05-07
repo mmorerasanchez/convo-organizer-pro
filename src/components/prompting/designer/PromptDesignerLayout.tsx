@@ -115,8 +115,8 @@ export function PromptDesignerLayout({
       
       setPromptResponse(result.completion);
       
-      // Update request count instead of token usage - THIS IS THE FIX
-      setRequestCount((prevCount) => prevCount + 1);
+      // Fix: Update request count with proper typing
+      setRequestCount(requestCount + 1);
       
       toast({
         title: "Response Generated",

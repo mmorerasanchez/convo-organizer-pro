@@ -12,12 +12,11 @@ import {
   Wrench, 
   Sparkles, 
   BookOpen,
-  ChevronLeft,
-  ChevronRight,
   MessageSquare,
   BarChart,
   LineChart,
-  PanelLeft
+  FileCode,
+  UsersRound
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -63,6 +62,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     { icon: MessageSquare, label: 'Feedback', path: '/feedback' },
     { icon: BarChart, label: 'Metrics', path: '/metrics' },
     { icon: LineChart, label: 'Roadmap', path: '/roadmap' },
+    { icon: FileCode, label: 'Templates', path: '/templates' },
+    { icon: UsersRound, label: 'Agents', path: '/agents' },
   ];
 
   const handleSignOut = async () => {
@@ -99,119 +100,99 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full flex-col bg-background">
-        <div className="border-b bg-white">
-          <div className="flex h-14 items-center px-4 sm:px-6">
-            <Sheet open={open} onOpenChange={setOpen}>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="mr-4 md:hidden">
-                  <Menu className="h-5 w-5" />
-                  <span className="sr-only">Toggle mobile navigation</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-60 sm:max-w-xs pr-0 bg-white">
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-2">
-                    <Link
-                      to="/"
-                      className="text-xl font-mono font-bold tracking-tight"
-                      onClick={() => setOpen(false)}
-                    >
-                      promptito
-                    </Link>
-                    <div>
-                      <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-2 py-0.5 rounded-md font-mono flex items-center">
-                        <Sparkles className="h-3 w-3 mr-1" />
-                        BETA made with AI
-                      </Badge>
-                    </div>
-                  </div>
-                  <nav className="flex flex-col gap-4">
-                    <div>
-                      <h3 className="mb-1 px-2 text-sm font-medium">Active modules</h3>
-                      <div className="flex flex-col gap-1">
-                        {activeModules.map((item) => (
-                          <Link
-                            key={item.path}
-                            to={item.path}
-                            className={cn(
-                              'flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-all font-mono',
-                              isActive(item.path)
-                                ? 'bg-primary text-primary-foreground'
-                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                            )}
-                            onClick={() => setOpen(false)}
-                          >
-                            <item.icon className="h-4 w-4" />
-                            {item.label}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h3 className="mb-1 px-2 text-sm font-medium text-muted-foreground">Coming soon</h3>
-                      <div className="flex flex-col gap-1">
-                        {comingSoonModules.map((item) => (
-                          <div
-                            key={item.path}
-                            className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-all font-mono text-muted-foreground opacity-60 cursor-not-allowed"
-                          >
-                            <item.icon className="h-4 w-4" />
-                            {item.label}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </nav>
-                </div>
-              </SheetContent>
-            </Sheet>
-            <Link
-              to="/"
-              className="flex items-center gap-2 font-mono text-lg font-bold md:text-xl tracking-tighter"
-            >
-              <span>promptito</span>
-              <div>
-                <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-1.5 py-0.5 rounded-md font-mono flex items-center">
-                  <Sparkles className="h-2.5 w-2.5 mr-0.5" />
-                  BETA made with AI
-                </Badge>
-              </div>
-            </Link>
-            <div className="ml-auto flex gap-2 items-center">
-              {user ? (
-                <>
-                  <div className="hidden md:block text-sm text-muted-foreground font-mono mr-2">
-                    {user.email}
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={handleSignOut}
-                    title="Sign out"
-                    className="h-8 w-8"
-                  >
-                    <LogOut className="h-4 w-4" />
-                  </Button>
-                </>
-              ) : (
-                <Link to="/auth">
-                  <Button variant="ghost" size="sm" className="gap-1.5 h-8 font-mono">
-                    <UserCircle className="h-4 w-4" />
-                    Sign In
-                  </Button>
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetContent side="left" className="w-60 sm:max-w-xs pr-0 bg-white">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/"
+                  className="text-xl font-mono font-bold tracking-tight"
+                  onClick={() => setOpen(false)}
+                >
+                  promptito
                 </Link>
-              )}
+                <div>
+                  <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-2 py-0.5 rounded-md font-mono flex items-center">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    BETA made with AI
+                  </Badge>
+                </div>
+              </div>
+              <nav className="flex flex-col gap-4">
+                <div>
+                  <h3 className="mb-1 px-2 text-sm font-medium">Active modules</h3>
+                  <div className="flex flex-col gap-1">
+                    {activeModules.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className={cn(
+                          'flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-all font-mono',
+                          isActive(item.path)
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                        )}
+                        onClick={() => setOpen(false)}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="mb-1 px-2 text-sm font-medium text-muted-foreground">Coming soon</h3>
+                  <div className="flex flex-col gap-1">
+                    {comingSoonModules.map((item) => (
+                      <div
+                        key={item.path}
+                        className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-all font-mono text-muted-foreground opacity-60 cursor-not-allowed"
+                      >
+                        <item.icon className="h-4 w-4" />
+                        {item.label}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </nav>
             </div>
-          </div>
-        </div>
+          </SheetContent>
+        </Sheet>
+        
         <div className="flex flex-1">
           <Sidebar 
             collapsible="icon" 
             className="z-10 bg-white"
             variant="sidebar"
           >
-            <SidebarHeader className="p-2">
+            <SidebarHeader className="flex items-center justify-between p-3 border-b">
+              <div className={cn(
+                "flex items-center transition-opacity duration-200",
+                "group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:justify-center"
+              )}>
+                <Link to="/" className={cn(
+                  "font-mono font-bold tracking-tighter flex items-center gap-1",
+                  "group-data-[collapsible=icon]:justify-center"
+                )}>
+                  <span className="text-lg md:text-xl">p</span>
+                  <span className={cn(
+                    "transition-opacity duration-200",
+                    "group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:absolute group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:overflow-hidden"
+                  )}>
+                    romptito
+                  </span>
+                </Link>
+                <div className={cn(
+                  "ml-1",
+                  "group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:absolute group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:overflow-hidden"
+                )}>
+                  <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-1.5 py-0.5 rounded-md font-mono flex items-center">
+                    <Sparkles className="h-2.5 w-2.5 mr-0.5" />
+                    BETA
+                  </Badge>
+                </div>
+              </div>
               <SidebarTrigger />
             </SidebarHeader>
             <SidebarContent>
@@ -231,9 +212,61 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             </SidebarContent>
           </Sidebar>
           
-          <main className="flex-1 px-4 py-6 sm:px-6">
-            <div className="mx-auto max-w-5xl">{children}</div>
-          </main>
+          {/* Mobile header bar */}
+          <div className="flex flex-col flex-1">
+            <div className="md:hidden border-b bg-white">
+              <div className="flex h-14 items-center px-4">
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon" className="mr-4">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle mobile navigation</span>
+                  </Button>
+                </SheetTrigger>
+                <Link to="/" className="flex items-center gap-1 font-mono text-lg font-bold tracking-tighter">
+                  <span>promptito</span>
+                  <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-1.5 py-0.5 rounded-md font-mono flex items-center">
+                    <Sparkles className="h-2.5 w-2.5 mr-0.5" />
+                    BETA
+                  </Badge>
+                </Link>
+              </div>
+            </div>
+
+            {/* Top header bar on desktop */}
+            <div className="hidden md:block border-b bg-white">
+              <div className="flex h-14 items-center px-4 sm:px-6">
+                <div className="ml-auto flex gap-2 items-center">
+                  {user ? (
+                    <>
+                      <div className="text-sm text-muted-foreground font-mono mr-2">
+                        {user.email}
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={handleSignOut}
+                        title="Sign out"
+                        className="h-8 w-8"
+                      >
+                        <LogOut className="h-4 w-4" />
+                      </Button>
+                    </>
+                  ) : (
+                    <Link to="/auth">
+                      <Button variant="ghost" size="sm" className="gap-1.5 h-8 font-mono">
+                        <UserCircle className="h-4 w-4" />
+                        Sign In
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <main className="flex-1 px-4 py-6 sm:px-6">
+              <div className="mx-auto max-w-5xl">{children}</div>
+            </main>
+          </div>
         </div>
       </div>
     </SidebarProvider>

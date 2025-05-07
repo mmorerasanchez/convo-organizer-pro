@@ -15,8 +15,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PromptState } from '@/hooks/prompting';
 import { useToast } from '@/hooks/use-toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchProjects, createProject } from '@/lib/api/projects';
-import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
 
 interface PromptManagerModalProps {
   open: boolean;
@@ -36,32 +37,67 @@ export function PromptManagerModal({
   const [newProjectDescription, setNewProjectDescription] = useState('');
   const [showNewProjectForm, setShowNewProjectForm] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   // Fetch user's projects
   const { data: projects = [] } = useQuery({
     queryKey: ['projects-list'],
-    queryFn: fetchProjects
+    queryFn: fetchProjects,
+    enabled: !!user
+  });
+
+  // Create new project mutation
+  const createProjectMutation = useMutation({
+    mutationFn: createProject,
+    onSuccess: (newProject) => {
+      setSelectedProjectId(newProject.id);
+      toast({
+        title: "Project Created",
+        description: `New project "${newProjectName}" created successfully.`
+      });
+      setShowNewProjectForm(false);
+      
+      // Invalidate projects query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ['projects-list'] });
+    },
+    onError: (error) => {
+      setError("Failed to create project. Please try again.");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to create project. Please try again."
+      });
+      console.error("Error creating project:", error);
+    }
   });
 
   const handleSaveVersion = async () => {
     try {
       setIsProcessing(true);
+      setError(null);
+      
+      // Validate project name if creating new project
+      if (showNewProjectForm && !newProjectName.trim()) {
+        setError("Project name is required");
+        setIsProcessing(false);
+        return;
+      }
       
       // If creating new project
       if (showNewProjectForm && newProjectName.trim()) {
-        const newProject = await createProject({
-          name: newProjectName.trim(),
-          description: newProjectDescription.trim()
-        });
-        
-        if (newProject) {
-          setSelectedProjectId(newProject.id);
-          toast({
-            title: "Project Created",
-            description: `New project "${newProjectName}" created successfully.`
+        try {
+          await createProjectMutation.mutateAsync({
+            name: newProjectName.trim(),
+            description: newProjectDescription.trim()
           });
+        } catch (error) {
+          console.error("Error creating project:", error);
+          setIsProcessing(false);
+          return;
         }
       }
       
@@ -69,7 +105,7 @@ export function PromptManagerModal({
       const saveResult = await onSave();
       
       // Handle project navigation if needed
-      if (selectedProjectId) {
+      if (selectedProjectId && saveResult) {
         toast({
           title: "Prompt Saved",
           description: "Your prompt has been saved successfully."
@@ -83,6 +119,7 @@ export function PromptManagerModal({
       
       onOpenChange(false);
     } catch (error) {
+      setError("An unexpected error occurred. Please try again.");
       console.error("Error in save process:", error);
       toast({
         variant: "destructive",
@@ -105,6 +142,12 @@ export function PromptManagerModal({
         </DialogHeader>
         
         <div className="space-y-4 py-4">
+          {error && (
+            <div className="bg-destructive/15 text-destructive p-3 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+          
           {!showNewProjectForm ? (
             <div className="space-y-2">
               <Label htmlFor="project">Select Project</Label>
