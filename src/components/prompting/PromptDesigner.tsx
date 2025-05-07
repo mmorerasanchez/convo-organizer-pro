@@ -7,6 +7,7 @@ import { PromptDesignerLayout } from './designer/PromptDesignerLayout';
 import { PromptManagerModal } from './designer/PromptManagerModal';
 import { AuthLoadingState } from './designer/AuthLoadingState';
 import { SaveToProjectDialog } from '../prompting/SaveToProjectDialog';
+import { Dialog } from '@/components/ui/dialog';
 
 const PromptDesigner = () => {
   const { user, loading } = useRequireAuth();
@@ -57,26 +58,29 @@ const PromptDesigner = () => {
         saveVersion={saveVersion}
         testPrompt={testPrompt}
         compilePromptText={compilePromptText}
+        onSaveToProject={() => setSaveToProjectDialogOpen(true)}
       />
       
-      <PromptManagerModal
-        open={saveModalOpen}
-        onOpenChange={setSaveModalOpen}
-        activePrompt={activePrompt}
-        onSave={async () => {
-          try {
-            if (activePrompt.id) {
-              await saveVersion.mutateAsync(activePrompt);
-            } else {
-              await createPrompt.mutateAsync(activePrompt);
+      <Dialog open={saveModalOpen} onOpenChange={setSaveModalOpen}>
+        <PromptManagerModal
+          open={saveModalOpen}
+          onOpenChange={setSaveModalOpen}
+          activePrompt={activePrompt}
+          onSave={async () => {
+            try {
+              if (activePrompt.id) {
+                await saveVersion.mutateAsync(activePrompt);
+              } else {
+                await createPrompt.mutateAsync(activePrompt);
+              }
+              return true;
+            } catch (error) {
+              console.error("Error saving prompt:", error);
+              return false;
             }
-            return true;
-          } catch (error) {
-            console.error("Error saving prompt:", error);
-            return false;
-          }
-        }}
-      />
+          }}
+        />
+      </Dialog>
       
       <SaveToProjectDialog
         open={saveToProjectDialogOpen}

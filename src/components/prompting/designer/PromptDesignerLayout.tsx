@@ -23,11 +23,12 @@ interface PromptDesignerLayoutProps {
   saveModalOpen: boolean;
   setSaveModalOpen: (open: boolean) => void;
   compiledPrompt: string;
-  setCompiledPrompt: (compiled: string) => void;
-  createPrompt: UseMutationResult<any, Error, PromptState>;
-  saveVersion: UseMutationResult<any, Error, PromptState>;
-  testPrompt: UseMutationResult<any, Error, any>;
-  compilePromptText: (fieldValues: Record<string, string>) => string;
+  setCompiledPrompt: (prompt: string) => void;
+  createPrompt: UseMutationResult<any, any, any, any>;
+  saveVersion: UseMutationResult<any, any, any, any>;
+  testPrompt: UseMutationResult<string, any, any, any>;
+  compilePromptText: (promptState: PromptState) => string;
+  onSaveToProject?: () => void;
 }
 
 export function PromptDesignerLayout({
@@ -40,155 +41,151 @@ export function PromptDesignerLayout({
   requestCount,
   setRequestCount,
   requestLimit,
+  saveModalOpen,
   setSaveModalOpen,
   compiledPrompt,
   setCompiledPrompt,
+  createPrompt,
+  saveVersion,
   testPrompt,
-  compilePromptText
+  compilePromptText,
+  onSaveToProject
 }: PromptDesignerLayoutProps) {
-  const { data: frameworks } = useFrameworks();
-  const { data: models } = useModels();
   const { toast } = useToast();
-  const { data: frameworkFields } = useFrameworkFields(activePrompt.frameworkId);
-
-  // If framework changes, reset field values
-  useEffect(() => {
-    if (activePrompt.frameworkId && frameworkFields && frameworkFields.length > 0) {
-      const newFieldValues = { ...activePrompt.fieldValues };
-      
-      // Initialize empty fields for any missing ones
-      frameworkFields.forEach(field => {
-        if (!newFieldValues[field.label]) {
-          newFieldValues[field.label] = '';
-        }
-      });
-      
-      setActivePrompt({ ...activePrompt, fieldValues: newFieldValues });
-    }
-  }, [activePrompt.frameworkId, frameworkFields, setActivePrompt]);
-
-  // Update compiled prompt whenever field values change
-  useEffect(() => {
-    if (activePrompt.fieldValues) {
-      const compiled = compilePromptText(activePrompt.fieldValues);
-      setCompiledPrompt(compiled);
-    }
-  }, [activePrompt.fieldValues, compilePromptText, setCompiledPrompt]);
+  const { data: frameworks = [] } = useFrameworks();
+  const { data: models = [] } = useModels();
   
-  // Handle field value changes
-  const handleFieldChange = (fieldName: string, value: string) => {
-    setActivePrompt({
-      ...activePrompt,
-      fieldValues: {
-        ...activePrompt.fieldValues,
-        [fieldName]: value
-      }
-    });
-  };
+  // Get framework-specific fields when framework changes
+  const { data: frameworkFields = [] } = useFrameworkFields(
+    activePrompt.frameworkId || undefined
+  );
   
-  // Handle prompt test
-  const handleTestPrompt = async () => {
-    try {
-      setIsTestingPrompt(true);
-      
-      if (!activePrompt.modelId) {
-        toast({
-          variant: "destructive",
-          title: "Model Required",
-          description: "Please select a model for testing."
-        });
-        return;
-      }
-      
-      const compiledPrompt = compilePromptText(activePrompt.fieldValues);
-      
-      const selectedModel = models?.find(m => m.id === activePrompt.modelId);
-      const modelName = selectedModel?.provider === 'OpenAI' ? 'gpt-4o' : 'gpt-4o'; // Default to GPT-4o
-      
-      const result = await testPrompt.mutateAsync({
-        versionId: activePrompt.id ? undefined : undefined,  // Only store test results for saved versions
-        prompt: compiledPrompt,
-        model: modelName,
-        temperature: activePrompt.temperature,
-        maxTokens: activePrompt.maxTokens
-      });
-      
-      setPromptResponse(result.completion);
-      
-      // Fix: Update request count with proper typing
-      setRequestCount(requestCount + 1);
-      
-      toast({
-        title: "Response Generated",
-        description: `Response generated in ${result.response_ms}ms`
-      });
-    } catch (error) {
-      console.error("Error testing prompt:", error);
+  // Compile the prompt text whenever prompt state changes
+  useEffect(() => {
+    const compiled = compilePromptText(activePrompt);
+    setCompiledPrompt(compiled);
+  }, [activePrompt, compilePromptText, setCompiledPrompt]);
+  
+  const handleSavePrompt = async () => {
+    if (!activePrompt.title.trim()) {
       toast({
         variant: "destructive",
-        title: "Generation Failed",
-        description: "Failed to generate response. Check your inputs and try again."
+        title: "Error",
+        description: "Please provide a title for your prompt."
+      });
+      return;
+    }
+    
+    setSaveModalOpen(true);
+  };
+  
+  const handleTestPrompt = async () => {
+    if (!activePrompt.modelId) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please select a model before testing."
+      });
+      return;
+    }
+    
+    const compiled = compilePromptText(activePrompt);
+    setCompiledPrompt(compiled);
+    
+    setIsTestingPrompt(true);
+    setPromptResponse('');
+    
+    try {
+      const response = await testPrompt.mutateAsync({
+        modelId: activePrompt.modelId,
+        prompt: compiled
+      });
+      
+      setPromptResponse(response || 'No response received.');
+      setRequestCount(prev => prev + 1);
+      
+      toast({
+        title: "Test Completed",
+        description: "The model has responded to your prompt."
+      });
+    } catch (error) {
+      console.error('Error testing prompt:', error);
+      toast({
+        variant: "destructive",
+        title: "Test Failed",
+        description: error instanceof Error ? error.message : "An error occurred while testing the prompt."
       });
     } finally {
       setIsTestingPrompt(false);
     }
   };
   
-  // Handle new prompt creation
-  const handleNewPrompt = () => {
-    setActivePrompt({
-      title: 'Untitled Prompt',
-      frameworkId: null,
-      fieldValues: {},
-      temperature: 0.7,
-      maxTokens: 1000,
-      modelId: null
-    });
-    setPromptResponse('');
+  const handleClear = () => {
+    if (window.confirm("Are you sure you want to clear this prompt? All unsaved changes will be lost.")) {
+      setActivePrompt({
+        id: '',
+        title: '',
+        description: '',
+        frameworkId: '',
+        modelId: '',
+        content: '',
+        version: 1,
+        fields: {}
+      });
+      setPromptResponse('');
+      setCompiledPrompt('');
+    }
   };
-
+  
   return (
     <div className="space-y-6">
-      <PromptDesignerHeader 
-        handleNewPrompt={handleNewPrompt} 
-        tokenUsage={requestCount}
-        tokenLimit={requestLimit}
+      {/* Header section with actions */}
+      <PromptDesignerHeader
+        title={activePrompt.title || "Untitled Prompt"}
+        currentUsage={requestCount}
+        limit={requestLimit}
+        onSave={handleSavePrompt}
+        onTest={handleTestPrompt}
+        onClear={handleClear}
+        isSaving={createPrompt.isPending || saveVersion.isPending}
+        isTesting={isTestingPrompt}
       />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Editor Section */}
+        {/* Left column - Prompt Designer */}
         <div className="space-y-6">
+          {/* Prompt Settings */}
           <PromptSettings 
-            activePrompt={activePrompt}
-            setActivePrompt={setActivePrompt}
+            prompt={activePrompt}
+            setPrompt={setActivePrompt}
             frameworks={frameworks}
             models={models}
           />
           
-          {activePrompt.frameworkId && frameworkFields?.length > 0 && (
-            <FrameworkFields
-              activePrompt={activePrompt}
-              frameworkFields={frameworkFields}
-              frameworks={frameworks}
-              handleFieldChange={handleFieldChange}
-              handleSavePrompt={() => setSaveModalOpen(true)}
-              handleTestPrompt={handleTestPrompt}
-              isTestingPrompt={isTestingPrompt}
-              showSaveModal={() => setSaveModalOpen(true)}
-              handleNewPrompt={handleNewPrompt}
+          {/* Framework Fields - show only if a framework is selected */}
+          {activePrompt.frameworkId && (
+            <FrameworkFields 
+              fields={frameworkFields}
+              values={activePrompt.fields || {}}
+              onChange={(newFields) => setActivePrompt({
+                ...activePrompt,
+                fields: { ...activePrompt.fields, ...newFields }
+              })}
             />
           )}
+          
+          {/* Compiled Prompt Preview */}
+          <CompiledPromptPreview 
+            content={compiledPrompt} 
+          />
         </div>
         
-        {/* Preview Section */}
+        {/* Right column - Model Response */}
         <div className="space-y-6">
-          <CompiledPromptPreview 
-            compiledPrompt={compiledPrompt} 
-          />
-          
           <ModelResponse 
-            promptResponse={promptResponse} 
+            promptResponse={promptResponse}
             compiledPrompt={compiledPrompt}
+            onSaveToProject={onSaveToProject}
           />
         </div>
       </div>
