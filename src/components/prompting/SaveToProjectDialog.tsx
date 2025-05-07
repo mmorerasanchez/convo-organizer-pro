@@ -99,11 +99,11 @@ export function SaveToProjectDialog({
         title,
         content,
         response: response || "",
-        created_at: now,
-        updated_at: now,
-        user_id: user.id,
+        platform: "prompt-designer", // Adding the required platform field
+        captured_at: now,  // Changed from created_at to captured_at
         project_id: projectId || null,
-        tags: []
+        status: "active",
+        user_id: user.id
       };
       
       const { error } = await supabase
