@@ -1,14 +1,13 @@
 
 import React, { useState } from 'react';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
-import { usePromptDesigner } from '@/hooks/prompting';
+import { usePromptDesigner, TestPromptResult, TestPromptParams } from '@/hooks/prompting';
 import { AuthenticationRequired } from './designer/AuthenticationRequired';
 import { PromptDesignerLayout } from './designer/PromptDesignerLayout';
 import { PromptManagerModal } from './designer/PromptManagerModal';
 import { AuthLoadingState } from './designer/AuthLoadingState';
 import { SaveToProjectDialog } from '../prompting/SaveToProjectDialog';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { TestPromptResult } from '@/hooks/prompting/types';
 
 const PromptDesigner = () => {
   const { user, loading } = useRequireAuth();
@@ -86,16 +85,18 @@ const PromptDesigner = () => {
       </Dialog>
       
       <Dialog open={saveToProjectDialogOpen} onOpenChange={setSaveToProjectDialogOpen}>
-        <SaveToProjectDialog
-          open={saveToProjectDialogOpen}
-          onOpenChange={setSaveToProjectDialogOpen}
-          promptTitle={activePrompt.title || "Untitled Prompt"}
-          promptContent={compiledPrompt}
-          responseContent={promptResponse}
-          onSaveComplete={() => {
-            // Additional actions after saving if needed
-          }}
-        />
+        <DialogContent>
+          <SaveToProjectDialog
+            open={saveToProjectDialogOpen}
+            onOpenChange={setSaveToProjectDialogOpen}
+            promptTitle={activePrompt.title || "Untitled Prompt"}
+            promptContent={compiledPrompt}
+            responseContent={promptResponse}
+            onSaveComplete={() => {
+              // Additional actions after saving if needed
+            }}
+          />
+        </DialogContent>
       </Dialog>
     </>
   );

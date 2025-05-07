@@ -6,10 +6,9 @@ import { PromptSettings } from './PromptSettings';
 import { FrameworkFields } from './FrameworkFields';
 import { CompiledPromptPreview } from './CompiledPromptPreview';
 import { ModelResponse } from './ModelResponse';
-import { PromptState } from '@/hooks/prompting';
+import { PromptState, TestPromptParams, TestPromptResult } from '@/hooks/prompting';
 import { useToast } from '@/hooks/use-toast';
 import { UseMutationResult } from '@tanstack/react-query';
-import { TestPromptParams, TestPromptResult } from '@/hooks/prompting/types';
 
 interface PromptDesignerLayoutProps {
   activePrompt: PromptState;
@@ -103,7 +102,7 @@ export function PromptDesignerLayout({
       });
       
       setPromptResponse(response.completion || 'No response received.');
-      setRequestCount(requestCount + 1);
+      setRequestCount(prev => prev + 1);
       
       toast({
         title: "Test Completed",
