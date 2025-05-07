@@ -4,7 +4,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProjects, getSharedProjects } from '@/lib/api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
-import { TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { BookOpen, Users } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 import AllProjectsTabContent from '@/components/projects/AllProjectsTabContent';
@@ -81,7 +81,9 @@ const Projects = () => {
           searchPlaceholder="Search projects..."
           searchValue={searchTerm}
           onSearchChange={setSearchTerm}
-        >
+        />
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="all-projects" className="mt-0 space-y-6">
             <AllProjectsTabContent 
               projects={filteredProjects}
@@ -103,7 +105,7 @@ const Projects = () => {
               resetFilters={resetFilters}
             />
           </TabsContent>
-        </PageHeader>
+        </Tabs>
       </div>
     </MainLayout>
   );
