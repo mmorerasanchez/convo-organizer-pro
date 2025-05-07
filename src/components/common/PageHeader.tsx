@@ -36,8 +36,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   return (
     <div className="space-y-6">
       <div className="border-b pb-4">
-        <h1 className="text-2xl font-semibold tracking-tight mb-2">{title}</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl font-medium tracking-tight mb-1">{title}</h1>
+        <p className="text-muted-foreground text-sm">
           {description}
         </p>
       </div>
@@ -50,7 +50,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                 <TabsTrigger 
                   key={tab.value}
                   value={tab.value} 
-                  className="h-7 px-3 text-sm flex items-center gap-1.5"
+                  className="h-7 px-3 text-sm flex items-center gap-1.5 font-mono"
                 >
                   {tab.icon}
                   {tab.label}
@@ -65,7 +65,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={searchPlaceholder}
-              className="pl-9 h-9 text-sm w-full"
+              className="pl-9 h-9 text-sm w-full font-mono"
               value={searchValue}
               onChange={(e) => onSearchChange?.(e.target.value)}
             />

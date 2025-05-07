@@ -47,7 +47,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           key={item.path}
           to={item.path}
           className={cn(
-            'flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-all font-medium',
+            'flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-all font-mono',
             isActive(item.path)
               ? 'bg-primary text-primary-foreground'
               : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -83,7 +83,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     promptito
                   </Link>
                   <div>
-                    <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-2 py-0.5 rounded-md font-medium flex items-center">
+                    <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-2 py-0.5 rounded-md font-mono flex items-center">
                       <Sparkles className="h-3 w-3 mr-1" />
                       BETA made with AI
                     </Badge>
@@ -97,11 +97,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </Sheet>
           <Link
             to="/"
-            className="flex items-center gap-2 font-mono text-lg font-semibold md:text-xl"
+            className="flex items-center gap-2 font-mono text-lg font-bold md:text-xl tracking-tighter"
           >
             <span>promptito</span>
             <div>
-              <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-1.5 py-0.5 rounded-md font-medium flex items-center">
+              <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-1.5 py-0.5 rounded-md font-mono flex items-center">
                 <Sparkles className="h-2.5 w-2.5 mr-0.5" />
                 BETA made with AI
               </Badge>
@@ -110,7 +110,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           <div className="ml-auto flex gap-2 items-center">
             {user ? (
               <>
-                <div className="hidden md:block text-sm text-muted-foreground mr-2">
+                <div className="hidden md:block text-sm text-muted-foreground font-mono mr-2">
                   {user.email}
                 </div>
                 <Button 
@@ -125,7 +125,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               </>
             ) : (
               <Link to="/auth">
-                <Button variant="ghost" size="sm" className="gap-1.5 h-8">
+                <Button variant="ghost" size="sm" className="gap-1.5 h-8 font-mono">
                   <UserCircle className="h-4 w-4" />
                   Sign In
                 </Button>

@@ -21,7 +21,7 @@ export function PromptInputCard({
   isProcessing,
 }: PromptInputCardProps) {
   return (
-    <Card className="overflow-hidden border shadow-sm">
+    <Card className="overflow-hidden border">
       <CardHeader className="pb-0">
         <CardTitle className="text-base font-medium">Your Original Prompt</CardTitle>
         <CardDescription className="text-xs text-muted-foreground">
@@ -31,7 +31,7 @@ export function PromptInputCard({
       <CardContent className="pt-4">
         <Textarea 
           placeholder="Enter your prompt here... (e.g., 'Tell me about climate change')"
-          className="min-h-[180px] bg-background border text-sm font-mono"
+          className="min-h-[180px] bg-background border text-sm font-mono prompt-area"
           value={promptInput}
           onChange={(e) => onChange(e.target.value)}
         />

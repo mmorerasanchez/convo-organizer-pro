@@ -38,7 +38,7 @@ export function PromptOutputCard({
   };
 
   return (
-    <Card className="overflow-hidden border shadow-sm">
+    <Card className="overflow-hidden border">
       <CardHeader className="pb-0">
         <CardTitle className="text-base font-medium">Improved Prompt</CardTitle>
         <CardDescription className="text-xs text-muted-foreground">
@@ -48,7 +48,7 @@ export function PromptOutputCard({
       <CardContent className="pt-4">
         <Textarea 
           placeholder="Your improved prompt will appear here..."
-          className="min-h-[180px] bg-background border rounded-md font-mono text-sm"
+          className="min-h-[180px] bg-background border rounded-md font-mono text-sm prompt-area"
           value={improvedPrompt}
           readOnly
         />
@@ -63,7 +63,7 @@ export function PromptOutputCard({
               variant="outline" 
               size="sm" 
               onClick={handleCopy}
-              className="gap-1.5 h-7 text-xs"
+              className="gap-1.5 h-7 text-xs font-mono"
             >
               {copied ? <CheckCircle2 size={12} /> : <Copy size={12} />}
               {copied ? 'Copied' : 'Copy'}
@@ -77,7 +77,7 @@ export function PromptOutputCard({
               <Button 
                 variant="outline" 
                 onClick={onRevert}
-                className="gap-1.5 text-xs h-8 px-3"
+                className="gap-1.5 text-xs h-8 px-3 font-mono"
               >
                 <ArrowLeft size={14} />
                 Previous
@@ -87,7 +87,7 @@ export function PromptOutputCard({
             <Button 
               variant="outline" 
               onClick={onTryAgain}
-              className="gap-1.5 text-xs h-8 px-3"
+              className="gap-1.5 text-xs h-8 px-3 font-mono"
               disabled={isProcessing}
             >
               <RefreshCw size={14} />
@@ -96,7 +96,7 @@ export function PromptOutputCard({
             
             <Button 
               onClick={onAccept}
-              className="gap-1.5 bg-primary hover:bg-primary/90 text-xs h-8 px-3"
+              className="gap-1.5 bg-primary hover:bg-primary/90 text-xs h-8 px-3 font-mono"
               disabled={isProcessing}
             >
               <ThumbsUp size={14} />

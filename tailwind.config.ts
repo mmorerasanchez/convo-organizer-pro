@@ -20,7 +20,9 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				mono: ['Space Mono', 'monospace'],
+				sans: ['Lexend Deca', 'sans-serif'],
+				mono: ['Inconsolata', 'monospace'],
+				heading: ['Lexend Deca', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
