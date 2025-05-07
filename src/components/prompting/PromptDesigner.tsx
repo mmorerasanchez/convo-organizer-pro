@@ -1,11 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { usePromptDesigner } from '@/hooks/prompting';
 import { AuthenticationRequired } from './designer/AuthenticationRequired';
 import { PromptDesignerLayout } from './designer/PromptDesignerLayout';
 import { PromptManagerModal } from './designer/PromptManagerModal';
-import { useState } from 'react';
+import { AuthLoadingState } from './designer/AuthLoadingState';
 
 const PromptDesigner = () => {
   const { user, loading } = useRequireAuth();
@@ -27,11 +27,7 @@ const PromptDesigner = () => {
   
   // If loading auth, show spinner
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <AuthLoadingState />;
   }
   
   // If user is not authenticated, show login message
