@@ -49,9 +49,7 @@ const Projects = () => {
           tabs={tabs}
           activeTab={activeTab}
           onTabChange={setActiveTab}
-        />
-        
-        <div className="space-y-6">
+        >
           <TabsContent value="all-projects" className="mt-0 space-y-6">
             <div className="flex justify-end space-x-2">
               <JoinProjectDialog />
@@ -101,7 +99,7 @@ const Projects = () => {
               )
             )}
           </TabsContent>
-        </div>
+        </PageHeader>
       </div>
     </MainLayout>
   );

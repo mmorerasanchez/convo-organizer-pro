@@ -38,9 +38,7 @@ const Tools = () => {
           tabs={tabs}
           activeTab={activeTab}
           onTabChange={setActiveTab}
-        />
-        
-        <div className="space-y-6">
+        >
           <TabsContent value="all-tools" className="mt-0 space-y-6">
             <div className="flex justify-end">
               <NewToolDialog />
@@ -82,7 +80,7 @@ const Tools = () => {
               </>
             )}
           </TabsContent>
-        </div>
+        </PageHeader>
       </div>
     </MainLayout>
   );

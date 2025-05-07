@@ -38,9 +38,7 @@ const Prompting = () => {
           tabs={tabs}
           activeTab={activeTab}
           onTabChange={setActiveTab}
-        />
-        
-        <div>
+        >
           <TabsContent value="guide" className="space-y-6 mt-0">
             <PromptingGuide />
           </TabsContent>
@@ -52,7 +50,7 @@ const Prompting = () => {
           <TabsContent value="designer" className="space-y-6 mt-0">
             <PromptDesigner />
           </TabsContent>
-        </div>
+        </PageHeader>
       </div>
     </MainLayout>
   );

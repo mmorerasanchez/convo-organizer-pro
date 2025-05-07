@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface PageHeaderProps {
@@ -12,6 +12,7 @@ interface PageHeaderProps {
   }[];
   activeTab?: string;
   onTabChange?: (value: string) => void;
+  children?: ReactNode;
 }
 
 const PageHeader: React.FC<PageHeaderProps> = ({
@@ -19,7 +20,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   description,
   tabs,
   activeTab,
-  onTabChange
+  onTabChange,
+  children
 }) => {
   return (
     <div className="space-y-8">
@@ -46,6 +48,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
               ))}
             </TabsList>
           </div>
+          {children}
         </Tabs>
       )}
     </div>
