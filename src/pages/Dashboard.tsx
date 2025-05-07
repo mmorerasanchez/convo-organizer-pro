@@ -5,7 +5,7 @@ import StatCard from '@/components/dashboard/StatCard';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import ProjectList from '@/components/dashboard/ProjectList';
 import AITools from '@/components/dashboard/AITools';
-import { BookOpen, MessageCircle, Wrench, Database, Brain } from 'lucide-react';
+import { BookOpen, MessageCircle, Wrench, Database, Brain, BarChart } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProjects, fetchConversations, fetchTools } from '@/lib/api';
@@ -108,9 +108,9 @@ const Dashboard = () => {
                 <TabsTrigger value="overview" className="h-7 px-3 text-sm">
                   Overview
                 </TabsTrigger>
-                <TabsTrigger value="ai-tools" className="h-7 px-3 text-sm flex items-center gap-1.5">
-                  <Brain size={14} />
-                  Tools
+                <TabsTrigger value="analytics" className="h-7 px-3 text-sm flex items-center gap-1.5 opacity-60 cursor-not-allowed" disabled>
+                  <BarChart size={14} />
+                  Analytics
                 </TabsTrigger>
               </TabsList>
               
@@ -121,8 +121,14 @@ const Dashboard = () => {
                 </div>
               </TabsContent>
               
-              <TabsContent value="ai-tools">
-                <AITools />
+              <TabsContent value="analytics">
+                <div className="text-center py-12 rounded-lg border bg-muted/20">
+                  <BarChart className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                  <h3 className="text-lg font-medium mb-2">Analytics coming soon</h3>
+                  <p className="text-muted-foreground max-w-md mx-auto">
+                    Detailed insights and analytics for your projects and tools will be available in a future update.
+                  </p>
+                </div>
               </TabsContent>
             </Tabs>
           </>

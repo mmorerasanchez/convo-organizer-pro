@@ -58,8 +58,8 @@ const Tools = () => {
     <MainLayout>
       <div className="space-y-6">
         <PageHeader 
-          title="Tools"
-          description="Discover and use AI-powered tools to enhance your workflow"
+          title="AI Tools"
+          description="Discover and use AI-powered tools and language models to enhance your workflow"
           tabs={tabs}
           activeTab={activeTab}
           onTabChange={setActiveTab}
