@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import React from 'react';
+import { DialogContent } from '@/components/ui/dialog';
 import { SaveDialogContent } from './project-save/DialogContent';
 import { useSaveToProject } from './project-save/useSaveToProject';
 
@@ -21,7 +21,7 @@ export function SaveToProjectDialog({
   responseContent,
   onSaveComplete
 }: SaveToProjectDialogProps) {
-  const [conversationTitle, setConversationTitle] = useState(promptTitle || 'Untitled Prompt');
+  const [conversationTitle, setConversationTitle] = React.useState(promptTitle || 'Untitled Prompt');
   
   const {
     selectedProjectId,

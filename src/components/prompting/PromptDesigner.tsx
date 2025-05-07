@@ -6,8 +6,8 @@ import { AuthenticationRequired } from './designer/AuthenticationRequired';
 import { PromptDesignerLayout } from './designer/PromptDesignerLayout';
 import { PromptManagerModal } from './designer/PromptManagerModal';
 import { AuthLoadingState } from './designer/AuthLoadingState';
-import { SaveToProjectDialog } from '../prompting/SaveToProjectDialog';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { SaveToProjectDialog } from './SaveToProjectDialog';
+import { Dialog } from '@/components/ui/dialog';
 
 const PromptDesigner = () => {
   const { user, loading } = useRequireAuth();
@@ -61,42 +61,38 @@ const PromptDesigner = () => {
         onSaveToProject={() => setSaveToProjectDialogOpen(true)}
       />
       
+      {/* Fix: Properly implement the Dialog for PromptManagerModal */}
       <Dialog open={saveModalOpen} onOpenChange={setSaveModalOpen}>
-        <DialogContent className="p-0 border-none bg-transparent">
-          <PromptManagerModal
-            open={saveModalOpen}
-            onOpenChange={setSaveModalOpen}
-            activePrompt={activePrompt}
-            onSave={async () => {
-              try {
-                if (activePrompt.id) {
-                  await saveVersion.mutateAsync(activePrompt);
-                } else {
-                  await createPrompt.mutateAsync(activePrompt);
-                }
-                return true;
-              } catch (error) {
-                console.error("Error saving prompt:", error);
-                return false;
+        <PromptManagerModal
+          activePrompt={activePrompt}
+          onSave={async () => {
+            try {
+              if (activePrompt.id) {
+                await saveVersion.mutateAsync(activePrompt);
+              } else {
+                await createPrompt.mutateAsync(activePrompt);
               }
-            }}
-          />
-        </DialogContent>
+              return true;
+            } catch (error) {
+              console.error("Error saving prompt:", error);
+              return false;
+            }
+          }}
+        />
       </Dialog>
       
+      {/* Fix: Properly implement the Dialog for SaveToProjectDialog */}
       <Dialog open={saveToProjectDialogOpen} onOpenChange={setSaveToProjectDialogOpen}>
-        <DialogContent>
-          <SaveToProjectDialog
-            open={saveToProjectDialogOpen}
-            onOpenChange={setSaveToProjectDialogOpen}
-            promptTitle={activePrompt.title || "Untitled Prompt"}
-            promptContent={compiledPrompt}
-            responseContent={promptResponse}
-            onSaveComplete={() => {
-              // Additional actions after saving if needed
-            }}
-          />
-        </DialogContent>
+        <SaveToProjectDialog
+          open={saveToProjectDialogOpen}
+          onOpenChange={setSaveToProjectDialogOpen}
+          promptTitle={activePrompt.title || "Untitled Prompt"}
+          promptContent={compiledPrompt}
+          responseContent={promptResponse}
+          onSaveComplete={() => {
+            // Additional actions after saving if needed
+          }}
+        />
       </Dialog>
     </>
   );

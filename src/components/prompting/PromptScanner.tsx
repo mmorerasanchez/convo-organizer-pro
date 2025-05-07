@@ -6,6 +6,7 @@ import { FeedbackDialog } from './FeedbackDialog';
 import { PromptScannerHeader } from './scanner/PromptScannerHeader';
 import { usePromptScanner } from '@/hooks/use-prompt-scanner';
 import { SaveToProjectDialog } from './SaveToProjectDialog';
+import { Dialog } from '@/components/ui/dialog';
 
 const PromptScanner = () => {
   const [saveToProjectDialogOpen, setSaveToProjectDialogOpen] = useState(false);
@@ -63,24 +64,28 @@ const PromptScanner = () => {
         />
       </div>
 
-      <FeedbackDialog
-        open={feedbackDialogOpen}
-        onOpenChange={setFeedbackDialogOpen}
-        feedback={currentFeedback}
-        onFeedbackChange={setCurrentFeedback}
-        onSubmit={handleSubmitFeedback}
-      />
+      <Dialog open={feedbackDialogOpen} onOpenChange={setFeedbackDialogOpen}>
+        <FeedbackDialog
+          open={feedbackDialogOpen}
+          onOpenChange={setFeedbackDialogOpen}
+          feedback={currentFeedback}
+          onFeedbackChange={setCurrentFeedback}
+          onSubmit={handleSubmitFeedback}
+        />
+      </Dialog>
       
-      <SaveToProjectDialog
-        open={saveToProjectDialogOpen}
-        onOpenChange={setSaveToProjectDialogOpen}
-        promptTitle="Improved Prompt"
-        promptContent={improvedPrompt}
-        responseContent={promptInput}
-        onSaveComplete={() => {
-          // Actions after saving if needed
-        }}
-      />
+      <Dialog open={saveToProjectDialogOpen} onOpenChange={setSaveToProjectDialogOpen}>
+        <SaveToProjectDialog
+          open={saveToProjectDialogOpen}
+          onOpenChange={setSaveToProjectDialogOpen}
+          promptTitle="Improved Prompt"
+          promptContent={improvedPrompt}
+          responseContent={promptInput}
+          onSaveComplete={() => {
+            // Actions after saving if needed
+          }}
+        />
+      </Dialog>
     </div>
   );
 };
