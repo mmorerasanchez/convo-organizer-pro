@@ -41,33 +41,38 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
   };
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-2">
+    <Card className="h-full flex flex-col border-muted/60">
+      <CardHeader className="p-5 pb-3">
         <div className="flex justify-between items-start">
-          <div>
-            <h3 className="text-lg font-semibold">{tool.name}</h3>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-medium">{tool.name}</h3>
+              <div className={`px-2 py-0.5 rounded-full text-xs font-medium ${getScoreColor()}`}>
+                {tool.score}
+              </div>
+            </div>
             <p className="text-sm text-muted-foreground">{tool.model}</p>
-          </div>
-          <div className={`px-2 py-1 rounded-full text-xs font-medium ${getScoreColor()}`}>
-            Score: {tool.score}
           </div>
         </div>
       </CardHeader>
-      <CardContent className="flex-grow">
+      <CardContent className="px-5 pt-0 pb-5 flex-grow">
         {tool.description && (
-          <p className="text-sm text-muted-foreground">{tool.description}</p>
+          <p className="text-sm text-muted-foreground line-clamp-3">
+            {tool.description}
+          </p>
         )}
       </CardContent>
-      <CardFooter className="border-t pt-4 flex justify-between">
+      <CardFooter className="border-t p-3 bg-muted/10 flex items-center justify-between">
         <EditToolDialog tool={tool} />
         <Button 
-          variant="destructive" 
+          variant="ghost" 
           size="sm" 
           onClick={handleDelete}
           disabled={deleteToolMutation.isPending}
+          className="text-destructive hover:text-destructive/90 hover:bg-destructive/10"
         >
-          <Trash className="h-4 w-4 mr-1" />
-          Delete
+          <Trash className="h-4 w-4" />
+          <span className="sr-only">Delete</span>
         </Button>
       </CardFooter>
     </Card>

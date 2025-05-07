@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Project } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageCircle, Users } from 'lucide-react';
+import { Folder, MessageCircle, Users } from 'lucide-react';
 
 interface ProjectCardProps {
   project: Project;
@@ -18,23 +18,33 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, isShared = false }) 
   const displayName = hasEmoji ? project.name.replace(hasEmoji[0], '') : project.name;
 
   return (
-    <Link to={`/projects/${project.id}`}>
-      <Card className="h-full hover:shadow-md transition-all duration-200">
-        <CardContent className="pt-6">
-          <div className="mb-2 text-xl font-semibold flex items-center justify-between">
-            <span className="flex items-center">
-              {emoji && <span className="mr-2 text-2xl">{emoji}</span>}
-              {displayName}
-            </span>
-            {isShared && (
-              <Users size={18} className="text-primary" aria-label="Shared Project" />
-            )}
+    <Link to={`/projects/${project.id}`} className="block h-full">
+      <Card className="h-full hover:shadow-md transition-all duration-200 border-muted/60">
+        <CardContent className="p-5">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="bg-primary/10 rounded-md p-2 flex-shrink-0">
+              {emoji ? (
+                <span className="text-xl">{emoji}</span>
+              ) : (
+                <Folder className="h-5 w-5 text-primary" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium truncate">{displayName}</h3>
+                {isShared && (
+                  <Users size={16} className="text-primary flex-shrink-0 ml-2" aria-label="Shared Project" />
+                )}
+              </div>
+              {project.description && (
+                <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                  {project.description || "No description provided"}
+                </p>
+              )}
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground line-clamp-2 h-10">
-            {project.description}
-          </p>
         </CardContent>
-        <CardFooter className="flex justify-between text-xs text-muted-foreground pt-0">
+        <CardFooter className="bg-muted/10 border-t px-5 py-3 flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <MessageCircle size={14} />
             <span>{project.conversationCount} conversations</span>

@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Project } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Folder } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface ProjectListProps {
   projects: Project[];
@@ -13,12 +14,21 @@ interface ProjectListProps {
 const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
   return (
     <Card className="col-span-1 lg:col-span-1">
-      <CardHeader>
-        <CardTitle>Recent Projects</CardTitle>
-        <CardDescription>Your recently updated projects</CardDescription>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Recent Projects</CardTitle>
+            <CardDescription>Your recently updated projects</CardDescription>
+          </div>
+          <Link to="/projects">
+            <Button variant="ghost" size="sm" className="text-primary">
+              View all
+            </Button>
+          </Link>
+        </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="p-0">
+        <div className="divide-y">
           {projects.length > 0 ? (
             projects.slice(0, 4).map((project) => (
               <Link
@@ -26,17 +36,20 @@ const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
                 key={project.id}
                 className="block"
               >
-                <div className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted transition-colors">
-                  <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                    <BookOpen size={18} />
+                <div className="flex items-center gap-3 p-4 hover:bg-muted/30 transition-colors">
+                  <div className="h-8 w-8 rounded bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                    <Folder size={16} />
                   </div>
-                  <div className="space-y-1">
-                    <div className="font-medium">{project.name}</div>
-                    <div className="text-sm text-muted-foreground line-clamp-1">
-                      {project.description}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Updated {formatDistanceToNow(new Date(project.updatedAt), { addSuffix: true })}
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium truncate">{project.name}</div>
+                    <div className="flex items-center justify-between mt-0.5">
+                      <div className="text-xs text-muted-foreground">
+                        Updated {formatDistanceToNow(new Date(project.updatedAt), { addSuffix: true })}
+                      </div>
+                      <div className="text-xs flex items-center gap-1 text-muted-foreground">
+                        <BookOpen size={12} />
+                        {project.conversationCount}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -47,15 +60,6 @@ const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
               No projects found
             </div>
           )}
-        </div>
-        
-        <div className="mt-4">
-          <Link 
-            to="/projects" 
-            className="text-sm text-primary hover:underline"
-          >
-            View all projects
-          </Link>
         </div>
       </CardContent>
     </Card>
