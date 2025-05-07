@@ -1,7 +1,7 @@
 
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
-import { TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import PromptingGuide from '@/components/prompting/PromptingGuide';
 import PromptScanner from '@/components/prompting/PromptScanner';
 import PromptDesigner from '@/components/prompting/PromptDesigner';
@@ -38,7 +38,9 @@ const Prompting = () => {
           tabs={tabs}
           activeTab={activeTab}
           onTabChange={setActiveTab}
-        >
+        />
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="guide" className="space-y-6 mt-0">
             <PromptingGuide />
           </TabsContent>
@@ -50,7 +52,7 @@ const Prompting = () => {
           <TabsContent value="designer" className="space-y-6 mt-0">
             <PromptDesigner />
           </TabsContent>
-        </PageHeader>
+        </Tabs>
       </div>
     </MainLayout>
   );
