@@ -9,7 +9,7 @@ import ToolCard from '@/components/tools/ToolCard';
 import NewToolDialog from '@/components/tools/NewToolDialog';
 import { Filter, Plus, Wrench, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import PageHeader from '@/components/common/PageHeader';
 import {
   Popover,
@@ -67,7 +67,9 @@ const Tools = () => {
           searchPlaceholder="Search tools by name, description or model..."
           searchValue={searchTerm}
           onSearchChange={setSearchTerm}
-        >
+        />
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="all-tools" className="mt-0 space-y-6">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
@@ -163,7 +165,7 @@ const Tools = () => {
               </>
             )}
           </TabsContent>
-        </PageHeader>
+        </Tabs>
       </div>
     </MainLayout>
   );
