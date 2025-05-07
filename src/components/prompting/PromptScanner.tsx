@@ -55,6 +55,7 @@ const PromptScanner = () => {
           onAccept={handleAccept}
           isProcessing={isProcessing}
           canRevert={feedbackHistory.length > 0}
+          originalPrompt={promptInput}
         />
       </div>
 

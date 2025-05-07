@@ -16,7 +16,8 @@ import {
   ChevronRight,
   MessageSquare,
   BarChart,
-  LineChart
+  LineChart,
+  PanelLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -97,8 +98,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen w-full flex-col">
-        <div className="border-b">
+      <div className="flex min-h-screen w-full flex-col bg-background">
+        <div className="border-b bg-white">
           <div className="flex h-14 items-center px-4 sm:px-6">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
@@ -107,7 +108,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   <span className="sr-only">Toggle mobile navigation</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-60 sm:max-w-xs pr-0">
+              <SheetContent side="left" className="w-60 sm:max-w-xs pr-0 bg-white">
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-2">
                     <Link
@@ -205,7 +206,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </div>
         </div>
         <div className="flex flex-1">
-          <Sidebar collapsible="icon" className="z-10">
+          <Sidebar 
+            collapsible="icon" 
+            className="z-10 bg-white"
+            variant="sidebar"
+          >
+            <SidebarHeader className="p-2">
+              <SidebarTrigger />
+            </SidebarHeader>
             <SidebarContent>
               <SidebarGroup>
                 <SidebarGroupLabel>Active modules</SidebarGroupLabel>
@@ -221,12 +229,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 </SidebarGroupContent>
               </SidebarGroup>
             </SidebarContent>
-            
-            <SidebarFooter className="border-t py-4">
-              <div className="flex items-center justify-center">
-                <SidebarTrigger />
-              </div>
-            </SidebarFooter>
           </Sidebar>
           
           <main className="flex-1 px-4 py-6 sm:px-6">

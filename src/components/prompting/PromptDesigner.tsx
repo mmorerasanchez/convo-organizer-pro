@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useFrameworks, useFrameworkFields, useModels } from '@/hooks/use-frameworks';
@@ -22,6 +23,7 @@ const PromptDesigner = () => {
   const [requestCount, setRequestCount] = useState(0);
   const [requestLimit] = useState(10); // Free tier limit
   const [saveModalOpen, setSaveModalOpen] = useState(false);
+  const [compiledPrompt, setCompiledPrompt] = useState('');
   
   const {
     activePrompt,
@@ -49,6 +51,14 @@ const PromptDesigner = () => {
       setActivePrompt({ ...activePrompt, fieldValues: newFieldValues });
     }
   }, [activePrompt.frameworkId, frameworkFields]);
+
+  // Update compiled prompt whenever field values change
+  useEffect(() => {
+    if (activePrompt.fieldValues) {
+      const compiled = compilePromptText(activePrompt.fieldValues);
+      setCompiledPrompt(compiled);
+    }
+  }, [activePrompt.fieldValues, compilePromptText]);
   
   // Handle field value changes
   const handleFieldChange = (fieldName: string, value: string) => {
@@ -196,10 +206,13 @@ const PromptDesigner = () => {
         {/* Preview Section */}
         <div className="space-y-6">
           <CompiledPromptPreview 
-            compiledPrompt={compilePromptText(activePrompt.fieldValues)} 
+            compiledPrompt={compiledPrompt} 
           />
           
-          <ModelResponse promptResponse={promptResponse} />
+          <ModelResponse 
+            promptResponse={promptResponse} 
+            compiledPrompt={compiledPrompt}
+          />
         </div>
       </div>
       
