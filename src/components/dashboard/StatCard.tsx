@@ -1,17 +1,25 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 interface StatCardProps {
   title: string;
   value: string | number;
   icon: React.ReactNode;
   description?: string;
+  className?: string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon, description }) => {
+const StatCard: React.FC<StatCardProps> = ({ 
+  title, 
+  value, 
+  icon, 
+  description,
+  className
+}) => {
   return (
-    <Card>
+    <Card className={cn(className)}>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
