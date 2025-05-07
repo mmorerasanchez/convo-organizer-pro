@@ -14,10 +14,10 @@ export interface PromptState {
 
 export interface TestPromptParams {
   versionId?: string;
+  modelId: string;
   prompt: string;
-  model: string;
-  temperature: number;
-  maxTokens: number;
+  temperature?: number;
+  maxTokens?: number;
 }
 
 export interface TestPromptResult {

@@ -74,7 +74,7 @@ export function usePromptDesigner() {
   });
   
   // Test a prompt
-  const testPrompt = useMutation({
+  const testPrompt = useMutation<TestPromptResult, Error, TestPromptParams>({
     mutationFn: testPromptRequest,
     onError: (error) => {
       console.error('Error testing prompt:', error);

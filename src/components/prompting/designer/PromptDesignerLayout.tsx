@@ -9,6 +9,7 @@ import { ModelResponse } from './ModelResponse';
 import { PromptState } from '@/hooks/prompting';
 import { useToast } from '@/hooks/use-toast';
 import { UseMutationResult } from '@tanstack/react-query';
+import { TestPromptParams, TestPromptResult } from '@/hooks/prompting/types';
 
 interface PromptDesignerLayoutProps {
   activePrompt: PromptState;
@@ -26,7 +27,7 @@ interface PromptDesignerLayoutProps {
   setCompiledPrompt: (prompt: string) => void;
   createPrompt: UseMutationResult<any, any, any, any>;
   saveVersion: UseMutationResult<any, any, any, any>;
-  testPrompt: UseMutationResult<string, any, any, any>;
+  testPrompt: UseMutationResult<TestPromptResult, Error, TestPromptParams, unknown>;
   compilePromptText: (promptState: PromptState) => string;
   onSaveToProject?: () => void;
 }
@@ -101,8 +102,8 @@ export function PromptDesignerLayout({
         prompt: compiled
       });
       
-      setPromptResponse(response || 'No response received.');
-      setRequestCount(prev => prev + 1);
+      setPromptResponse(response.completion || 'No response received.');
+      setRequestCount(requestCount + 1);
       
       toast({
         title: "Test Completed",
@@ -125,30 +126,27 @@ export function PromptDesignerLayout({
       setActivePrompt({
         id: '',
         title: '',
-        description: '',
-        frameworkId: '',
-        modelId: '',
-        content: '',
-        version: 1,
-        fields: {}
+        frameworkId: null,
+        fieldValues: {},
+        temperature: 0.7,
+        maxTokens: 1000,
+        modelId: null
       });
       setPromptResponse('');
       setCompiledPrompt('');
     }
   };
   
+  // For compatibility with the PromptDesignerHeader component
+  const handleNewPrompt = () => handleClear();
+  
   return (
     <div className="space-y-6">
       {/* Header section with actions */}
       <PromptDesignerHeader
-        title={activePrompt.title || "Untitled Prompt"}
-        currentUsage={requestCount}
-        limit={requestLimit}
-        onSave={handleSavePrompt}
-        onTest={handleTestPrompt}
-        onClear={handleClear}
-        isSaving={createPrompt.isPending || saveVersion.isPending}
-        isTesting={isTestingPrompt}
+        handleNewPrompt={handleNewPrompt}
+        tokenUsage={requestCount}
+        tokenLimit={requestLimit}
       />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -156,8 +154,8 @@ export function PromptDesignerLayout({
         <div className="space-y-6">
           {/* Prompt Settings */}
           <PromptSettings 
-            prompt={activePrompt}
-            setPrompt={setActivePrompt}
+            activePrompt={activePrompt}
+            setActivePrompt={setActivePrompt}
             frameworks={frameworks}
             models={models}
           />
@@ -165,18 +163,26 @@ export function PromptDesignerLayout({
           {/* Framework Fields - show only if a framework is selected */}
           {activePrompt.frameworkId && (
             <FrameworkFields 
-              fields={frameworkFields}
-              values={activePrompt.fields || {}}
-              onChange={(newFields) => setActivePrompt({
-                ...activePrompt,
-                fields: { ...activePrompt.fields, ...newFields }
-              })}
+              activePrompt={activePrompt}
+              frameworkFields={frameworkFields}
+              frameworks={frameworks}
+              handleFieldChange={(fieldName: string, value: string) => {
+                setActivePrompt({
+                  ...activePrompt,
+                  fieldValues: { ...activePrompt.fieldValues, [fieldName]: value }
+                });
+              }}
+              handleSavePrompt={handleSavePrompt}
+              handleTestPrompt={handleTestPrompt}
+              isTestingPrompt={isTestingPrompt}
+              showSaveModal={() => setSaveModalOpen(true)}
+              handleNewPrompt={handleNewPrompt}
             />
           )}
           
           {/* Compiled Prompt Preview */}
           <CompiledPromptPreview 
-            content={compiledPrompt} 
+            compiledPrompt={compiledPrompt} 
           />
         </div>
         

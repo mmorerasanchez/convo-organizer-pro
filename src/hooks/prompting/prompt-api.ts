@@ -60,7 +60,7 @@ export const createNewPrompt = async (promptData: PromptState, userId: string) =
       temperature: promptData.temperature,
       max_tokens: promptData.maxTokens,
       model_id: promptData.modelId,
-      compiled_text: compilePromptText(promptData.fieldValues)
+      compiled_text: compilePromptText(promptData)
     })
     .select()
     .single();
@@ -101,7 +101,7 @@ export const savePromptVersion = async (promptData: PromptState) => {
       temperature: promptData.temperature,
       max_tokens: promptData.maxTokens,
       model_id: promptData.modelId,
-      compiled_text: compilePromptText(promptData.fieldValues)
+      compiled_text: compilePromptText(promptData)
     })
     .select()
     .single();
@@ -146,16 +146,18 @@ export const testPromptRequest = async (params: TestPromptParams): Promise<TestP
   return data;
 };
 
-// Compile prompt text from field values
-export const compilePromptText = (fieldValues: Record<string, string>) => {
+// Compile prompt text from PromptState
+export const compilePromptText = (promptState: PromptState): string => {
   let compiledText = '';
   
   // Convert the field values to a formatted string
-  Object.entries(fieldValues).forEach(([key, value]) => {
-    if (value && value.trim()) {
-      compiledText += `${key}:\n${value}\n\n`;
-    }
-  });
+  if (promptState.fieldValues) {
+    Object.entries(promptState.fieldValues).forEach(([key, value]) => {
+      if (value && value.trim()) {
+        compiledText += `${key}:\n${value}\n\n`;
+      }
+    });
+  }
   
   return compiledText.trim();
 };
