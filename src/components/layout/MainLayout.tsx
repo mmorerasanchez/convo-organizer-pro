@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -46,7 +47,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           key={item.path}
           to={item.path}
           className={cn(
-            'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all',
+            'flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-all font-medium',
             isActive(item.path)
               ? 'bg-primary text-primary-foreground'
               : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -63,7 +64,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
     <div className="flex min-h-screen flex-col">
       <div className="border-b">
-        <div className="flex h-16 items-center px-4 sm:px-6">
+        <div className="flex h-14 items-center px-4 sm:px-6">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="mr-4 md:hidden">
@@ -82,7 +83,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     promptito
                   </Link>
                   <div>
-                    <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-2 py-1 rounded-md font-medium flex items-center">
+                    <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-2 py-0.5 rounded-md font-medium flex items-center">
                       <Sparkles className="h-3 w-3 mr-1" />
                       BETA made with AI
                     </Badge>
@@ -100,8 +101,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           >
             <span>promptito</span>
             <div>
-              <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-2 py-1 rounded-md font-medium flex items-center">
-                <Sparkles className="h-3 w-3 mr-1" />
+              <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-1.5 py-0.5 rounded-md font-medium flex items-center">
+                <Sparkles className="h-2.5 w-2.5 mr-0.5" />
                 BETA made with AI
               </Badge>
             </div>
@@ -109,7 +110,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           <div className="ml-auto flex gap-2 items-center">
             {user ? (
               <>
-                <div className="hidden md:block text-sm mr-2">
+                <div className="hidden md:block text-sm text-muted-foreground mr-2">
                   {user.email}
                 </div>
                 <Button 
@@ -117,13 +118,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   size="icon" 
                   onClick={handleSignOut}
                   title="Sign out"
+                  className="h-8 w-8"
                 >
                   <LogOut className="h-4 w-4" />
                 </Button>
               </>
             ) : (
               <Link to="/auth">
-                <Button variant="ghost" size="sm" className="gap-2">
+                <Button variant="ghost" size="sm" className="gap-1.5 h-8">
                   <UserCircle className="h-4 w-4" />
                   Sign In
                 </Button>
@@ -133,10 +135,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </div>
       </div>
       <div className="flex flex-1">
-        <aside className="hidden w-60 flex-col border-r px-4 pt-8 md:flex">
-          <nav className="flex flex-col gap-1">{renderNavLinks()}</nav>
+        <aside className="hidden w-56 flex-col border-r px-3 pt-6 md:flex">
+          <nav className="flex flex-col gap-1 space-y-0.5">{renderNavLinks()}</nav>
         </aside>
-        <main className="flex-1 px-4 py-8 sm:px-6 sm:py-10">
+        <main className="flex-1 px-4 py-6 sm:px-6">
           <div className="mx-auto max-w-5xl">{children}</div>
         </main>
       </div>

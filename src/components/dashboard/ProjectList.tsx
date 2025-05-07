@@ -14,14 +14,14 @@ interface ProjectListProps {
 const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
   return (
     <Card className="col-span-1 lg:col-span-1">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Recent Projects</CardTitle>
+            <CardTitle className="text-lg font-medium">Recent Projects</CardTitle>
             <CardDescription>Your recently updated projects</CardDescription>
           </div>
           <Link to="/projects">
-            <Button variant="ghost" size="sm" className="text-primary">
+            <Button variant="ghost" size="sm" className="text-primary h-8 text-sm">
               View all
             </Button>
           </Link>
@@ -36,12 +36,12 @@ const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
                 key={project.id}
                 className="block"
               >
-                <div className="flex items-center gap-3 p-4 hover:bg-muted/30 transition-colors">
-                  <div className="h-8 w-8 rounded bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                    <Folder size={16} />
+                <div className="flex items-center gap-3 p-3 hover:bg-muted/30 transition-colors">
+                  <div className="h-7 w-7 rounded bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                    <Folder size={14} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="font-medium truncate">{project.name}</div>
+                    <div className="font-medium truncate text-sm">{project.name}</div>
                     <div className="flex items-center justify-between mt-0.5">
                       <div className="text-xs text-muted-foreground">
                         Updated {formatDistanceToNow(new Date(project.updatedAt), { addSuffix: true })}
@@ -56,7 +56,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
               </Link>
             ))
           ) : (
-            <div className="text-center py-6 text-muted-foreground">
+            <div className="text-center py-6 text-muted-foreground text-sm">
               No projects found
             </div>
           )}

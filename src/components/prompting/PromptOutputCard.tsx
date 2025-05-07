@@ -30,27 +30,32 @@ export function PromptOutputCard({
     navigator.clipboard.writeText(improvedPrompt);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    toast({
+      title: "Copied to clipboard",
+      description: "The improved prompt has been copied to your clipboard.",
+      duration: 2000,
+    });
   };
 
   return (
     <Card className="overflow-hidden border shadow-sm">
-      <CardHeader className="bg-white pb-0">
-        <CardTitle className="text-lg font-medium">Improved Prompt</CardTitle>
-        <CardDescription className="text-sm text-muted-foreground">
+      <CardHeader className="pb-0">
+        <CardTitle className="text-base font-medium">Improved Prompt</CardTitle>
+        <CardDescription className="text-xs text-muted-foreground">
           Enhanced based on prompt engineering best practices
         </CardDescription>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="pt-4">
         <Textarea 
           placeholder="Your improved prompt will appear here..."
-          className="min-h-[200px] bg-background border rounded-md font-mono text-sm"
+          className="min-h-[180px] bg-background border rounded-md font-mono text-sm"
           value={improvedPrompt}
           readOnly
         />
       </CardContent>
-      <CardFooter className="flex flex-col space-y-4 bg-muted/20 px-6 py-4 border-t">
+      <CardFooter className="flex flex-col space-y-3 bg-muted/10 px-5 py-3 border-t">
         <div className="w-full flex justify-between items-center">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             Not satisfied? Provide feedback for further improvement.
           </p>
           {improvedPrompt && (
@@ -58,43 +63,43 @@ export function PromptOutputCard({
               variant="outline" 
               size="sm" 
               onClick={handleCopy}
-              className="gap-2 h-8 text-xs"
+              className="gap-1.5 h-7 text-xs"
             >
-              {copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}
+              {copied ? <CheckCircle2 size={12} /> : <Copy size={12} />}
               {copied ? 'Copied' : 'Copy'}
             </Button>
           )}
         </div>
         
         {improvedPrompt && (
-          <div className="w-full flex justify-between gap-4">
+          <div className="w-full flex justify-between gap-2">
             {canRevert && (
               <Button 
                 variant="outline" 
                 onClick={onRevert}
-                className="gap-2 text-sm h-9"
+                className="gap-1.5 text-xs h-8 px-3"
               >
-                <ArrowLeft size={16} />
-                Previous Version
+                <ArrowLeft size={14} />
+                Previous
               </Button>
             )}
             
             <Button 
               variant="outline" 
               onClick={onTryAgain}
-              className="gap-2 text-sm h-9"
+              className="gap-1.5 text-xs h-8 px-3"
               disabled={isProcessing}
             >
-              <RefreshCw size={16} />
+              <RefreshCw size={14} />
               Try Again
             </Button>
             
             <Button 
               onClick={onAccept}
-              className="gap-2 bg-primary hover:bg-primary/90 text-sm h-9"
+              className="gap-1.5 bg-primary hover:bg-primary/90 text-xs h-8 px-3"
               disabled={isProcessing}
             >
-              <ThumbsUp size={16} />
+              <ThumbsUp size={14} />
               Accept
             </Button>
           </div>

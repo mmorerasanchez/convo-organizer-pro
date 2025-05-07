@@ -42,37 +42,38 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         </p>
       </div>
       
-      {showSearch && (
-        <div className="relative">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={searchPlaceholder}
-            className="pl-9 w-full md:max-w-md"
-            value={searchValue}
-            onChange={(e) => onSearchChange?.(e.target.value)}
-          />
-        </div>
-      )}
-      
-      {tabs && tabs.length > 0 && (
-        <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
-          <div className="border-b mb-6">
-            <TabsList className="w-full justify-start bg-transparent p-0 h-auto">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        {tabs && tabs.length > 0 && (
+          <Tabs value={activeTab} onValueChange={onTabChange} className="w-full max-w-[600px]">
+            <TabsList className="h-9 p-1 bg-muted/50">
               {tabs.map((tab) => (
                 <TabsTrigger 
                   key={tab.value}
                   value={tab.value} 
-                  className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none px-4 py-3 h-auto text-base flex items-center gap-2"
+                  className="h-7 px-3 text-sm flex items-center gap-1.5"
                 >
                   {tab.icon}
                   {tab.label}
                 </TabsTrigger>
               ))}
             </TabsList>
+          </Tabs>
+        )}
+
+        {showSearch && (
+          <div className="relative w-full sm:w-auto sm:min-w-[260px]">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder={searchPlaceholder}
+              className="pl-9 h-9 text-sm w-full"
+              value={searchValue}
+              onChange={(e) => onSearchChange?.(e.target.value)}
+            />
           </div>
-          {children}
-        </Tabs>
-      )}
+        )}
+      </div>
+      
+      {children}
     </div>
   );
 };

@@ -41,37 +41,37 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
   };
 
   return (
-    <Card className="h-full flex flex-col border-muted/60">
-      <CardHeader className="p-5 pb-3">
+    <Card className="h-full flex flex-col border-muted/60 hover:shadow-sm transition-all">
+      <CardHeader className="p-4 pb-2">
         <div className="flex justify-between items-start">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-medium">{tool.name}</h3>
-              <div className={`px-2 py-0.5 rounded-full text-xs font-medium ${getScoreColor()}`}>
+              <h3 className="text-sm font-medium">{tool.name}</h3>
+              <div className={`px-1.5 py-0.5 rounded-full text-xs font-medium ${getScoreColor()}`}>
                 {tool.score}
               </div>
             </div>
-            <p className="text-sm text-muted-foreground">{tool.model}</p>
+            <p className="text-xs text-muted-foreground">{tool.model}</p>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="px-5 pt-0 pb-5 flex-grow">
+      <CardContent className="px-4 pt-0 pb-4 flex-grow">
         {tool.description && (
-          <p className="text-sm text-muted-foreground line-clamp-3">
+          <p className="text-xs text-muted-foreground line-clamp-3">
             {tool.description}
           </p>
         )}
       </CardContent>
-      <CardFooter className="border-t p-3 bg-muted/10 flex items-center justify-between">
+      <CardFooter className="border-t p-2 bg-muted/10 flex items-center justify-between">
         <EditToolDialog tool={tool} />
         <Button 
           variant="ghost" 
           size="sm" 
           onClick={handleDelete}
           disabled={deleteToolMutation.isPending}
-          className="text-destructive hover:text-destructive/90 hover:bg-destructive/10"
+          className="text-destructive hover:text-destructive/90 hover:bg-destructive/10 h-7 px-2"
         >
-          <Trash className="h-4 w-4" />
+          <Trash className="h-3.5 w-3.5" />
           <span className="sr-only">Delete</span>
         </Button>
       </CardFooter>
