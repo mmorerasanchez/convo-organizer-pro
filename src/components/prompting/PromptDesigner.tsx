@@ -7,7 +7,6 @@ import { PromptDesignerLayout } from './designer/PromptDesignerLayout';
 import { PromptManagerModal } from './designer/PromptManagerModal';
 import { AuthLoadingState } from './designer/AuthLoadingState';
 import { SaveToProjectDialog } from './SaveToProjectDialog';
-import { Dialog } from '@/components/ui/dialog';
 
 const PromptDesigner = () => {
   const { user, loading } = useRequireAuth();
