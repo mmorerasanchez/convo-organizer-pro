@@ -61,39 +61,35 @@ const PromptDesigner = () => {
         onSaveToProject={() => setSaveToProjectDialogOpen(true)}
       />
       
-      <Dialog open={saveModalOpen} onOpenChange={setSaveModalOpen}>
-        <PromptManagerModal
-          open={saveModalOpen}
-          onOpenChange={setSaveModalOpen}
-          activePrompt={activePrompt}
-          onSave={async () => {
-            try {
-              if (activePrompt.id) {
-                await saveVersion.mutateAsync(activePrompt);
-              } else {
-                await createPrompt.mutateAsync(activePrompt);
-              }
-              return true;
-            } catch (error) {
-              console.error("Error saving prompt:", error);
-              return false;
+      <PromptManagerModal
+        open={saveModalOpen}
+        onOpenChange={setSaveModalOpen}
+        activePrompt={activePrompt}
+        onSave={async () => {
+          try {
+            if (activePrompt.id) {
+              await saveVersion.mutateAsync(activePrompt);
+            } else {
+              await createPrompt.mutateAsync(activePrompt);
             }
-          }}
-        />
-      </Dialog>
+            return true;
+          } catch (error) {
+            console.error("Error saving prompt:", error);
+            return false;
+          }
+        }}
+      />
       
-      <Dialog open={saveToProjectDialogOpen} onOpenChange={setSaveToProjectDialogOpen}>
-        <SaveToProjectDialog
-          open={saveToProjectDialogOpen}
-          onOpenChange={setSaveToProjectDialogOpen}
-          promptTitle={activePrompt.title || "Untitled Prompt"}
-          promptContent={compiledPrompt}
-          responseContent={promptResponse}
-          onSaveComplete={() => {
-            // Additional actions after saving if needed
-          }}
-        />
-      </Dialog>
+      <SaveToProjectDialog
+        open={saveToProjectDialogOpen}
+        onOpenChange={setSaveToProjectDialogOpen}
+        promptTitle={activePrompt.title || "Untitled Prompt"}
+        promptContent={compiledPrompt}
+        responseContent={promptResponse}
+        onSaveComplete={() => {
+          // Additional actions after saving if needed
+        }}
+      />
     </>
   );
 };

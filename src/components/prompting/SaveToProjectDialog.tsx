@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog } from '@/components/ui/dialog';
 import { SaveDialogContent } from './project-save/DialogContent';
 import { useSaveToProject } from './project-save/useSaveToProject';
 
@@ -53,7 +53,7 @@ export function SaveToProjectDialog({
   };
 
   return (
-    <DialogContent className="sm:max-w-[500px]">
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <SaveDialogContent
         error={error}
         conversationTitle={conversationTitle}
@@ -72,6 +72,6 @@ export function SaveToProjectDialog({
         onSave={handleSave}
         isProcessing={isProcessing}
       />
-    </DialogContent>
+    </Dialog>
   );
 }

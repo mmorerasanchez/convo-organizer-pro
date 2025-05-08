@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
+  Dialog,
   DialogContent, 
   DialogDescription, 
   DialogFooter, 
@@ -131,91 +132,93 @@ export function PromptManagerModal({
   };
 
   return (
-    <DialogContent className="sm:max-w-[425px]">
-      <DialogHeader>
-        <DialogTitle>Save Prompt</DialogTitle>
-        <DialogDescription>
-          Save your prompt and optionally attach it to a project.
-        </DialogDescription>
-      </DialogHeader>
-      
-      <div className="space-y-4 py-4">
-        {error && (
-          <div className="bg-destructive/15 text-destructive p-3 rounded-md text-sm">
-            {error}
-          </div>
-        )}
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Save Prompt</DialogTitle>
+          <DialogDescription>
+            Save your prompt and optionally attach it to a project.
+          </DialogDescription>
+        </DialogHeader>
         
-        {!showNewProjectForm ? (
-          <div className="space-y-2">
-            <Label htmlFor="project">Select Project</Label>
-            <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a project" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">None</SelectItem>
-                {projects.map((project) => (
-                  <SelectItem key={project.id} value={project.id}>
-                    {project.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button 
-              variant="outline" 
-              className="w-full mt-2"
-              onClick={() => setShowNewProjectForm(true)}
-            >
-              Create New Project
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <div className="space-y-2">
-              <Label htmlFor="name">Project Name</Label>
-              <Input 
-                id="name" 
-                value={newProjectName}
-                onChange={(e) => setNewProjectName(e.target.value)}
-                placeholder="Enter project name"
-              />
+        <div className="space-y-4 py-4">
+          {error && (
+            <div className="bg-destructive/15 text-destructive p-3 rounded-md text-sm">
+              {error}
             </div>
+          )}
+          
+          {!showNewProjectForm ? (
             <div className="space-y-2">
-              <Label htmlFor="description">Description (Optional)</Label>
-              <Input 
-                id="description" 
-                value={newProjectDescription}
-                onChange={(e) => setNewProjectDescription(e.target.value)}
-                placeholder="Enter project description"
-              />
+              <Label htmlFor="project">Select Project</Label>
+              <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
+                <SelectTrigger id="project">
+                  <SelectValue placeholder="Select a project" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  {projects.map((project) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button 
+                variant="outline" 
+                className="w-full mt-2"
+                onClick={() => setShowNewProjectForm(true)}
+              >
+                Create New Project
+              </Button>
             </div>
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={() => setShowNewProjectForm(false)}
-            >
-              Back to Project Selection
-            </Button>
-          </div>
-        )}
-      </div>
-      
-      <DialogFooter>
-        <Button 
-          variant="outline" 
-          onClick={() => onOpenChange(false)}
-          disabled={isProcessing}
-        >
-          Cancel
-        </Button>
-        <Button 
-          onClick={handleSaveVersion}
-          disabled={isProcessing || (showNewProjectForm && !newProjectName.trim())}
-        >
-          {isProcessing ? "Saving..." : "Save Prompt"}
-        </Button>
-      </DialogFooter>
-    </DialogContent>
+          ) : (
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <Label htmlFor="name">Project Name</Label>
+                <Input 
+                  id="name" 
+                  value={newProjectName}
+                  onChange={(e) => setNewProjectName(e.target.value)}
+                  placeholder="Enter project name"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="description">Description (Optional)</Label>
+                <Input 
+                  id="description" 
+                  value={newProjectDescription}
+                  onChange={(e) => setNewProjectDescription(e.target.value)}
+                  placeholder="Enter project description"
+                />
+              </div>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setShowNewProjectForm(false)}
+              >
+                Back to Project Selection
+              </Button>
+            </div>
+          )}
+        </div>
+        
+        <DialogFooter>
+          <Button 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+            disabled={isProcessing}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSaveVersion}
+            disabled={isProcessing || (showNewProjectForm && !newProjectName.trim())}
+          >
+            {isProcessing ? "Saving..." : "Save Prompt"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
