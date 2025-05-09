@@ -97,7 +97,8 @@ export const joinProjectByShareLink = async (shareLink: string): Promise<Project
         createdAt: directProject.created_at,
         updatedAt: directProject.updated_at,
         conversationCount: 0, // We don't have this information yet
-        shareLink: directProject.share_link
+        shareLink: directProject.share_link,
+        status: directProject.status || 'active' // Add status field
       };
     }
     
@@ -145,7 +146,8 @@ export const joinProjectByShareLink = async (shareLink: string): Promise<Project
       createdAt: projectData.created_at,
       updatedAt: projectData.updated_at,
       conversationCount: 0, // We don't have this information yet
-      shareLink: projectData.share_link
+      shareLink: projectData.share_link,
+      status: projectData.status || 'active' // Add status field
     };
   } catch (error) {
     console.error('Error in joinProjectByShareLink:', error);

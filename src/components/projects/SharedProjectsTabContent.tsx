@@ -26,7 +26,7 @@ const SharedProjectsTabContent: React.FC<SharedProjectsTabContentProps> = ({
   const [viewMode, setViewMode] = useState<'grid' | 'status'>('grid');
 
   if (!isLoading && projects.length === 0 && !searchTerm) {
-    return <SharedProjectsEmptyState />;
+    return <SharedProjectsEmptyState searchTerm={searchTerm} />;
   }
   
   return (
