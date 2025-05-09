@@ -166,7 +166,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             className="z-10 bg-white"
             variant="sidebar"
           >
-            <SidebarHeader className="flex items-center justify-between p-3 border-b">
+            <SidebarHeader className="flex items-center justify-between p-3 border-b h-14">
               <div className={cn(
                 "flex items-center transition-opacity duration-200",
                 "group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:justify-center"
@@ -183,15 +183,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     romptito
                   </span>
                 </Link>
-                <div className={cn(
-                  "ml-1",
-                  "group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:absolute group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:overflow-hidden"
-                )}>
-                  <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-1.5 py-0.5 rounded-md font-mono flex items-center">
-                    <Sparkles className="h-2.5 w-2.5 mr-0.5" />
-                    BETA
-                  </Badge>
-                </div>
               </div>
               <SidebarTrigger />
             </SidebarHeader>
@@ -210,6 +201,18 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 </SidebarGroupContent>
               </SidebarGroup>
             </SidebarContent>
+            
+            <SidebarFooter className="mt-auto border-t p-3 flex justify-center items-center">
+              <div className="flex items-center gap-1.5">
+                <Link to="/" className="font-mono font-bold tracking-tighter flex items-center">
+                  <span className="text-lg">promptito</span>
+                </Link>
+                <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-1.5 py-0.5 rounded-md font-mono flex items-center">
+                  <Sparkles className="h-2.5 w-2.5 mr-0.5" />
+                  BETA
+                </Badge>
+              </div>
+            </SidebarFooter>
           </Sidebar>
           
           {/* Mobile header bar */}
