@@ -15,16 +15,50 @@ serve(async (req) => {
   }
   
   try {
-    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+    // Log that we're starting the email sending process
+    console.log("Starting send-verification-email function");
     
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
+    // Check if RESEND_API_KEY is available
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    if (!resendApiKey) {
+      console.error("RESEND_API_KEY environment variable not found");
+      return new Response(
+        JSON.stringify({ error: "Email service configuration error" }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
+      );
+    }
     
+    // Initialize Resend with API key
+    console.log("Initializing Resend client");
+    const resend = new Resend(resendApiKey);
+    
+    // Initialize Supabase admin client
+    console.log("Initializing Supabase admin client");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error("Supabase URL or Service Role Key not found");
+      return new Response(
+        JSON.stringify({ error: "Auth service configuration error" }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
+      );
+    }
+    
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Extract email from request body
+    console.log("Parsing request body");
     const { email } = await req.json();
     
     if (!email) {
+      console.error("No email provided in request");
       return new Response(
         JSON.stringify({ error: "Email is required" }),
         { 
@@ -34,6 +68,9 @@ serve(async (req) => {
       );
     }
     
+    console.log(`Generating signup link for email: ${email}`);
+    
+    // Generate signup link
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: "signup",
       email,
@@ -56,6 +93,8 @@ serve(async (req) => {
     // Send the verification email using Resend
     try {
       const verificationLink = data.properties.action_link;
+      console.log(`Verification link generated successfully, sending email to ${email}`);
+      
       const emailResult = await resend.emails.send({
         from: "Promptito <onboarding@resend.dev>",
         to: [email],
@@ -80,7 +119,7 @@ serve(async (req) => {
         `,
       });
       
-      console.log("Email sent successfully:", email);
+      console.log("Email sent successfully:", email, emailResult);
       
       return new Response(
         JSON.stringify({ 

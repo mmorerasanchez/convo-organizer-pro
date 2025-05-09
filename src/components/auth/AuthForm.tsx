@@ -30,6 +30,7 @@ const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState("");
+  const [edgeFunctionError, setEdgeFunctionError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Get the current origin for redirection
@@ -56,28 +57,31 @@ const AuthForm = () => {
   const handleSignUp = async (values: z.infer<typeof authSchema>) => {
     try {
       setIsLoading(true);
+      setEdgeFunctionError(null);
       
       // Store email for verification message
       setVerificationEmail(values.email);
       
       try {
         // Call our custom Edge Function to send a verification email
+        console.log("Calling send-verification-email Edge Function");
         const response = await fetch(`${origin}/functions/v1/send-verification-email`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabase.auth.getSession()}`
           },
           body: JSON.stringify({ email: values.email }),
         });
 
         const result = await response.json();
+        console.log("Edge Function response:", result);
         
         if (!response.ok) {
-          throw new Error(result.error || 'Failed to send verification email');
+          throw new Error(result.error || result.details || 'Failed to send verification email');
         }
         
         // Skip default Supabase email and use our custom email
+        console.log("Creating Supabase user");
         const { error } = await supabase.auth.signUp({
           email: values.email,
           password: values.password,
@@ -94,7 +98,10 @@ const AuthForm = () => {
         signUpForm.reset();
       } catch (edgeFunctionError: any) {
         console.error("Edge function error:", edgeFunctionError);
+        setEdgeFunctionError(edgeFunctionError.message || "Failed to send verification email");
+        
         // Fall back to default Supabase email if our Edge Function fails
+        toast.info("Using default email verification method");
         const { error } = await supabase.auth.signUp({
           email: values.email,
           password: values.password,
@@ -163,6 +170,16 @@ const AuthForm = () => {
             </AlertDescription>
           </Alert>
           
+          {edgeFunctionError && (
+            <Alert className="bg-yellow-50 text-yellow-800 border-yellow-200">
+              <AlertCircle className="h-4 w-4 mr-2" />
+              <AlertDescription>
+                Our custom email service encountered an issue: {edgeFunctionError}.
+                A default verification email has been sent instead.
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <p className="text-center text-sm text-muted-foreground mt-4">
             After verifying your email, you'll be able to sign in to your account.
           </p>
@@ -173,6 +190,7 @@ const AuthForm = () => {
             onClick={() => {
               setVerificationSent(false);
               setVerificationEmail("");
+              setEdgeFunctionError(null);
             }}
           >
             Back to Sign In
