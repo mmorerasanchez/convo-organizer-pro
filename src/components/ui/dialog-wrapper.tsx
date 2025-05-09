@@ -13,45 +13,80 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface DialogWrapperProps {
+  // Core props
+  children: React.ReactNode;
   trigger?: React.ReactNode;
   title?: string;
   description?: string;
-  children: React.ReactNode;
   footer?: React.ReactNode;
+  
+  // Styling
+  className?: string;
+  contentClassName?: string;
+  headerClassName?: string;
+  footerClassName?: string;
+  
+  // Control props
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  className?: string;
+  defaultOpen?: boolean;
+  
+  // Cancel button
   showCancel?: boolean;
   cancelText?: string;
   onCancel?: () => void;
+  cancelButtonVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  
+  // State
   isProcessing?: boolean;
 }
 
 export function DialogWrapper({
+  // Core props
+  children,
   trigger,
   title,
   description,
-  children,
   footer,
+  
+  // Styling
+  className,
+  contentClassName,
+  headerClassName,
+  footerClassName,
+  
+  // Control props
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
-  className,
+  defaultOpen = false,
+  
+  // Cancel button
   showCancel = false,
   cancelText = "Cancel",
   onCancel,
+  cancelButtonVariant = "outline",
+  
+  // State
   isProcessing = false,
 }: DialogWrapperProps) {
-  const [internalOpen, setInternalOpen] = useState(false);
+  // Handle controlled vs uncontrolled state
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
   
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
-  const onOpenChange = isControlled ? controlledOnOpenChange : setInternalOpen;
+  const onOpenChange = (value: boolean) => {
+    if (isControlled) {
+      controlledOnOpenChange?.(value);
+    } else {
+      setInternalOpen(value);
+    }
+  };
 
   const handleCancel = () => {
     if (onCancel) {
       onCancel();
-    } else if (!isControlled) {
-      setInternalOpen(false);
+    } else {
+      onOpenChange(false);
     }
   };
 
@@ -59,9 +94,9 @@ export function DialogWrapper({
     <Dialog open={open} onOpenChange={onOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       
-      <DialogContent className={cn("sm:max-w-[425px]", className)}>
+      <DialogContent className={cn("sm:max-w-[425px]", className, contentClassName)}>
         {(title || description) && (
-          <DialogHeader>
+          <DialogHeader className={headerClassName}>
             {title && <DialogTitle>{title}</DialogTitle>}
             {description && <DialogDescription>{description}</DialogDescription>}
           </DialogHeader>
@@ -70,10 +105,10 @@ export function DialogWrapper({
         {children}
         
         {(footer || showCancel) && (
-          <DialogFooter>
+          <DialogFooter className={cn(footerClassName)}>
             {showCancel && (
               <Button 
-                variant="outline" 
+                variant={cancelButtonVariant}
                 onClick={handleCancel}
                 disabled={isProcessing}
               >

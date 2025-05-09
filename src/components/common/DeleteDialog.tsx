@@ -82,8 +82,11 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({
         </Button>
       }
     >
-      {/* Add an empty div as children to satisfy the required prop */}
-      <div></div>
+      <div className="py-2">
+        <p className="text-center text-sm text-muted-foreground">
+          This will permanently delete this {itemType} and any associated data.
+        </p>
+      </div>
     </DialogWrapper>
   );
 };

@@ -10,6 +10,7 @@ interface FeedbackDialogProps {
   feedback: string;
   onFeedbackChange: (feedback: string) => void;
   onSubmit: () => void;
+  isSubmitting?: boolean;
 }
 
 export function FeedbackDialog({
@@ -18,6 +19,7 @@ export function FeedbackDialog({
   feedback,
   onFeedbackChange,
   onSubmit,
+  isSubmitting = false,
 }: FeedbackDialogProps) {
   return (
     <DialogWrapper
@@ -25,16 +27,17 @@ export function FeedbackDialog({
       onOpenChange={onOpenChange}
       title="Provide Improvement Feedback"
       description="Help us understand how you'd like the prompt to be improved."
-      className="sm:max-w-[500px] p-6 gap-6"
+      className="sm:max-w-[500px]"
+      contentClassName="p-6 gap-6"
       showCancel={true}
-      isProcessing={false}
+      isProcessing={isSubmitting}
       footer={
         <Button 
           onClick={onSubmit}
-          disabled={!feedback.trim()}
+          disabled={!feedback.trim() || isSubmitting}
           className="bg-primary hover:bg-primary/90 h-10"
         >
-          Submit Feedback
+          {isSubmitting ? "Submitting..." : "Submit Feedback"}
         </Button>
       }
     >
