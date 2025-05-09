@@ -10,6 +10,7 @@ import {
   SidebarTrigger 
 } from '@/components/ui/sidebar';
 import SidebarNavItems from './SidebarNavItems';
+import JoinProjectDialog from '@/components/projects/JoinProjectDialog';
 
 const SidebarNav: React.FC = () => {
   return (
@@ -24,6 +25,10 @@ const SidebarNav: React.FC = () => {
       
       <SidebarContent>
         <SidebarNavItems />
+        
+        <div className="px-3 py-2">
+          <JoinProjectDialog />
+        </div>
       </SidebarContent>
     </Sidebar>
   );

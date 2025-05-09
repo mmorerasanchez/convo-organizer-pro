@@ -13,11 +13,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 interface JoinProjectDialogProps {
   variant?: 'default' | 'card';
   trigger?: React.ReactNode;
+  size?: 'sm' | 'default';
 }
 
 const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({ 
   variant = 'default',
-  trigger
+  trigger,
+  size = 'default'
 }) => {
   const [open, setOpen] = useState(false);
   const [projectShareLink, setProjectShareLink] = useState('');
@@ -79,7 +81,11 @@ const JoinProjectDialog: React.FC<JoinProjectDialogProps> = ({
   };
 
   const defaultTrigger = (
-    <Button variant={variant === 'card' ? 'default' : 'outline'}>
+    <Button 
+      variant={variant === 'card' ? 'default' : 'outline'} 
+      size={size === 'sm' ? 'sm' : 'default'}
+      className="w-full justify-start"
+    >
       <UsersIcon className="mr-2 h-4 w-4" />
       Join a Project
     </Button>

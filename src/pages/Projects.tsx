@@ -35,8 +35,7 @@ const Projects = () => {
     {
       value: 'shared-projects',
       label: 'Shared Projects',
-      icon: <Users className="h-4 w-4" />,
-      disabled: true
+      icon: <Users className="h-4 w-4" />
     }
   ];
 
@@ -97,13 +96,14 @@ const Projects = () => {
           </TabsContent>
           
           <TabsContent value="shared-projects" className="mt-0 space-y-6">
-            <div className="text-center py-12 rounded-lg border bg-muted/20">
-              <Users className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-              <h3 className="text-lg font-medium mb-2">Shared Projects</h3>
-              <p className="text-muted-foreground mb-4">
-                Coming soon in a future update
-              </p>
-            </div>
+            <SharedProjectsTabContent 
+              projects={filteredSharedProjects}
+              isLoading={isLoadingShared} 
+              searchTerm={searchTerm}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              resetFilters={resetFilters}
+            />
           </TabsContent>
         </Tabs>
       </div>

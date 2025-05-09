@@ -3,6 +3,7 @@ import React from 'react';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetTrigger } from '@/components/ui/sheet';
+import MobileNavSheet from './MobileNavSheet';
 
 const MobileHeader: React.FC = () => {
   return (
@@ -15,6 +16,7 @@ const MobileHeader: React.FC = () => {
               <span className="sr-only">Toggle mobile navigation</span>
             </Button>
           </SheetTrigger>
+          <MobileNavSheet />
         </Sheet>
       </div>
     </div>
