@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Project } from '@/lib/types';
 import ProjectFilters from './ProjectFilters';
 import ProjectGrid from './ProjectGrid';
+import ProjectsByStatus from './ProjectsByStatus';
 import JoinProjectDialog from './JoinProjectDialog';
 import NewProjectDialog from './NewProjectDialog';
 
@@ -23,14 +24,18 @@ const AllProjectsTabContent: React.FC<AllProjectsTabContentProps> = ({
   setSortBy,
   resetFilters
 }) => {
+  const [viewMode, setViewMode] = useState<'grid' | 'status'>('grid');
+  
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center flex-wrap gap-2">
         <ProjectFilters
           searchTerm={searchTerm}
           sortBy={sortBy}
           setSortBy={setSortBy}
           resetFilters={resetFilters}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
         />
         <div className="flex items-center space-x-2">
           <JoinProjectDialog />
@@ -38,12 +43,20 @@ const AllProjectsTabContent: React.FC<AllProjectsTabContentProps> = ({
         </div>
       </div>
       
-      <ProjectGrid 
-        projects={projects}
-        isLoading={isLoading}
-        showNewButton={true}
-        searchTerm={searchTerm}
-      />
+      {viewMode === 'grid' ? (
+        <ProjectGrid 
+          projects={projects}
+          isLoading={isLoading}
+          showNewButton={true}
+          searchTerm={searchTerm}
+        />
+      ) : (
+        <ProjectsByStatus 
+          projects={projects}
+          isLoading={isLoading}
+          showNewButton={true}
+        />
+      )}
     </div>
   );
 };

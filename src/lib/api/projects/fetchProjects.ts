@@ -22,7 +22,8 @@ export const fetchProjects = async (): Promise<Project[]> => {
     createdAt: project.created_at,
     updatedAt: project.updated_at,
     conversationCount: project.conversations?.[0]?.count || 0,
-    shareLink: project.share_link
+    shareLink: project.share_link,
+    status: project.status || 'active'
   }));
 };
 
@@ -62,7 +63,8 @@ export const fetchProjectById = async (id: string): Promise<Project | null> => {
         createdAt: sharedData.created_at,
         updatedAt: sharedData.updated_at,
         conversationCount: sharedData.conversations?.[0]?.count || 0,
-        shareLink: sharedData.share_link
+        shareLink: sharedData.share_link,
+        status: sharedData.status || 'active'
       };
     }
     throw error;
@@ -77,7 +79,8 @@ export const fetchProjectById = async (id: string): Promise<Project | null> => {
     createdAt: data.created_at,
     updatedAt: data.updated_at,
     conversationCount: data.conversations?.[0]?.count || 0,
-    shareLink: data.share_link
+    shareLink: data.share_link,
+    status: data.status || 'active'
   };
 };
 
@@ -91,7 +94,7 @@ export const getSharedProjects = async (): Promise<Project[]> => {
     .select(`
       project_id,
       projects!inner(
-        id, name, description, created_at, updated_at, 
+        id, name, description, created_at, updated_at, status,
         conversations(count)
       )
     `)
@@ -107,6 +110,7 @@ export const getSharedProjects = async (): Promise<Project[]> => {
     createdAt: item.projects.created_at,
     updatedAt: item.projects.updated_at,
     conversationCount: item.projects.conversations?.[0]?.count || 0,
-    shareLink: undefined
+    shareLink: undefined,
+    status: item.projects.status || 'active'
   }));
 };

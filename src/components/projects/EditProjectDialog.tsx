@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Edit } from 'lucide-react';
 import { toast } from 'sonner';
 import { Project } from '@/lib/types';
@@ -22,6 +23,7 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
 }) => {
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description);
+  const [status, setStatus] = useState(project.status || 'active');
   const [open, setOpen] = useState(false);
   
   const queryClient = useQueryClient();
@@ -29,7 +31,8 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   const updateProjectMutation = useMutation({
     mutationFn: () => updateProject(project.id, {
       name: name.trim(),
-      description: description.trim()
+      description: description.trim(),
+      status: status
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
@@ -73,6 +76,21 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
               required
             />
           </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="status">Status</Label>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger id="status">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="not started">Not Started</SelectItem>
+                <SelectItem value="in progress">In Progress</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
             <Textarea

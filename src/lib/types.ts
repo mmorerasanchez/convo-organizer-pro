@@ -25,6 +25,7 @@ export interface Project {
   updatedAt: string;
   conversationCount: number;
   shareLink?: string;
+  status: string;
 }
 
 export interface Knowledge {

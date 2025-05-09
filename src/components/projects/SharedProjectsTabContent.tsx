@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Project } from '@/lib/types';
 import ProjectFilters from './ProjectFilters';
 import ProjectGrid from './ProjectGrid';
+import ProjectsByStatus from './ProjectsByStatus';
 import SharedProjectsEmptyState from './SharedProjectsEmptyState';
 
 interface SharedProjectsTabContentProps {
@@ -22,20 +23,12 @@ const SharedProjectsTabContent: React.FC<SharedProjectsTabContentProps> = ({
   setSortBy,
   resetFilters
 }) => {
-  if (isLoading) {
-    return (
-      <ProjectGrid 
-        projects={[]}
-        isLoading={true}
-        isShared={true}
-      />
-    );
-  }
+  const [viewMode, setViewMode] = useState<'grid' | 'status'>('grid');
 
-  if (projects.length === 0) {
-    return <SharedProjectsEmptyState searchTerm={searchTerm} />;
+  if (!isLoading && projects.length === 0 && !searchTerm) {
+    return <SharedProjectsEmptyState />;
   }
-
+  
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -44,14 +37,26 @@ const SharedProjectsTabContent: React.FC<SharedProjectsTabContentProps> = ({
           sortBy={sortBy}
           setSortBy={setSortBy}
           resetFilters={resetFilters}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
         />
       </div>
-      <ProjectGrid 
-        projects={projects}
-        isLoading={isLoading}
-        isShared={true}
-        searchTerm={searchTerm}
-      />
+      
+      {viewMode === 'grid' ? (
+        <ProjectGrid 
+          projects={projects}
+          isLoading={isLoading}
+          showNewButton={false}
+          searchTerm={searchTerm}
+          isShared={true}
+        />
+      ) : (
+        <ProjectsByStatus 
+          projects={projects}
+          isLoading={isLoading}
+          showNewButton={false}
+        />
+      )}
     </div>
   );
 };

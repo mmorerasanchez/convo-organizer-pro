@@ -6,6 +6,7 @@ import { Project } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
 import { BookOpen, Folder } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import ProjectStatusBadge from '../projects/ProjectStatusBadge';
 
 interface ProjectListProps {
   projects: Project[];
@@ -43,8 +44,11 @@ const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
                   <div className="min-w-0 flex-1">
                     <div className="font-medium truncate text-sm">{project.name}</div>
                     <div className="flex items-center justify-between mt-0.5">
-                      <div className="text-xs text-muted-foreground">
-                        Updated {formatDistanceToNow(new Date(project.updatedAt), { addSuffix: true })}
+                      <div className="text-xs flex items-center gap-1.5">
+                        <ProjectStatusBadge status={project.status} className="text-xs py-0 px-1.5" />
+                        <span className="text-muted-foreground">
+                          Updated {formatDistanceToNow(new Date(project.updatedAt), { addSuffix: true })}
+                        </span>
                       </div>
                       <div className="text-xs flex items-center gap-1 text-muted-foreground">
                         <BookOpen size={12} />

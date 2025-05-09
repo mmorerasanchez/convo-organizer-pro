@@ -8,6 +8,7 @@ import { Project } from '../../types';
 export const createProject = async (project: {
   name: string;
   description: string;
+  status?: string;
 }): Promise<Project> => {
   // Get the current user session
   const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -32,6 +33,7 @@ export const createProject = async (project: {
   // Sanitize inputs
   const sanitizedName = project.name.trim();
   const sanitizedDescription = project.description ? project.description.trim() : '';
+  const sanitizedStatus = project.status || 'not started';
   
   try {
     const { data, error } = await supabase
@@ -40,7 +42,8 @@ export const createProject = async (project: {
         {
           name: sanitizedName,
           description: sanitizedDescription,
-          user_id: userId
+          user_id: userId,
+          status: sanitizedStatus
         }
       ])
       .select()
@@ -63,7 +66,8 @@ export const createProject = async (project: {
       createdAt: data.created_at,
       updatedAt: data.updated_at,
       conversationCount: 0,
-      shareLink: data.share_link
+      shareLink: data.share_link,
+      status: data.status
     };
   } catch (error) {
     console.error('Project operation error:', error);
@@ -76,7 +80,7 @@ export const createProject = async (project: {
  */
 export const updateProject = async (
   id: string,
-  updates: { name?: string; description?: string }
+  updates: { name?: string; description?: string; status?: string }
 ): Promise<void> => {
   // Get the current user session
   const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -109,6 +113,10 @@ export const updateProject = async (
   
   if (updates.description !== undefined) {
     sanitizedUpdates.description = updates.description.trim();
+  }
+  
+  if (updates.status !== undefined) {
+    sanitizedUpdates.status = updates.status;
   }
   
   try {

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -22,6 +23,7 @@ const NewProjectDialog: React.FC<NewProjectDialogProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [status, setStatus] = useState('not started');
   const [open, setOpen] = useState(false);
   
   const navigate = useNavigate();
@@ -35,6 +37,7 @@ const NewProjectDialog: React.FC<NewProjectDialogProps> = ({
       setOpen(false);
       setName('');
       setDescription('');
+      setStatus('not started');
       navigate(`/projects/${newProject.id}`);
     },
     onError: (error: Error) => {
@@ -46,7 +49,8 @@ const NewProjectDialog: React.FC<NewProjectDialogProps> = ({
     e.preventDefault();
     createProjectMutation.mutate({
       name: name.trim(),
-      description: description.trim()
+      description: description.trim(),
+      status: status
     });
   };
   
@@ -80,6 +84,21 @@ const NewProjectDialog: React.FC<NewProjectDialogProps> = ({
               required
             />
           </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="status">Status</Label>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger id="status">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="not started">Not Started</SelectItem>
+                <SelectItem value="in progress">In Progress</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
             <Textarea
