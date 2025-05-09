@@ -81,7 +81,10 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({
           {isDeleting ? 'Deleting...' : 'Delete'}
         </Button>
       }
-    />
+    >
+      {/* Add an empty div as children to satisfy the required prop */}
+      <div></div>
+    </DialogWrapper>
   );
 };
 
