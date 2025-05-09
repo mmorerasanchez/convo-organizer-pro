@@ -39,8 +39,10 @@ export const usePromptScannerContext = () => {
       
       const result = await promptImprovement.improvePrompt(promptInput);
       
-      dispatch({ type: 'SET_IMPROVED_PROMPT', payload: result.improvedPrompt });
-      dispatch({ type: 'SET_REQUEST_COUNT', payload: requestCount + 1 });
+      if (result) {
+        dispatch({ type: 'SET_IMPROVED_PROMPT', payload: result });
+        dispatch({ type: 'SET_REQUEST_COUNT', payload: requestCount + 1 });
+      }
     } catch (error) {
       console.error('Error improving prompt:', error);
       dispatch({ type: 'SET_API_ERROR', payload: 'Failed to improve prompt. Please try again.' });
@@ -60,15 +62,18 @@ export const usePromptScannerContext = () => {
       dispatch({ type: 'SET_IS_PROCESSING', payload: true });
       dispatch({ type: 'SET_API_ERROR', payload: null });
       
-      const result = await promptImprovement.improveWithFeedback(improvedPrompt, currentFeedback);
+      // Use improvePrompt with feedback parameter instead of nonexistent improveWithFeedback
+      const result = await promptImprovement.improvePrompt(improvedPrompt, currentFeedback);
       
-      dispatch({ 
-        type: 'ADD_FEEDBACK_HISTORY', 
-        payload: { feedback: currentFeedback, result: improvedPrompt } 
-      });
-      dispatch({ type: 'SET_IMPROVED_PROMPT', payload: result.improvedPrompt });
-      dispatch({ type: 'SET_CURRENT_FEEDBACK', payload: '' });
-      dispatch({ type: 'SET_REQUEST_COUNT', payload: requestCount + 1 });
+      if (result) {
+        dispatch({ 
+          type: 'ADD_FEEDBACK_HISTORY', 
+          payload: { feedback: currentFeedback, result: improvedPrompt } 
+        });
+        dispatch({ type: 'SET_IMPROVED_PROMPT', payload: result });
+        dispatch({ type: 'SET_CURRENT_FEEDBACK', payload: '' });
+        dispatch({ type: 'SET_REQUEST_COUNT', payload: requestCount + 1 });
+      }
     } catch (error) {
       console.error('Error processing feedback:', error);
       dispatch({ type: 'SET_API_ERROR', payload: 'Failed to process feedback. Please try again.' });
@@ -91,8 +96,8 @@ export const usePromptScannerContext = () => {
       const newHistory = [...feedbackHistory];
       newHistory.pop();
       dispatch({ 
-        type: 'SET_FEEDBACK_HISTORY', 
-        payload: newHistory 
+        type: 'ADD_FEEDBACK_HISTORY', // Fixed: Changed from SET_FEEDBACK_HISTORY to ADD_FEEDBACK_HISTORY
+        payload: newHistory[newHistory.length - 1] || { feedback: '', result: '' }
       });
     }
   }, [feedbackHistory, dispatch]);
