@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { Dialog } from '@/components/ui/dialog';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { SaveDialogContent } from './project-save/DialogContent';
 import { useSaveToProject } from './project-save/useSaveToProject';
+import { Button } from '@/components/ui/button';
 
 interface SaveToProjectDialogProps {
   open: boolean;

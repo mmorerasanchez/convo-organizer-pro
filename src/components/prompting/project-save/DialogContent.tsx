@@ -5,7 +5,7 @@ import {
   DialogTitle, 
   DialogDescription, 
   DialogFooter,
-  DialogContent as BaseDialogContent
+  DialogContent 
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,7 +52,7 @@ export function SaveDialogContent({
   isProcessing
 }: SaveDialogContentProps) {
   return (
-    <BaseDialogContent className="sm:max-w-[500px]">
+    <DialogContent className="sm:max-w-[500px]">
       <DialogHeader>
         <DialogTitle>Save to Project</DialogTitle>
         <DialogDescription>
@@ -110,6 +110,6 @@ export function SaveDialogContent({
           {isProcessing ? "Saving..." : "Save"}
         </Button>
       </DialogFooter>
-    </BaseDialogContent>
+    </DialogContent>
   );
 }
