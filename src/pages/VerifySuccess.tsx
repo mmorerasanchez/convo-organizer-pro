@@ -14,7 +14,7 @@ const VerifySuccess = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
   useEffect(() => {
-    // Check if this is a redirected verification
+    // Check if user is authenticated, which means verification was successful
     const checkVerification = async () => {
       try {
         const { data, error } = await supabase.auth.getSession();
@@ -30,23 +30,10 @@ const VerifySuccess = () => {
           // If we have a session, verification was successful
           setVerificationState('success');
         } else {
-          // No session, might need to process the hash
-          const hash = window.location.hash;
-          if (hash && hash.includes('access_token')) {
-            // Process the redirect with hash
-            const { error } = await supabase.auth.getUser();
-            if (error) {
-              console.error("Error processing auth redirect:", error);
-              setVerificationState('error');
-              setErrorMessage(error.message);
-            } else {
-              setVerificationState('success');
-            }
-          } else {
-            // No hash and no session, might be a direct page visit
-            setVerificationState('error');
-            setErrorMessage("No verification data found. Please try signing in.");
-          }
+          // No session, might be an issue
+          console.warn("No active session found on verification success page");
+          setVerificationState('error');
+          setErrorMessage("Your session could not be verified. Please try signing in.");
         }
       } catch (error: any) {
         console.error("Unexpected error during verification:", error);
@@ -56,7 +43,7 @@ const VerifySuccess = () => {
     };
     
     checkVerification();
-  }, [navigate]);
+  }, []);
   
   const handleGoToLogin = () => {
     navigate('/auth');

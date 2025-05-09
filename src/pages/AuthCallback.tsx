@@ -14,6 +14,29 @@ const AuthCallback = () => {
     // Handle the OAuth callback
     const handleAuthCallback = async () => {
       try {
+        // Check if this is a verification flow by examining URL hash
+        const isVerification = location.hash && 
+          (location.hash.includes('type=signup') || location.hash.includes('type=recovery'));
+        
+        console.log("Auth callback triggered, is verification:", isVerification);
+        
+        // Process the URL fragment (hash)
+        if (location.hash) {
+          console.log("Processing auth hash...");
+          
+          // Let Supabase auth handle the fragment/hash
+          const { error: fragmentError } = await supabase.auth.getSession();
+          
+          if (fragmentError) {
+            console.error("Error processing auth fragment:", fragmentError);
+            setError(fragmentError.message);
+            toast.error("Authentication failed: " + fragmentError.message);
+            setTimeout(() => navigate('/auth'), 2000);
+            return;
+          }
+        }
+        
+        // Get the current session
         const { data, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -24,17 +47,17 @@ const AuthCallback = () => {
           return;
         }
         
-        // Check if this is an email verification redirect
-        if (location.hash && location.hash.includes('type=signup')) {
-          // This is coming from email verification
-          // Redirect to the verification success page
-          navigate('/verify-success');
-          return;
-        }
-        
         if (data.session) {
-          toast.success("Successfully signed in!");
-          navigate('/');
+          if (isVerification) {
+            // This is from email verification, redirect to success page
+            console.log("Email verified successfully, redirecting to success page");
+            navigate('/verify-success');
+          } else {
+            // Standard login flow
+            console.log("Login successful, redirecting to dashboard");
+            toast.success("Successfully signed in!");
+            navigate('/');
+          }
         } else {
           // No session but no error either, unusual state
           console.warn("No session found but no error reported");

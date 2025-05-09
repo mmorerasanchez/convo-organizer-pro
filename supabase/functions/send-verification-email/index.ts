@@ -70,12 +70,15 @@ serve(async (req) => {
     
     console.log(`Generating signup link for email: ${email}`);
     
-    // Generate signup link
+    // Use the production URL for redirects
+    const productionDomain = "https://app.promptito.xyz";
+    
+    // Generate signup link with redirect to auth callback handler
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: "signup",
       email,
       options: {
-        redirectTo: `${new URL(req.url).origin}/verify-success`,
+        redirectTo: `${productionDomain}/auth/callback`,
       },
     });
     
