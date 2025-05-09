@@ -21,7 +21,7 @@ export function usePromptDesigner() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   
-  // State for the currently active prompt
+  // State for the currently active prompt - initialize with empty prompt
   const [activePrompt, setActivePrompt] = React.useState<PromptState>(createEmptyPrompt());
   
   // Fetch user's prompts
@@ -37,8 +37,13 @@ export function usePromptDesigner() {
       if (!user) throw new Error('User not authenticated');
       return createNewPrompt(promptData, user.id);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success('Prompt created successfully');
+      // Update the active prompt with the newly created prompt
+      setActivePrompt({
+        ...activePrompt,
+        id: data.id
+      });
       queryClient.invalidateQueries({ queryKey: ['prompts', user?.id] });
     },
     onError: (error) => {

@@ -52,14 +52,18 @@ export function PromptDesignerLayout({
   const { data: models = [] } = useModels();
   
   // Get framework-specific fields when framework changes
+  // Add null check to prevent accessing frameworkId of null
   const { data: frameworkFields = [] } = useFrameworkFields(
-    activePrompt.frameworkId || undefined
+    activePrompt?.frameworkId || undefined
   );
   
   // Compile the prompt text whenever prompt state changes
+  // Add null check to prevent errors when activePrompt is null
   useEffect(() => {
-    const compiled = compilePromptText(activePrompt);
-    setCompiledPrompt(compiled);
+    if (activePrompt) {
+      const compiled = compilePromptText(activePrompt);
+      setCompiledPrompt(compiled);
+    }
   }, [activePrompt, compilePromptText, setCompiledPrompt]);
   
   // Extract handler functions to a custom hook
@@ -79,6 +83,11 @@ export function PromptDesignerLayout({
     setCompiledPrompt,
     testPrompt
   });
+  
+  // If activePrompt is null, return a loading state or empty UI
+  if (!activePrompt) {
+    return <div className="flex justify-center items-center h-64">Loading prompt designer...</div>;
+  }
   
   return (
     <div className="space-y-6">

@@ -35,10 +35,10 @@ const PromptDesigner = () => {
   
   // Initialize with empty prompt if none exists
   useEffect(() => {
-    if (!activePrompt && !loading && user) {
+    if (user && !activePrompt) {
       setActivePrompt(createEmptyPrompt());
     }
-  }, [activePrompt, loading, user, setActivePrompt]);
+  }, [activePrompt, user, setActivePrompt]);
   
   // If loading auth, show spinner
   if (loading) {
@@ -48,6 +48,11 @@ const PromptDesigner = () => {
   // If user is not authenticated, show login message
   if (!user) {
     return <AuthenticationRequired />;
+  }
+
+  // If activePrompt is still null after initialization attempt, show loading state
+  if (!activePrompt) {
+    return <div className="flex justify-center items-center h-64">Initializing prompt designer...</div>;
   }
 
   return (

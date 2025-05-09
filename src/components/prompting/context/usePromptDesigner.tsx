@@ -8,6 +8,7 @@ import {
   PromptState,
   TestPromptParams
 } from '@/hooks/prompting';
+import { createEmptyPrompt } from '@/hooks/prompting/prompt-utils';
 
 export const usePromptDesignerContext = () => {
   const { state, dispatch } = usePromptingContext();
@@ -85,7 +86,9 @@ export const usePromptDesignerContext = () => {
   
   const handleClear = useCallback(() => {
     dispatch({ type: 'RESET_DESIGNER' });
-  }, [dispatch]);
+    // Initialize with a new empty prompt immediately after reset
+    setActivePrompt(createEmptyPrompt());
+  }, [dispatch, setActivePrompt]);
   
   return {
     // State
