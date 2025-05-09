@@ -7,7 +7,7 @@ import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import ToolCard from '@/components/tools/ToolCard';
 import NewToolDialog from '@/components/tools/NewToolDialog';
-import { Filter, Plus, Wrench, X } from 'lucide-react';
+import { Filter, Plus, Wrench, X, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import PageHeader from '@/components/common/PageHeader';
@@ -19,7 +19,7 @@ import {
 
 const Tools = () => {
   useRequireAuth();
-  const [activeTab, setActiveTab] = useState('all-tools');
+  const [activeTab, setActiveTab] = useState('my-tools');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'score' | 'name'>('score');
   
@@ -30,9 +30,15 @@ const Tools = () => {
 
   const tabs = [
     {
-      value: 'all-tools',
-      label: 'All Tools',
+      value: 'my-tools',
+      label: 'My Tools',
       icon: <Wrench className="h-4 w-4" />
+    },
+    {
+      value: 'tool-finder',
+      label: 'Tool Finder',
+      icon: <Search className="h-4 w-4" />,
+      disabled: true
     }
   ];
 
@@ -70,7 +76,7 @@ const Tools = () => {
         />
         
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsContent value="all-tools" className="mt-0 space-y-6">
+          <TabsContent value="my-tools" className="mt-0 space-y-6">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 {searchTerm && (
@@ -164,6 +170,16 @@ const Tools = () => {
                 )}
               </>
             )}
+          </TabsContent>
+          
+          <TabsContent value="tool-finder">
+            <div className="text-center py-12 rounded-lg border bg-muted/20">
+              <Search className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+              <h3 className="text-lg font-medium mb-2">Tool Finder</h3>
+              <p className="text-muted-foreground mb-4">
+                Coming soon in a future update
+              </p>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

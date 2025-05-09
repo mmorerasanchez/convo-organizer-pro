@@ -7,6 +7,7 @@ import SidebarNav from './SidebarNav';
 import MobileHeader from './MobileHeader';
 import DesktopHeader from './DesktopHeader';
 import MobileNavSheet from './MobileNavSheet';
+import SidebarLogoFooter from './SidebarLogoFooter';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -44,6 +45,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <main className="flex-1 px-4 py-6 sm:px-6">
               <div className="mx-auto max-w-5xl">{children}</div>
             </main>
+            
+            {/* Centered footer with logo */}
+            <footer className="border-t p-4 text-center">
+              <SidebarLogoFooter />
+            </footer>
           </div>
         </div>
       </div>
