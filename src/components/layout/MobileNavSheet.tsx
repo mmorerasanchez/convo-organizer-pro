@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Sparkles } from 'lucide-react';
 import { activeModules, comingSoonModules } from './SidebarNavItems';
 import { cn } from '@/lib/utils';
+import SidebarNavItems from './SidebarNavItems';
 
 interface MobileNavSheetProps {
   isOpen: boolean;
@@ -37,42 +38,7 @@ const MobileNavSheet: React.FC<MobileNavSheetProps> = ({
           </div>
         </div>
         <nav className="flex flex-col gap-4">
-          <div>
-            <h3 className="mb-1 px-2 text-sm font-medium">Active modules</h3>
-            <div className="flex flex-col gap-1">
-              {activeModules.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={cn(
-                    'flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-all font-mono',
-                    isActivePath(item.path)
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  )}
-                  onClick={() => onOpenChange(false)}
-                >
-                  <item.icon className="h-4 w-4" />
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-          
-          <div>
-            <h3 className="mb-1 px-2 text-sm font-medium text-muted-foreground">Coming soon</h3>
-            <div className="flex flex-col gap-1">
-              {comingSoonModules.map((item) => (
-                <div
-                  key={item.path}
-                  className="flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-all font-mono text-muted-foreground opacity-60 cursor-not-allowed"
-                >
-                  <item.icon className="h-4 w-4" />
-                  {item.label}
-                </div>
-              ))}
-            </div>
-          </div>
+          <SidebarNavItems onNavItemClick={() => onOpenChange(false)} />
         </nav>
       </div>
     </SheetContent>
