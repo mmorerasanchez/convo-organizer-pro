@@ -1,43 +1,76 @@
 
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Handle the OAuth callback
     const handleAuthCallback = async () => {
       try {
-        const { error } = await supabase.auth.getSession();
+        const { data, error: sessionError } = await supabase.auth.getSession();
         
-        if (error) {
-          toast.error("Authentication failed");
-          navigate('/auth');
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          setError(sessionError.message);
+          toast.error("Authentication failed: " + sessionError.message);
+          setTimeout(() => navigate('/auth'), 2000);
           return;
         }
         
-        toast.success("Successfully signed in!");
-        navigate('/');
-      } catch (error) {
+        // Check if this is an email verification redirect
+        if (location.hash && location.hash.includes('type=signup')) {
+          // This is coming from email verification
+          // Redirect to the verification success page
+          navigate('/verify-success');
+          return;
+        }
+        
+        if (data.session) {
+          toast.success("Successfully signed in!");
+          navigate('/');
+        } else {
+          // No session but no error either, unusual state
+          console.warn("No session found but no error reported");
+          setError("Unable to complete authentication. Please try signing in manually.");
+          setTimeout(() => navigate('/auth'), 2000);
+        }
+      } catch (error: any) {
         console.error("Error handling auth callback:", error);
+        setError(error.message || "Authentication failed");
         toast.error("Authentication failed");
-        navigate('/auth');
+        setTimeout(() => navigate('/auth'), 2000);
       }
     };
 
     handleAuthCallback();
-  }, [navigate]);
+  }, [navigate, location]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
-        <div className="mb-4">
-          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
-        </div>
-        <p className="text-muted-foreground">Completing authentication...</p>
+        {error ? (
+          <div>
+            <div className="text-red-500 mb-4">
+              <p className="text-xl font-semibold">Authentication Error</p>
+              <p>{error}</p>
+            </div>
+            <p className="text-muted-foreground">Redirecting to login...</p>
+          </div>
+        ) : (
+          <>
+            <div className="mb-4">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+            </div>
+            <p className="text-muted-foreground">Completing authentication...</p>
+          </>
+        )}
       </div>
     </div>
   );
