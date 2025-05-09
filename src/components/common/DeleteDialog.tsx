@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Trash } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { DialogWrapper } from '@/components/ui/dialog-wrapper';
 
 interface DeleteDialogProps {
   itemType: 'project' | 'conversation' | 'knowledge';
@@ -57,42 +57,31 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({
     }
   };
   
-  const triggerButton = trigger || (
+  const defaultTrigger = (
     <Button variant="outline" size="icon">
       <Trash className="h-4 w-4" />
     </Button>
   );
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {triggerButton}
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Delete {itemType}</DialogTitle>
-          <DialogDescription>
-            Are you sure you want to delete "{itemName}"? This action cannot be undone.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button 
-            variant="outline" 
-            onClick={() => setOpen(false)}
-            disabled={isDeleting}
-          >
-            Cancel
-          </Button>
-          <Button 
-            variant="destructive" 
-            onClick={handleDelete}
-            disabled={isDeleting}
-          >
-            {isDeleting ? 'Deleting...' : 'Delete'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <DialogWrapper
+      open={open}
+      onOpenChange={setOpen}
+      trigger={trigger || defaultTrigger}
+      title={`Delete ${itemType}`}
+      description={`Are you sure you want to delete "${itemName}"? This action cannot be undone.`}
+      showCancel={true}
+      isProcessing={isDeleting}
+      footer={
+        <Button 
+          variant="destructive" 
+          onClick={handleDelete}
+          disabled={isDeleting}
+        >
+          {isDeleting ? 'Deleting...' : 'Delete'}
+        </Button>
+      }
+    />
   );
 };
 

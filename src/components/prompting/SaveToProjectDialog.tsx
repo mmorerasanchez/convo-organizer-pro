@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { SaveDialogContent } from './project-save/DialogContent';
 import { useSaveToProject } from './project-save/useSaveToProject';
-import { Button } from '@/components/ui/button';
+import { DialogWrapper } from '@/components/ui/dialog-wrapper';
 
 interface SaveToProjectDialogProps {
   open: boolean;
@@ -54,7 +53,10 @@ export function SaveToProjectDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogWrapper
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       <SaveDialogContent
         error={error}
         conversationTitle={conversationTitle}
@@ -73,6 +75,6 @@ export function SaveToProjectDialog({
         onSave={handleSave}
         isProcessing={isProcessing}
       />
-    </Dialog>
+    </DialogWrapper>
   );
 }
