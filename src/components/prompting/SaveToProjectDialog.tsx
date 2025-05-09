@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { SaveDialogContent } from './project-save/DialogContent';
 import { useSaveToProject } from './project-save/useSaveToProject';
 import { Button } from '@/components/ui/button';

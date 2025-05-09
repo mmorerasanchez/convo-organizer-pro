@@ -12,7 +12,7 @@ interface DeleteDialogProps {
   trigger?: React.ReactNode;
   redirectPath?: string;
   onDelete?: () => void;
-  isDeleting?: boolean; // Make isDeleting optional
+  isDeleting?: boolean;
 }
 
 const DeleteDialog: React.FC<DeleteDialogProps> = ({
@@ -21,7 +21,7 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({
   trigger,
   redirectPath,
   onDelete,
-  isDeleting: externalIsDeleting // Accept the prop from outside
+  isDeleting: externalIsDeleting
 }) => {
   const [open, setOpen] = useState(false);
   const [internalIsDeleting, setInternalIsDeleting] = useState(false);
