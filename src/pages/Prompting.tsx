@@ -7,6 +7,7 @@ import PromptScanner from '@/components/prompting/PromptScanner';
 import PromptDesigner from '@/components/prompting/PromptDesigner';
 import { BookOpen, Lightbulb, Wand2 } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
+import { PromptingProvider } from '@/components/prompting/context/PromptingContext';
 
 const Prompting = () => {
   const [activeTab, setActiveTab] = React.useState('guide');
@@ -31,29 +32,31 @@ const Prompting = () => {
 
   return (
     <MainLayout>
-      <div className="space-y-8">
-        <PageHeader 
-          title="Prompting Tools"
-          description="Learn best practices, improve your prompts, and design structured prompts with proven frameworks"
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsContent value="guide" className="space-y-6 mt-0">
-            <PromptingGuide />
-          </TabsContent>
+      <PromptingProvider>
+        <div className="space-y-8">
+          <PageHeader 
+            title="Prompting Tools"
+            description="Learn best practices, improve your prompts, and design structured prompts with proven frameworks"
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
           
-          <TabsContent value="scanner" className="space-y-6 mt-0">
-            <PromptScanner />
-          </TabsContent>
-          
-          <TabsContent value="designer" className="space-y-6 mt-0">
-            <PromptDesigner />
-          </TabsContent>
-        </Tabs>
-      </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsContent value="guide" className="space-y-6 mt-0">
+              <PromptingGuide />
+            </TabsContent>
+            
+            <TabsContent value="scanner" className="space-y-6 mt-0">
+              <PromptScanner />
+            </TabsContent>
+            
+            <TabsContent value="designer" className="space-y-6 mt-0">
+              <PromptDesigner />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </PromptingProvider>
     </MainLayout>
   );
 };

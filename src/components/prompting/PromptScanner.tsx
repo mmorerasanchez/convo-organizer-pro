@@ -4,7 +4,7 @@ import { PromptInputCard } from './PromptInputCard';
 import { PromptOutputCard } from './PromptOutputCard';
 import { FeedbackDialog } from './FeedbackDialog';
 import { PromptScannerHeader } from './scanner/PromptScannerHeader';
-import { usePromptScanner } from '@/hooks/use-prompt-scanner';
+import { usePromptScannerContext } from './context/usePromptScanner';
 import { SaveToProjectDialog } from './SaveToProjectDialog';
 
 const PromptScanner = () => {
@@ -30,7 +30,7 @@ const PromptScanner = () => {
     handleRevertToPrevious,
     handleAccept,
     handleSubmitFeedback
-  } = usePromptScanner();
+  } = usePromptScannerContext();
 
   return (
     <div className="space-y-6">
@@ -68,6 +68,7 @@ const PromptScanner = () => {
         feedback={currentFeedback}
         onFeedbackChange={setCurrentFeedback}
         onSubmit={handleSubmitFeedback}
+        isSubmitting={isProcessing}
       />
       
       <SaveToProjectDialog

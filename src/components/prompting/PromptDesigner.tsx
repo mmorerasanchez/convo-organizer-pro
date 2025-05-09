@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
-import { usePromptDesigner, TestPromptResult, TestPromptParams } from '@/hooks/prompting';
+import { createEmptyPrompt } from '@/hooks/prompting/prompt-utils';
+import { usePromptDesignerContext } from './context/usePromptDesigner';
 import { AuthenticationRequired } from './designer/AuthenticationRequired';
 import { PromptDesignerLayout } from './designer/PromptDesignerLayout';
 import { PromptManagerModal } from './designer/PromptManagerModal';
@@ -10,22 +11,34 @@ import { SaveToProjectDialog } from './SaveToProjectDialog';
 
 const PromptDesigner = () => {
   const { user, loading } = useRequireAuth();
-  const [promptResponse, setPromptResponse] = useState<string>('');
-  const [isTestingPrompt, setIsTestingPrompt] = useState(false);
-  const [requestCount, setRequestCount] = useState(0);
-  const [requestLimit] = useState(10); // Free tier limit
   const [saveModalOpen, setSaveModalOpen] = useState(false);
-  const [compiledPrompt, setCompiledPrompt] = useState('');
   const [saveToProjectDialogOpen, setSaveToProjectDialogOpen] = useState(false);
   
   const {
     activePrompt,
     setActivePrompt,
+    promptResponse,
+    setPromptResponse,
+    compiledPrompt,
+    setCompiledPrompt,
+    isTestingPrompt,
+    setIsTestingPrompt,
+    requestCount,
+    setRequestCount,
     createPrompt,
     saveVersion,
     testPrompt,
-    compilePromptText
-  } = usePromptDesigner();
+    compilePromptText,
+    handleTestPrompt,
+    handleClear
+  } = usePromptDesignerContext();
+  
+  // Initialize with empty prompt if none exists
+  useEffect(() => {
+    if (!activePrompt && !loading && user) {
+      setActivePrompt(createEmptyPrompt());
+    }
+  }, [activePrompt, loading, user, setActivePrompt]);
   
   // If loading auth, show spinner
   if (loading) {
@@ -48,7 +61,7 @@ const PromptDesigner = () => {
         setIsTestingPrompt={setIsTestingPrompt}
         requestCount={requestCount}
         setRequestCount={setRequestCount}
-        requestLimit={requestLimit}
+        requestLimit={10}
         saveModalOpen={saveModalOpen}
         setSaveModalOpen={setSaveModalOpen}
         compiledPrompt={compiledPrompt}
@@ -82,7 +95,7 @@ const PromptDesigner = () => {
       <SaveToProjectDialog
         open={saveToProjectDialogOpen}
         onOpenChange={setSaveToProjectDialogOpen}
-        promptTitle={activePrompt.title || "Untitled Prompt"}
+        promptTitle={activePrompt?.title || "Untitled Prompt"}
         promptContent={compiledPrompt}
         responseContent={promptResponse}
         onSaveComplete={() => {
