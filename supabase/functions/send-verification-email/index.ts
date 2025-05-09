@@ -1,6 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
+import { Resend } from "https://esm.sh/resend@1.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,6 +15,8 @@ serve(async (req) => {
   }
   
   try {
+    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+    
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
@@ -50,22 +53,58 @@ serve(async (req) => {
       );
     }
     
-    // You would use a proper email service here like Resend
-    // For now, we'll return the link that would be sent
-    console.log("Generated verification link for:", email);
-    
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: "Verification email sent successfully",
-        // This would not be returned in production, but helpful for testing
-        link: data.properties.action_link
-      }),
-      { 
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      }
-    );
+    // Send the verification email using Resend
+    try {
+      const verificationLink = data.properties.action_link;
+      const emailResult = await resend.emails.send({
+        from: "Promptito <onboarding@resend.dev>",
+        to: [email],
+        subject: "Verify your email for Promptito",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e9e9e9; border-radius: 5px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <h1 style="color: #333; font-size: 24px; margin-bottom: 10px;">Welcome to Promptito</h1>
+              <p style="color: #666; font-size: 16px; margin-bottom: 20px;">Please verify your email to get started</p>
+            </div>
+            <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
+              <p style="margin-bottom: 20px; font-size: 16px;">Click the button below to verify your email address and activate your account:</p>
+              <div style="text-align: center;">
+                <a href="${verificationLink}" style="display: inline-block; background-color: #000; color: white; text-decoration: none; padding: 12px 25px; border-radius: 3px; font-weight: bold;">Verify Email Address</a>
+              </div>
+            </div>
+            <div style="color: #888; font-size: 14px; text-align: center; margin-top: 20px;">
+              <p>If you didn't create an account with Promptito, you can ignore this email.</p>
+              <p>© ${new Date().getFullYear()} Promptito.xyz</p>
+            </div>
+          </div>
+        `,
+      });
+      
+      console.log("Email sent successfully:", email);
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: "Verification email sent successfully"
+        }),
+        { 
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
+      );
+    } catch (emailError: any) {
+      console.error("Failed to send email:", emailError);
+      return new Response(
+        JSON.stringify({ 
+          error: "Failed to send verification email", 
+          details: emailError.message 
+        }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
+      );
+    }
     
   } catch (error) {
     console.error("Unexpected error:", error);

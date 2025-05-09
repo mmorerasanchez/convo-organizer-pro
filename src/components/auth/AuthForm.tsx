@@ -60,21 +60,56 @@ const AuthForm = () => {
       // Store email for verification message
       setVerificationEmail(values.email);
       
-      // Sign up with Supabase Auth
-      const { error } = await supabase.auth.signUp({
-        email: values.email,
-        password: values.password,
-        options: {
-          emailRedirectTo: `${origin}/verify-success`,
+      try {
+        // Call our custom Edge Function to send a verification email
+        const response = await fetch(`${origin}/functions/v1/send-verification-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabase.auth.getSession()}`
+          },
+          body: JSON.stringify({ email: values.email }),
+        });
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to send verification email');
         }
-      });
-      
-      if (error) throw error;
-      
-      // Show verification message
-      setVerificationSent(true);
-      toast.success("Sign up successful! Please check your email for verification.");
-      signUpForm.reset();
+        
+        // Skip default Supabase email and use our custom email
+        const { error } = await supabase.auth.signUp({
+          email: values.email,
+          password: values.password,
+          options: {
+            emailRedirectTo: `${origin}/verify-success`,
+          }
+        });
+        
+        if (error) throw error;
+        
+        // Show verification message
+        setVerificationSent(true);
+        toast.success("Sign up successful! Please check your email for verification.");
+        signUpForm.reset();
+      } catch (edgeFunctionError: any) {
+        console.error("Edge function error:", edgeFunctionError);
+        // Fall back to default Supabase email if our Edge Function fails
+        const { error } = await supabase.auth.signUp({
+          email: values.email,
+          password: values.password,
+          options: {
+            emailRedirectTo: `${origin}/verify-success`,
+          }
+        });
+        
+        if (error) throw error;
+        
+        // Show verification message
+        setVerificationSent(true);
+        toast.success("Sign up successful! Please check your email for verification.");
+        signUpForm.reset();
+      }
     } catch (error: any) {
       toast.error(error.message || "An error occurred during sign up");
       console.error("Sign up error:", error);
