@@ -14,23 +14,25 @@ const AuthCallback = () => {
     // Handle the OAuth callback
     const handleAuthCallback = async () => {
       try {
-        // Check if this is a verification flow by examining URL hash
-        const isVerification = location.hash && 
-          (location.hash.includes('type=signup') || location.hash.includes('type=recovery'));
+        // Check if this is a verification flow by examining URL hash or query params
+        const isVerification = 
+          (location.hash && (location.hash.includes('type=signup') || location.hash.includes('type=recovery'))) ||
+          (location.search && (location.search.includes('type=signup') || location.search.includes('type=recovery')));
         
         console.log("Auth callback triggered, is verification:", isVerification);
         console.log("Current URL:", window.location.href);
         console.log("URL hash:", location.hash);
+        console.log("URL search:", location.search);
         
-        // Process the URL fragment (hash)
-        if (location.hash) {
-          console.log("Processing auth hash...");
+        // Process the URL fragment (hash) and query parameters
+        if (location.hash || location.search) {
+          console.log("Processing auth parameters...");
           
-          // Let Supabase auth handle the fragment/hash
+          // Let Supabase auth handle the fragment/hash and query params
           const { error: fragmentError } = await supabase.auth.getSession();
           
           if (fragmentError) {
-            console.error("Error processing auth fragment:", fragmentError);
+            console.error("Error processing auth parameters:", fragmentError);
             setError(fragmentError.message);
             toast.error("Authentication failed: " + fragmentError.message);
             setTimeout(() => navigate('/auth'), 2000);
@@ -48,6 +50,8 @@ const AuthCallback = () => {
           setTimeout(() => navigate('/auth'), 2000);
           return;
         }
+        
+        console.log("Session data:", data);
         
         if (data.session) {
           if (isVerification) {

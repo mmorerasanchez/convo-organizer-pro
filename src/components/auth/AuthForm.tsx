@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -81,20 +80,25 @@ const AuthForm = () => {
           }),
         });
 
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Edge Function error response:", errorData);
+          throw new Error(errorData.error || errorData.details || 'Failed to send verification email');
+        }
+
         const result = await response.json();
         console.log("Edge Function response:", result);
         
-        if (!response.ok) {
-          throw new Error(result.error || result.details || 'Failed to send verification email');
-        }
-        
-        // Skip default Supabase email and use our custom email
+        // Create Supabase user 
         console.log("Creating Supabase user");
         const { error } = await supabase.auth.signUp({
           email: values.email,
           password: values.password,
           options: {
             emailRedirectTo: `${origin}/auth/callback`,
+            data: {
+              // Add any additional user metadata if needed
+            }
           }
         });
         

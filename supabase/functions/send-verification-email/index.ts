@@ -1,7 +1,9 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
-import { Resend } from "https://esm.sh/resend@1.0.0";
+
+// Use npm instead of importing directly from esm.sh to avoid the Headers constructor issue
+import { Resend } from "npm:resend@1.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,7 +35,7 @@ serve(async (req) => {
     }
     
     // Initialize Resend with API key
-    console.log("Initializing Resend client");
+    console.log("Initializing Resend client with npm package");
     const resend = new Resend(resendApiKey);
     
     // Initialize Supabase admin client
@@ -102,9 +104,9 @@ serve(async (req) => {
     // Send the verification email using Resend
     try {
       const verificationLink = data.properties.action_link;
-      console.log(`Verification link generated successfully, sending email to ${email}`);
-      console.log(`Verification link: ${verificationLink}`);
+      console.log(`Verification link generated successfully: ${verificationLink}`);
       
+      console.log(`Attempting to send email to ${email}`);
       const emailResult = await resend.emails.send({
         from: "Promptito <onboarding@resend.dev>",
         to: [email],
