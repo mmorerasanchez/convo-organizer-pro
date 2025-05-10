@@ -17,30 +17,8 @@ const AuthCallback = () => {
       try {
         console.log("Auth callback triggered");
         console.log("Current URL:", window.location.href);
-        console.log("URL hash:", location.hash);
-        console.log("URL search:", location.search);
         
-        // Get flow type from either query parameters or hash
-        const urlParams = new URLSearchParams(location.search);
-        const hashParams = new URLSearchParams(location.hash.replace('#', '?'));
-        
-        const typeFromQuery = urlParams.get('type');
-        const typeFromHash = hashParams.get('type');
-        const flowType = typeFromQuery || typeFromHash;
-        
-        // Check for OAuth provider info
-        const provider = urlParams.get('provider') || hashParams.get('provider');
-        
-        console.log("Flow type:", flowType);
-        console.log("Provider:", provider);
-        
-        const isVerification = flowType === 'signup' || flowType === 'recovery';
-        const isOAuth = provider === 'google';
-        
-        console.log("Is verification flow:", isVerification);
-        console.log("Is OAuth flow:", isOAuth);
-
-        // Let Supabase handle the session
+        // For Google OAuth, let Supabase automatically exchange the code
         const { data, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -52,23 +30,21 @@ const AuthCallback = () => {
           return;
         }
         
-        console.log("Session data:", data);
-        
         if (data.session) {
+          console.log("Session successfully retrieved:", data.session.user.id);
+          
           // Check if user profile exists and create if not
           await ensureUserProfile(data.session.user.id, data.session.user);
           
           // Check if user has roles assigned and assign default if not
           await checkUserRoles(data.session.user.id);
           
-          if (isVerification) {
-            console.log("Email verified successfully, redirecting to success page");
-            navigate('/verify-success', { replace: true });
-          } else {
-            console.log("Login successful, redirecting to dashboard");
-            toast.success(isOAuth ? "Successfully signed in with Google!" : "Successfully signed in!");
-            navigate('/', { replace: true });
-          }
+          // Clear any hash or query parameters from the URL to avoid leaving tokens exposed
+          window.history.replaceState({}, document.title, window.location.pathname);
+          
+          console.log("Login successful, redirecting to dashboard");
+          toast.success("Successfully signed in!");
+          navigate('/', { replace: true });
         } else {
           console.warn("No session found but no error reported");
           setError("Unable to complete authentication. Please try signing in manually.");

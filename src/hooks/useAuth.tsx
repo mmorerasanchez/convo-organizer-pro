@@ -25,10 +25,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("Setting up auth state listener");
+    
     // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
         console.log("Auth state changed:", event);
+        
+        // Update session and user synchronously
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         setLoading(false);
@@ -58,10 +62,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signInWithGoogle = async () => {
     try {
+      // Make sure we're using the correct redirect URL
+      const redirectTo = `${window.location.origin}/auth/callback`;
+      console.log("Using redirect URL:", redirectTo);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo
         }
       });
       
