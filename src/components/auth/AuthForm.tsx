@@ -1,44 +1,42 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Label } from '@/components/ui/label';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { InfoIcon, AlertCircle, Check, Loader2 } from 'lucide-react';
+import { InfoIcon, Loader2 } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Checkbox } from '@/components/ui/checkbox';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Separator } from '@/components/ui/separator';
 
 // Validation schema for authentication forms
-const authSchema = z.object({
+const signInSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-  password: z.string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number")
+  password: z.string().min(8, "Password must be at least 8 characters")
+});
+
+const signUpSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  acceptTerms: z.boolean().refine(val => val === true, {
+    message: "You must accept the terms and conditions"
+  })
 });
 
 const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [verificationSent, setVerificationSent] = useState(false);
-  const [isPasswordReset, setIsPasswordReset] = useState(false);
-  const [verificationEmail, setVerificationEmail] = useState("");
-  const [edgeFunctionError, setEdgeFunctionError] = useState<string | null>(null);
+  const { signInWithEmail, signUpWithEmail } = useAuth();
   const navigate = useNavigate();
 
-  // Get the current origin for redirection
-  const origin = window.location.origin;
-
   // Setup form for sign in
-  const signInForm = useForm<z.infer<typeof authSchema>>({
-    resolver: zodResolver(authSchema),
+  const signInForm = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema),
     defaultValues: {
       email: "",
       password: ""
@@ -46,99 +44,21 @@ const AuthForm = () => {
   });
 
   // Setup form for sign up
-  const signUpForm = useForm<z.infer<typeof authSchema>>({
-    resolver: zodResolver(authSchema),
+  const signUpForm = useForm<z.infer<typeof signUpSchema>>({
+    resolver: zodResolver(signUpSchema),
     defaultValues: {
       email: "",
-      password: ""
+      password: "",
+      acceptTerms: false
     }
   });
 
-  const handleSignUp = async (values: z.infer<typeof authSchema>) => {
+  const handleSignUp = async (values: z.infer<typeof signUpSchema>) => {
     try {
       setIsLoading(true);
-      setEdgeFunctionError(null);
-      
-      // Store email for verification message
-      setVerificationEmail(values.email);
-      
-      // Get the Supabase URL from the client for Edge Function calls
-      const supabaseUrl = "https://whigwajpngjkxohfhvup.supabase.co";
-      
-      try {
-        // Call our custom Edge Function to send a verification email
-        console.log("Calling send-verification-email Edge Function");
-        console.log("Using origin:", origin);
-        
-        const response = await fetch(`${supabaseUrl}/functions/v1/send-verification-email`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            email: values.email,
-            origin: origin // Pass the origin to the Edge Function
-          }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Edge Function error response:", errorData);
-          throw new Error(errorData.error || errorData.details || 'Failed to send verification email');
-        }
-
-        const result = await response.json();
-        console.log("Edge Function response:", result);
-        
-        // Check if the user already exists and was sent a password reset
-        if (result.userExists) {
-          setIsPasswordReset(true);
-          setVerificationSent(true);
-          toast.success("Password reset email sent. Please check your inbox.");
-          signUpForm.reset();
-          return;
-        }
-        
-        // Otherwise create Supabase user 
-        console.log("Creating Supabase user");
-        const { error } = await supabase.auth.signUp({
-          email: values.email,
-          password: values.password,
-          options: {
-            emailRedirectTo: `${origin}/auth/callback`,
-            data: {
-              // Add any additional user metadata if needed
-            }
-          }
-        });
-        
-        if (error) throw error;
-        
-        // Show verification message
-        setVerificationSent(true);
-        toast.success("Sign up successful! Please check your email for verification.");
-        signUpForm.reset();
-      } catch (edgeFunctionError: any) {
-        console.error("Edge function error:", edgeFunctionError);
-        setEdgeFunctionError(edgeFunctionError.message || "Failed to send verification email");
-        
-        // Fall back to default Supabase email if our Edge Function fails
-        toast.info("Using default email verification method");
-        const { error } = await supabase.auth.signUp({
-          email: values.email,
-          password: values.password,
-          options: {
-            emailRedirectTo: `${origin}/auth/callback`, // Always redirect to the auth callback
-          }
-        });
-        
-        if (error) throw error;
-        
-        // Show verification message
-        setVerificationSent(true);
-        toast.success("Sign up successful! Please check your email for verification.");
-        signUpForm.reset();
-      }
+      await signUpWithEmail(values.email, values.password, values.acceptTerms);
+      toast.success("Account created successfully!");
+      navigate('/');
     } catch (error: any) {
       toast.error(error.message || "An error occurred during sign up");
       console.error("Sign up error:", error);
@@ -147,16 +67,10 @@ const AuthForm = () => {
     }
   };
 
-  const handleSignIn = async (values: z.infer<typeof authSchema>) => {
+  const handleSignIn = async (values: z.infer<typeof signInSchema>) => {
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-      });
-      
-      if (error) throw error;
-      
+      await signInWithEmail(values.email, values.password);
       toast.success("Successfully signed in!");
       navigate('/');
     } catch (error: any) {
@@ -166,66 +80,6 @@ const AuthForm = () => {
       setIsLoading(false);
     }
   };
-
-  // If verification email was sent, show confirmation screen
-  if (verificationSent) {
-    return (
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-center">
-            {isPasswordReset ? "Password Reset Email Sent" : "Verification Email Sent"}
-          </CardTitle>
-          <CardDescription className="text-center">
-            Check your inbox
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex justify-center my-6">
-            <div className="rounded-full bg-green-100 p-3">
-              <Check className="h-8 w-8 text-green-600" />
-            </div>
-          </div>
-          
-          <Alert className="bg-blue-50 text-blue-800 border-blue-200">
-            <InfoIcon className="h-4 w-4 mr-2" />
-            <AlertDescription>
-              We've sent a {isPasswordReset ? "password reset" : "verification"} email to <strong>{verificationEmail}</strong>. 
-              Please check your inbox and click the {isPasswordReset ? "reset" : "verification"} link.
-            </AlertDescription>
-          </Alert>
-          
-          {edgeFunctionError && (
-            <Alert className="bg-yellow-50 text-yellow-800 border-yellow-200">
-              <AlertCircle className="h-4 w-4 mr-2" />
-              <AlertDescription>
-                Our custom email service encountered an issue: {edgeFunctionError}.
-                A default {isPasswordReset ? "password reset" : "verification"} email has been sent instead.
-              </AlertDescription>
-            </Alert>
-          )}
-          
-          <p className="text-center text-sm text-muted-foreground mt-4">
-            {isPasswordReset 
-              ? "After resetting your password, you'll be able to sign in to your account."
-              : "After verifying your email, you'll be able to sign in to your account."}
-          </p>
-        </CardContent>
-        <CardFooter>
-          <Button
-            className="w-full"
-            onClick={() => {
-              setVerificationSent(false);
-              setVerificationEmail("");
-              setEdgeFunctionError(null);
-              setIsPasswordReset(false);
-            }}
-          >
-            Back to Sign In
-          </Button>
-        </CardFooter>
-      </Card>
-    );
-  }
 
   return (
     <Card className="w-full max-w-md">
@@ -312,7 +166,7 @@ const AuthForm = () => {
                 <Alert className="bg-blue-50 text-blue-800 border-blue-200 mb-4">
                   <InfoIcon className="h-4 w-4 mr-2" />
                   <AlertDescription>
-                    After signing up, you'll need to confirm your email before signing in.
+                    After signing up, you'll be immediately logged in to your account.
                   </AlertDescription>
                 </Alert>
                 
@@ -353,15 +207,26 @@ const AuthForm = () => {
                   )}
                 />
                 
-                <div className="text-xs text-muted-foreground space-y-1">
-                  <p>Password requirements:</p>
-                  <ul className="list-disc pl-4">
-                    <li>At least 8 characters</li>
-                    <li>At least one uppercase letter</li>
-                    <li>At least one lowercase letter</li>
-                    <li>At least one number</li>
-                  </ul>
-                </div>
+                <FormField
+                  control={signUpForm.control}
+                  name="acceptTerms"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-4 border rounded-md">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>
+                          I accept the terms and conditions
+                        </FormLabel>
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
+                />
                 
                 <Button 
                   type="submit" 
