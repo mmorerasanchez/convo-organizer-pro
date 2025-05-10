@@ -2,14 +2,13 @@
 import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Sparkles, LogIn } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
 const Login = () => {
-  const { user } = useAuth();
+  const { user, signInWithGoogle } = useAuth();
 
   // Redirect if already logged in
   if (user) {
@@ -18,16 +17,8 @@ const Login = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) {
-        toast.error(`Sign in failed: ${error.message}`);
-      }
+      await signInWithGoogle();
+      // Toast is not needed here as the page will redirect
     } catch (error: any) {
       toast.error(`An unexpected error occurred: ${error.message}`);
     }

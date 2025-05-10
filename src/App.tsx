@@ -17,6 +17,7 @@ import Login from "./pages/Login";
 import AuthCallback from "./pages/AuthCallback";
 import VerifySuccess from "./pages/VerifySuccess";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/common/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -28,13 +29,13 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/projects/:id" element={<ProjectDetail />} />
+            <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+            <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
             <Route path="/projects/shared/:shareLink" element={<SharedProjectDetail />} />
-            <Route path="/conversations/:id" element={<ConversationDetail />} />
-            <Route path="/prompting" element={<Prompting />} />
-            <Route path="/tools" element={<Tools />} />
+            <Route path="/conversations/:id" element={<ProtectedRoute><ConversationDetail /></ProtectedRoute>} />
+            <Route path="/prompting" element={<ProtectedRoute><Prompting /></ProtectedRoute>} />
+            <Route path="/tools" element={<ProtectedRoute><Tools /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/login" element={<Login />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
