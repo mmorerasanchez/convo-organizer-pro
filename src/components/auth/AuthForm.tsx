@@ -62,15 +62,23 @@ const AuthForm = () => {
       // Store email for verification message
       setVerificationEmail(values.email);
       
+      // Get the Supabase URL from the client for Edge Function calls
+      const supabaseUrl = "https://whigwajpngjkxohfhvup.supabase.co";
+      
       try {
         // Call our custom Edge Function to send a verification email
         console.log("Calling send-verification-email Edge Function");
-        const response = await fetch(`${origin}/functions/v1/send-verification-email`, {
+        console.log("Using origin:", origin);
+        
+        const response = await fetch(`${supabaseUrl}/functions/v1/send-verification-email`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ email: values.email }),
+          body: JSON.stringify({ 
+            email: values.email,
+            origin: origin // Pass the origin to the Edge Function
+          }),
         });
 
         const result = await response.json();
@@ -86,7 +94,7 @@ const AuthForm = () => {
           email: values.email,
           password: values.password,
           options: {
-            emailRedirectTo: `${origin}/verify-success`,
+            emailRedirectTo: `${origin}/auth/callback`,
           }
         });
         
@@ -106,7 +114,7 @@ const AuthForm = () => {
           email: values.email,
           password: values.password,
           options: {
-            emailRedirectTo: `${origin}/verify-success`,
+            emailRedirectTo: `${origin}/auth/callback`, // Always redirect to the auth callback
           }
         });
         

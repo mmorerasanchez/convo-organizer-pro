@@ -11,6 +11,7 @@ const corsHeaders = {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
+    console.log("Handling OPTIONS request for CORS");
     return new Response(null, { headers: corsHeaders });
   }
   
@@ -55,7 +56,7 @@ serve(async (req) => {
     
     // Extract email from request body
     console.log("Parsing request body");
-    const { email } = await req.json();
+    const { email, origin } = await req.json();
     
     if (!email) {
       console.error("No email provided in request");
@@ -70,15 +71,20 @@ serve(async (req) => {
     
     console.log(`Generating signup link for email: ${email}`);
     
-    // Use the production URL for redirects
-    const productionDomain = "https://app.promptito.xyz";
+    // Get the origin either from request or use production URL as fallback
+    const requestOrigin = origin || "https://app.promptito.xyz";
+    console.log(`Using origin: ${requestOrigin}`);
+    
+    // Always redirect to the auth callback path
+    const redirectUrl = `${requestOrigin}/auth/callback`;
+    console.log(`Setting redirect URL to: ${redirectUrl}`);
     
     // Generate signup link with redirect to auth callback handler
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: "signup",
       email,
       options: {
-        redirectTo: `${productionDomain}/auth/callback`,
+        redirectTo: redirectUrl,
       },
     });
     
@@ -97,6 +103,7 @@ serve(async (req) => {
     try {
       const verificationLink = data.properties.action_link;
       console.log(`Verification link generated successfully, sending email to ${email}`);
+      console.log(`Verification link: ${verificationLink}`);
       
       const emailResult = await resend.emails.send({
         from: "Promptito <onboarding@resend.dev>",
@@ -122,12 +129,13 @@ serve(async (req) => {
         `,
       });
       
-      console.log("Email sent successfully:", email, emailResult);
+      console.log("Email sent successfully:", emailResult);
       
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: "Verification email sent successfully"
+          message: "Verification email sent successfully",
+          redirectUrl
         }),
         { 
           status: 200,

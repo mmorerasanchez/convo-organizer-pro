@@ -19,6 +19,8 @@ const AuthCallback = () => {
           (location.hash.includes('type=signup') || location.hash.includes('type=recovery'));
         
         console.log("Auth callback triggered, is verification:", isVerification);
+        console.log("Current URL:", window.location.href);
+        console.log("URL hash:", location.hash);
         
         // Process the URL fragment (hash)
         if (location.hash) {
@@ -51,12 +53,12 @@ const AuthCallback = () => {
           if (isVerification) {
             // This is from email verification, redirect to success page
             console.log("Email verified successfully, redirecting to success page");
-            navigate('/verify-success');
+            navigate('/verify-success', { replace: true });
           } else {
             // Standard login flow
             console.log("Login successful, redirecting to dashboard");
             toast.success("Successfully signed in!");
-            navigate('/');
+            navigate('/', { replace: true });
           }
         } else {
           // No session but no error either, unusual state
