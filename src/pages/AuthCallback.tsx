@@ -20,11 +20,10 @@ const AuthCallback = () => {
         console.log("URL hash:", location.hash);
         console.log("URL search:", location.search);
         
-        // Extract type parameter to determine flow type (signup, recovery, etc.)
+        // Get flow type from either query parameters or hash
         const urlParams = new URLSearchParams(location.search);
         const hashParams = new URLSearchParams(location.hash.replace('#', '?'));
         
-        // Get flow type from either query parameters or hash
         const typeFromQuery = urlParams.get('type');
         const typeFromHash = hashParams.get('type');
         const flowType = typeFromQuery || typeFromHash;
@@ -40,35 +39,8 @@ const AuthCallback = () => {
         
         console.log("Is verification flow:", isVerification);
         console.log("Is OAuth flow:", isOAuth);
-        
-        // Process the URL fragment (hash) and query parameters
-        if (location.hash || location.search) {
-          console.log("Processing auth parameters...");
-          
-          try {
-            // Let Supabase auth handle the fragment/hash and query params
-            const { data: sessionData, error: fragmentError } = await supabase.auth.getSession();
-            
-            if (fragmentError) {
-              console.error("Error processing auth parameters:", fragmentError);
-              setError(fragmentError.message);
-              toast.error("Authentication failed: " + fragmentError.message);
-              setProcessing(false);
-              setTimeout(() => navigate('/login'), 2000);
-              return;
-            }
-            
-            // Check if we got a session
-            if (sessionData.session) {
-              console.log("Session found after parameter processing:", sessionData.session);
-            }
-          } catch (e) {
-            console.error("Error during session processing:", e);
-          }
-        }
-        
-        // Get the current session
-        console.log("Checking final session state");
+
+        // Let Supabase handle the session
         const { data, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -80,27 +52,24 @@ const AuthCallback = () => {
           return;
         }
         
-        console.log("Final session data:", data);
+        console.log("Session data:", data);
         
         if (data.session) {
-          // Check if user profile exists, if not create one
+          // Check if user profile exists and create if not
           await ensureUserProfile(data.session.user.id, data.session.user);
           
-          // Check if user has roles assigned, if not assign default role
+          // Check if user has roles assigned and assign default if not
           await checkUserRoles(data.session.user.id);
           
           if (isVerification) {
-            // This is from email verification, redirect to success page
             console.log("Email verified successfully, redirecting to success page");
             navigate('/verify-success', { replace: true });
           } else {
-            // Standard login flow
             console.log("Login successful, redirecting to dashboard");
             toast.success(isOAuth ? "Successfully signed in with Google!" : "Successfully signed in!");
             navigate('/', { replace: true });
           }
         } else {
-          // No session but no error either, unusual state
           console.warn("No session found but no error reported");
           setError("Unable to complete authentication. Please try signing in manually.");
           setProcessing(false);
@@ -128,9 +97,14 @@ const AuthCallback = () => {
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
       
-      if (profileError || !profileData) {
+      if (profileError) {
+        console.error("Error checking profile:", profileError);
+        return;
+      }
+      
+      if (!profileData) {
         console.log("No profile found, creating one");
         
         // Create profile if it doesn't exist

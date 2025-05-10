@@ -19,6 +19,8 @@ export const useRole = () => {
       }
 
       try {
+        console.log("Fetching roles for user:", user.id);
+        
         // Fetch user roles from the user_roles table
         const { data, error } = await supabase
           .from('user_roles')
@@ -31,6 +33,7 @@ export const useRole = () => {
         } else {
           // Map the data to an array of role names
           const userRoles = data.map(item => item.role as UserRole);
+          console.log("Fetched user roles:", userRoles);
           
           // If no roles found, try to assign the default 'customer' role
           if (userRoles.length === 0) {
