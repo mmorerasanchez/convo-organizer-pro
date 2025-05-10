@@ -29,10 +29,17 @@ const AuthCallback = () => {
         const typeFromHash = hashParams.get('type');
         const flowType = typeFromQuery || typeFromHash;
         
+        // Check for OAuth provider info
+        const provider = urlParams.get('provider') || hashParams.get('provider');
+        
         console.log("Flow type:", flowType);
+        console.log("Provider:", provider);
         
         const isVerification = flowType === 'signup' || flowType === 'recovery';
+        const isOAuth = provider === 'google';
+        
         console.log("Is verification flow:", isVerification);
+        console.log("Is OAuth flow:", isOAuth);
         
         // Process the URL fragment (hash) and query parameters
         if (location.hash || location.search) {
@@ -47,7 +54,7 @@ const AuthCallback = () => {
               setError(fragmentError.message);
               toast.error("Authentication failed: " + fragmentError.message);
               setProcessing(false);
-              setTimeout(() => navigate('/auth'), 2000);
+              setTimeout(() => navigate('/login'), 2000);
               return;
             }
             
@@ -69,14 +76,17 @@ const AuthCallback = () => {
           setError(sessionError.message);
           toast.error("Authentication failed: " + sessionError.message);
           setProcessing(false);
-          setTimeout(() => navigate('/auth'), 2000);
+          setTimeout(() => navigate('/login'), 2000);
           return;
         }
         
         console.log("Final session data:", data);
         
         if (data.session) {
-          // Check if user has roles assigned
+          // Check if user profile exists, if not create one
+          await ensureUserProfile(data.session.user.id, data.session.user);
+          
+          // Check if user has roles assigned, if not assign default role
           await checkUserRoles(data.session.user.id);
           
           if (isVerification) {
@@ -86,7 +96,7 @@ const AuthCallback = () => {
           } else {
             // Standard login flow
             console.log("Login successful, redirecting to dashboard");
-            toast.success("Successfully signed in!");
+            toast.success(isOAuth ? "Successfully signed in with Google!" : "Successfully signed in!");
             navigate('/', { replace: true });
           }
         } else {
@@ -94,19 +104,58 @@ const AuthCallback = () => {
           console.warn("No session found but no error reported");
           setError("Unable to complete authentication. Please try signing in manually.");
           setProcessing(false);
-          setTimeout(() => navigate('/auth'), 2000);
+          setTimeout(() => navigate('/login'), 2000);
         }
       } catch (error: any) {
         console.error("Error handling auth callback:", error);
         setError(error.message || "Authentication failed");
         toast.error("Authentication failed");
         setProcessing(false);
-        setTimeout(() => navigate('/auth'), 2000);
+        setTimeout(() => navigate('/login'), 2000);
       }
     };
 
     handleAuthCallback();
   }, [navigate, location]);
+
+  // Ensure user has a profile
+  const ensureUserProfile = async (userId: string, user: any) => {
+    try {
+      console.log("Checking if user profile exists for:", userId);
+      
+      // Check if user profile exists
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (profileError || !profileData) {
+        console.log("No profile found, creating one");
+        
+        // Create profile if it doesn't exist
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert([{
+            id: userId,
+            email: user.email,
+            full_name: user.user_metadata?.full_name || user.user_metadata?.name || null,
+            avatar_url: user.user_metadata?.avatar_url || null
+          }]);
+        
+        if (insertError) {
+          console.error("Failed to create user profile:", insertError);
+          return;
+        }
+        
+        console.log("Successfully created user profile");
+      } else {
+        console.log("User profile already exists:", profileData);
+      }
+    } catch (error) {
+      console.error("Error in profile management:", error);
+    }
+  };
 
   // Check if user has roles and create one if missing
   const checkUserRoles = async (userId: string) => {

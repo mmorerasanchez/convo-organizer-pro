@@ -12,7 +12,7 @@ interface UseRequireAuthOptions {
 }
 
 export const useRequireAuth = (options: UseRequireAuthOptions = {}) => {
-  const { redirectUrl = '/auth', requiredRole } = options;
+  const { redirectUrl = '/login', requiredRole } = options;
   const { user, loading: authLoading } = useAuth();
   const { hasRole, loading: roleLoading } = useRole();
   const navigate = useNavigate();
