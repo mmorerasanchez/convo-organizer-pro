@@ -18,7 +18,13 @@ const AuthCallback = () => {
         console.log("Auth callback triggered");
         console.log("Current URL:", window.location.href);
         
-        // For Google OAuth, let Supabase automatically exchange the code
+        // Check if we have hash parameters (tokens) in the URL
+        const hashParams = location.hash ? new URLSearchParams(location.hash.substring(1)) : null;
+        if (hashParams && hashParams.get('access_token')) {
+          console.log("Found access token in URL hash, proceeding with session retrieval");
+        }
+        
+        // Get the session - Supabase client should automatically exchange the code/token
         const { data, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -30,7 +36,7 @@ const AuthCallback = () => {
           return;
         }
         
-        if (data.session) {
+        if (data && data.session) {
           console.log("Session successfully retrieved:", data.session.user.id);
           
           // Check if user profile exists and create if not
@@ -60,6 +66,7 @@ const AuthCallback = () => {
       }
     };
 
+    // Execute the callback handler when component mounts
     handleAuthCallback();
   }, [navigate, location]);
 

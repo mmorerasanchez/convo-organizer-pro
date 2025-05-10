@@ -14,6 +14,6 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: false // This is critical for proper OAuth callback handling
+    detectSessionInUrl: true // Set to true to detect session in URL for OAuth callbacks
   }
 });

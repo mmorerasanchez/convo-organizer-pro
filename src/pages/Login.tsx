@@ -20,9 +20,10 @@ const Login = () => {
     try {
       setIsLoading(true);
       await signInWithGoogle();
-      // Toast is not needed here as the page will redirect to the callback URL
+      // No need for toast here as the page will redirect to auth callback
     } catch (error: any) {
-      toast.error(`Authentication failed: ${error.message}`);
+      console.error("Google sign-in error:", error);
+      toast.error(`Authentication failed: ${error.message || "Unknown error"}`);
       setIsLoading(false);
     }
   };

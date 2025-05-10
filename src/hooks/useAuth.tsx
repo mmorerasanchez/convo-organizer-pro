@@ -62,14 +62,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signInWithGoogle = async () => {
     try {
-      // Make sure we're using the correct redirect URL
-      const redirectTo = `${window.location.origin}/auth/callback`;
+      // Construct full redirect URL
+      const origin = window.location.origin;
+      const redirectTo = `${origin}/auth/callback`;
       console.log("Using redirect URL:", redirectTo);
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo
+          redirectTo,
+          queryParams: {
+            prompt: 'select_account' // Force account selection, prevents automatic sign-in
+          }
         }
       });
       
