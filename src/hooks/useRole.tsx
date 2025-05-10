@@ -31,7 +31,30 @@ export const useRole = () => {
         } else {
           // Map the data to an array of role names
           const userRoles = data.map(item => item.role as UserRole);
-          setRoles(userRoles);
+          
+          // If no roles found, try to assign the default 'customer' role
+          if (userRoles.length === 0) {
+            console.log("No roles found for user, attempting to assign default 'customer' role");
+            
+            try {
+              const { error: insertError } = await supabase
+                .from('user_roles')
+                .insert([
+                  { user_id: user.id, role: 'customer' }
+                ]);
+              
+              if (insertError) {
+                console.error("Failed to assign customer role:", insertError);
+              } else {
+                console.log("Successfully assigned 'customer' role to user");
+                setRoles(['customer']);
+              }
+            } catch (assignError) {
+              console.error("Error assigning default role:", assignError);
+            }
+          } else {
+            setRoles(userRoles);
+          }
         }
       } catch (error) {
         console.error('Unexpected error fetching roles:', error);

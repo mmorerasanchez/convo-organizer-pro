@@ -28,6 +28,7 @@ const authSchema = z.object({
 const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
+  const [isPasswordReset, setIsPasswordReset] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState("");
   const [edgeFunctionError, setEdgeFunctionError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -89,7 +90,16 @@ const AuthForm = () => {
         const result = await response.json();
         console.log("Edge Function response:", result);
         
-        // Create Supabase user 
+        // Check if the user already exists and was sent a password reset
+        if (result.userExists) {
+          setIsPasswordReset(true);
+          setVerificationSent(true);
+          toast.success("Password reset email sent. Please check your inbox.");
+          signUpForm.reset();
+          return;
+        }
+        
+        // Otherwise create Supabase user 
         console.log("Creating Supabase user");
         const { error } = await supabase.auth.signUp({
           email: values.email,
@@ -162,7 +172,9 @@ const AuthForm = () => {
     return (
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-center">Verification Email Sent</CardTitle>
+          <CardTitle className="text-center">
+            {isPasswordReset ? "Password Reset Email Sent" : "Verification Email Sent"}
+          </CardTitle>
           <CardDescription className="text-center">
             Check your inbox
           </CardDescription>
@@ -177,8 +189,8 @@ const AuthForm = () => {
           <Alert className="bg-blue-50 text-blue-800 border-blue-200">
             <InfoIcon className="h-4 w-4 mr-2" />
             <AlertDescription>
-              We've sent a verification email to <strong>{verificationEmail}</strong>. 
-              Please check your inbox and click the verification link.
+              We've sent a {isPasswordReset ? "password reset" : "verification"} email to <strong>{verificationEmail}</strong>. 
+              Please check your inbox and click the {isPasswordReset ? "reset" : "verification"} link.
             </AlertDescription>
           </Alert>
           
@@ -187,13 +199,15 @@ const AuthForm = () => {
               <AlertCircle className="h-4 w-4 mr-2" />
               <AlertDescription>
                 Our custom email service encountered an issue: {edgeFunctionError}.
-                A default verification email has been sent instead.
+                A default {isPasswordReset ? "password reset" : "verification"} email has been sent instead.
               </AlertDescription>
             </Alert>
           )}
           
           <p className="text-center text-sm text-muted-foreground mt-4">
-            After verifying your email, you'll be able to sign in to your account.
+            {isPasswordReset 
+              ? "After resetting your password, you'll be able to sign in to your account."
+              : "After verifying your email, you'll be able to sign in to your account."}
           </p>
         </CardContent>
         <CardFooter>
@@ -203,6 +217,7 @@ const AuthForm = () => {
               setVerificationSent(false);
               setVerificationEmail("");
               setEdgeFunctionError(null);
+              setIsPasswordReset(false);
             }}
           >
             Back to Sign In
