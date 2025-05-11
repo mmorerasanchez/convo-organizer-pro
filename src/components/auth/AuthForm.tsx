@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { InfoIcon, Loader2 } from 'lucide-react';
+import { InfoIcon, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Checkbox } from '@/components/ui/checkbox';
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -57,10 +57,9 @@ const AuthForm = () => {
     try {
       setIsLoading(true);
       await signUpWithEmail(values.email, values.password, values.acceptTerms);
-      toast.success("Account created successfully!");
       navigate('/');
     } catch (error: any) {
-      toast.error(error.message || "An error occurred during sign up");
+      // Error is already handled in signUpWithEmail with toast
       console.error("Sign up error:", error);
     } finally {
       setIsLoading(false);
@@ -71,10 +70,9 @@ const AuthForm = () => {
     try {
       setIsLoading(true);
       await signInWithEmail(values.email, values.password);
-      toast.success("Successfully signed in!");
       navigate('/');
     } catch (error: any) {
-      toast.error(error.message || "An error occurred during sign in");
+      // Error is already handled in signInWithEmail with toast
       console.error("Sign in error:", error);
     } finally {
       setIsLoading(false);
@@ -164,9 +162,9 @@ const AuthForm = () => {
                 </CardDescription>
                 
                 <Alert className="bg-blue-50 text-blue-800 border-blue-200 mb-4">
-                  <InfoIcon className="h-4 w-4 mr-2" />
+                  <CheckCircle className="h-4 w-4 mr-2" />
                   <AlertDescription>
-                    After signing up, you'll be immediately logged in to your account.
+                    You'll be immediately logged in after creating your account.
                   </AlertDescription>
                 </Alert>
                 

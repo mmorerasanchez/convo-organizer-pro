@@ -34,6 +34,7 @@ const Login = () => {
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold">Sign in</h2>
           <p className="text-sm text-muted-foreground mt-1">Continue to promptito</p>
+          <p className="text-xs text-green-600 mt-2 font-medium">No email verification required - sign up and use immediately!</p>
         </div>
 
         <div className="space-y-4">

@@ -60,8 +60,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
+      toast.success('Signed out successfully');
     } catch (error) {
       console.error('Error signing out:', error);
+      toast.error('Error signing out');
     }
   };
 
@@ -73,8 +75,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       
       if (error) throw error;
+      toast.success('Signed in successfully');
     } catch (error: any) {
       console.error('Error signing in with email:', error);
+      toast.error(error.message || 'Error signing in');
       throw error;
     }
   };
@@ -85,21 +89,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         throw new Error('You must accept the terms and conditions');
       }
 
-      const { error } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             accepted_terms: acceptedTerms,
-          },
-          // Don't require email verification
-          emailRedirectTo: undefined
+          }
         }
       });
       
       if (error) throw error;
+      
+      // With email confirmation disabled, the user should be automatically logged in
+      if (data.user) {
+        toast.success('Account created successfully!');
+      } else {
+        throw new Error('Failed to create account');
+      }
     } catch (error: any) {
       console.error('Error signing up with email:', error);
+      toast.error(error.message || 'Error creating account');
       throw error;
     }
   };
