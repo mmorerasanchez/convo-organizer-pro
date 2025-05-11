@@ -25,15 +25,19 @@ const MobileNavSheet: React.FC<MobileNavSheetProps> = ({
         <div className="flex items-center gap-2">
           <Link
             to="/"
-            className="text-xl font-mono font-bold tracking-tight"
+            className="flex items-center"
             onClick={() => onOpenChange(false)}
           >
-            promptito
+            <img 
+              src="/lovable-uploads/b15e12a3-21d5-4c4a-b216-7b5f6b43112e.png" 
+              alt="Promptito" 
+              className="h-6 w-6 mr-1"
+            />
           </Link>
           <div>
             <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-2 py-0.5 rounded-md font-mono flex items-center">
               <Sparkles className="h-3 w-3 mr-1" />
-              BETA made with AI
+              ALPHA made with AI
             </Badge>
           </div>
         </div>

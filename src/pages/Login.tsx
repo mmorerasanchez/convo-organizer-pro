@@ -23,7 +23,7 @@ const Login = () => {
           <h1 className="text-3xl font-mono font-bold tracking-tight text-gray-800">promptito</h1>
           <div className="ml-2">
             <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-2 py-1 rounded-md font-medium flex items-center">
-              BETA made with AI
+              ALPHA made with AI
             </Badge>
           </div>
         </div>

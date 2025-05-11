@@ -19,8 +19,8 @@ const SidebarNav: React.FC = () => {
       className="z-10 bg-white"
       variant="sidebar"
     >
-      <SidebarHeader className="flex items-center justify-end p-3 border-b h-14">
-        <SidebarTrigger />
+      <SidebarHeader className="flex items-center p-3 border-b h-14">
+        <SidebarTrigger className="ml-0" />
       </SidebarHeader>
       
       <SidebarContent>
