@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { LogIn, Loader2 } from 'lucide-react';
+import { LogIn, Loader2, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
@@ -20,9 +20,16 @@ const Login = () => {
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-muted/40">
       <div className="mb-8 text-center">
         <div className="flex items-center justify-center mb-2">
-          <h1 className="text-3xl font-mono font-bold tracking-tight text-gray-800">promptito</h1>
+          <div className="flex items-center">
+            <img 
+              src="/lovable-uploads/b15e12a3-21d5-4c4a-b216-7b5f6b43112e.png" 
+              alt="Promptito" 
+              className="h-7 w-7 mr-2"
+            />
+          </div>
           <div className="ml-2">
             <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 text-xs px-2 py-1 rounded-md font-medium flex items-center">
+              <Sparkles className="h-3 w-3 mr-1" />
               ALPHA made with AI
             </Badge>
           </div>
