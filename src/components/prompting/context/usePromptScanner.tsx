@@ -1,130 +1,129 @@
 
-import { useCallback } from 'react';
+import React, { createContext, useState, useContext, ReactNode } from 'react';
+import { usePromptScanner } from '@/hooks/use-prompt-scanner';
 import { toast } from 'sonner';
-import { usePromptingContext } from './PromptingContext';
-import { usePromptImprovement } from '@/hooks/use-prompt-improvement';
 
-export const usePromptScannerContext = () => {
-  const { state, dispatch } = usePromptingContext();
-  const promptImprovement = usePromptImprovement();
+type PromptScannerContextValue = ReturnType<typeof usePromptScanner>;
+
+const PromptScannerContext = createContext<PromptScannerContextValue | undefined>(undefined);
+
+export const PromptScannerProvider = ({ children }: { children: ReactNode }) => {
+  const [promptInput, setPromptInput] = useState('');
+  const [improvedPrompt, setImprovedPrompt] = useState('');
+  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
+  const [currentFeedback, setCurrentFeedback] = useState('');
+  const [requestCount, setRequestCount] = useState(0);
+  const [requestLimit] = useState(10); // Free tier limit
   
   const {
-    promptInput,
-    improvedPrompt,
-    currentFeedback,
-    feedbackHistory,
-    requestCount,
-    requestLimit,
     isProcessing,
     apiError,
-  } = state;
-  
-  const setPromptInput = useCallback((input: string) => {
-    dispatch({ type: 'SET_PROMPT_INPUT', payload: input });
-  }, [dispatch]);
-  
-  const setCurrentFeedback = useCallback((feedback: string) => {
-    dispatch({ type: 'SET_CURRENT_FEEDBACK', payload: feedback });
-  }, [dispatch]);
-  
-  const handleInitialScan = useCallback(async () => {
+    setApiError,
+    feedbackHistory,
+    setFeedbackHistory,
+    improvePrompt,
+  } = usePromptScanner();
+
+  const handleImprovePrompt = async (feedback?: string) => {
+    try {
+      if (!promptInput.trim()) {
+        toast.error("Please enter a prompt to improve.");
+        return;
+      }
+      
+      const result = await improvePrompt(promptInput, feedback);
+      if (result) {
+        if (improvedPrompt) {
+          setFeedbackHistory([...feedbackHistory, { feedback: feedback || '', improvedPrompt }]);
+        }
+        setImprovedPrompt(result);
+        
+        // Increment request count
+        setRequestCount(prev => prev + 1);
+      }
+    } catch (error) {
+      console.error('Error in handleImprovePrompt:', error);
+    }
+  };
+
+  const handleInitialScan = () => {
     if (!promptInput.trim()) {
-      toast.error('Please enter a prompt to scan');
+      toast.error("Please enter a prompt to improve.");
       return;
     }
-    
-    try {
-      dispatch({ type: 'SET_IS_PROCESSING', payload: true });
-      dispatch({ type: 'SET_API_ERROR', payload: null });
-      
-      const result = await promptImprovement.improvePrompt(promptInput);
-      
-      if (result) {
-        dispatch({ type: 'SET_IMPROVED_PROMPT', payload: result });
-        dispatch({ type: 'SET_REQUEST_COUNT', payload: requestCount + 1 });
-      }
-    } catch (error) {
-      console.error('Error improving prompt:', error);
-      dispatch({ type: 'SET_API_ERROR', payload: 'Failed to improve prompt. Please try again.' });
-      toast.error('Failed to improve prompt');
-    } finally {
-      dispatch({ type: 'SET_IS_PROCESSING', payload: false });
-    }
-  }, [promptInput, requestCount, promptImprovement, dispatch]);
-  
-  const handleSubmitFeedback = useCallback(async () => {
-    if (!currentFeedback.trim()) {
-      toast.error('Please enter feedback');
-      return;
-    }
-    
-    try {
-      dispatch({ type: 'SET_IS_PROCESSING', payload: true });
-      dispatch({ type: 'SET_API_ERROR', payload: null });
-      
-      // Use improvePrompt with feedback parameter instead of nonexistent improveWithFeedback
-      const result = await promptImprovement.improvePrompt(improvedPrompt, currentFeedback);
-      
-      if (result) {
-        dispatch({ 
-          type: 'ADD_FEEDBACK_HISTORY', 
-          payload: { feedback: currentFeedback, result: improvedPrompt } 
-        });
-        dispatch({ type: 'SET_IMPROVED_PROMPT', payload: result });
-        dispatch({ type: 'SET_CURRENT_FEEDBACK', payload: '' });
-        dispatch({ type: 'SET_REQUEST_COUNT', payload: requestCount + 1 });
-      }
-    } catch (error) {
-      console.error('Error processing feedback:', error);
-      dispatch({ type: 'SET_API_ERROR', payload: 'Failed to process feedback. Please try again.' });
-      toast.error('Failed to process feedback');
-    } finally {
-      dispatch({ type: 'SET_IS_PROCESSING', payload: false });
-    }
-  }, [currentFeedback, improvedPrompt, requestCount, promptImprovement, dispatch]);
-  
-  const handleClear = useCallback(() => {
-    dispatch({ type: 'RESET_SCANNER' });
-  }, [dispatch]);
-  
-  const handleRevertToPrevious = useCallback(() => {
+    handleImprovePrompt();
+  };
+
+  const handleClear = () => {
+    setPromptInput('');
+    setImprovedPrompt('');
+    setFeedbackHistory([]);
+    setApiError(null);
+  };
+
+  const handleRevertToPrevious = () => {
     if (feedbackHistory.length > 0) {
-      const previousPrompt = feedbackHistory[feedbackHistory.length - 1].result;
-      dispatch({ type: 'SET_IMPROVED_PROMPT', payload: previousPrompt });
+      const previousState = feedbackHistory[feedbackHistory.length - 1];
+      setImprovedPrompt(previousState.improvedPrompt);
+      setFeedbackHistory(feedbackHistory.slice(0, -1));
       
-      // Remove the last item from history
-      const newHistory = [...feedbackHistory];
-      newHistory.pop();
-      dispatch({ 
-        type: 'ADD_FEEDBACK_HISTORY', // Fixed: Changed from SET_FEEDBACK_HISTORY to ADD_FEEDBACK_HISTORY
-        payload: newHistory[newHistory.length - 1] || { feedback: '', result: '' }
-      });
+      toast.info("Reverted to previous version.");
     }
-  }, [feedbackHistory, dispatch]);
+  };
+
+  const handleAccept = () => {
+    if (!improvedPrompt) return;
+    
+    navigator.clipboard.writeText(improvedPrompt).then(() => {
+      toast.success("Prompt copied to clipboard.");
+    }).catch(err => {
+      console.error('Failed to copy to clipboard:', err);
+      toast.error("Unable to copy to clipboard. Please try again or copy manually.");
+    });
+  };
+
+  const handleSubmitFeedback = () => {
+    if (currentFeedback.trim()) {
+      handleImprovePrompt(currentFeedback);
+      setFeedbackDialogOpen(false);
+      setCurrentFeedback('');
+    }
+  };
   
-  const handleAccept = useCallback(() => {
-    toast.success('Prompt accepted!');
-    // Additional actions when accepting the prompt could be added here
-  }, []);
-  
-  return {
+  const contextValue = {
     // State
     promptInput,
     setPromptInput,
     improvedPrompt,
+    apiError,
+    feedbackDialogOpen,
+    setFeedbackDialogOpen,
     currentFeedback,
     setCurrentFeedback,
-    feedbackHistory,
     requestCount,
     requestLimit,
     isProcessing,
-    apiError,
+    feedbackHistory,
     
     // Actions
     handleInitialScan,
     handleClear,
     handleRevertToPrevious,
     handleAccept,
-    handleSubmitFeedback,
+    handleSubmitFeedback
   };
+  
+  return (
+    <PromptScannerContext.Provider value={contextValue}>
+      {children}
+    </PromptScannerContext.Provider>
+  );
+};
+
+export const usePromptScannerContext = () => {
+  const context = useContext(PromptScannerContext);
+  if (context === undefined) {
+    throw new Error('usePromptScannerContext must be used within a PromptScannerProvider');
+  }
+  return context;
 };

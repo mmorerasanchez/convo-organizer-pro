@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
 interface PromptImprovement {
@@ -12,7 +12,6 @@ export function usePromptImprovement() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [feedbackHistory, setFeedbackHistory] = useState<PromptImprovement[]>([]);
-  const { toast } = useToast();
 
   const improvePrompt = async (originalPrompt: string, userFeedback?: string) => {
     if (!originalPrompt.trim()) return;
@@ -47,18 +46,11 @@ export function usePromptImprovement() {
       
       // Show warning if it's a fallback response
       if (data.warning) {
-        toast({
-          title: "Limited Improvement",
-          description: data.warning,
-          variant: "default"
-        });
+        toast.warning(data.warning);
       } else {
-        toast({
-          title: userFeedback ? "Prompt Refined" : "Prompt Enhanced",
-          description: userFeedback 
-            ? "Your prompt has been refined based on your feedback and best practices."
-            : "Your prompt has been enhanced using our prompting guide and expert techniques.",
-        });
+        toast.success(userFeedback 
+          ? "Prompt refined based on your feedback" 
+          : "Prompt enhanced with best practices");
       }
 
       // Extract just the improved prompt if the response contains explanation
@@ -79,23 +71,11 @@ export function usePromptImprovement() {
       
       // Different toast messages for different error types
       if (errorMessage.includes("quota")) {
-        toast({
-          variant: "destructive",
-          title: "API Quota Exceeded",
-          description: "OpenAI API quota exceeded. The service is temporarily unavailable. Please try again later.",
-        });
+        toast.error("API quota exceeded. Please try again later.");
       } else if (errorMessage.includes("internet") || errorMessage.includes("network") || errorMessage.includes("connection")) {
-        toast({
-          variant: "destructive",
-          title: "Network Error",
-          description: "Please check your internet connection and try again.",
-        });
+        toast.error("Network error. Please check your connection and try again.");
       } else {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to improve your prompt. Please try again.",
-        });
+        toast.error("Failed to improve prompt. Please try again.");
       }
       
       return null;
@@ -107,7 +87,7 @@ export function usePromptImprovement() {
   return {
     isProcessing,
     apiError,
-    setApiError,  // Exposing the setter
+    setApiError,
     feedbackHistory,
     setFeedbackHistory,
     improvePrompt,

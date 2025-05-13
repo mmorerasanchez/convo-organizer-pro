@@ -1,28 +1,19 @@
 
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { Session, User } from '@supabase/supabase-js';
 
-interface AuthContextProps {
+interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signOut: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
-  signUpWithEmail: (email: string, password: string, acceptedTerms: boolean) => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
+  signUpWithEmail: (email: string, password: string, acceptTerms: boolean) => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextProps>({
-  user: null,
-  session: null,
-  loading: true,
-  signOut: async () => {},
-  signInWithEmail: async () => {},
-  signUpWithEmail: async () => {},
-  signInWithGoogle: async () => {}
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -30,23 +21,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("Setting up auth state listener");
+    console.info('Setting up auth state listener');
     
-    // Set up auth state listener first
+    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, currentSession) => {
-        console.log("Auth state changed:", event);
-        
-        // Update session and user synchronously
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-        setLoading(false);
+      (event, newSession) => {
+        console.info(`Auth state changed: ${event}`);
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
       }
     );
 
-    // Then check for existing session
+    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      console.log("Initial session check:", currentSession ? "Session found" : "No session");
+      console.info(`Initial session check: ${currentSession ? 'Session found' : 'No session'}`);
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       setLoading(false);
@@ -57,103 +45,85 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  const signOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast.success('Signed out successfully');
-    } catch (error) {
-      console.error('Error signing out:', error);
-      toast.error('Error signing out');
-    }
-  };
-
   const signInWithEmail = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password,
-      });
-      
-      if (error) throw error;
-      toast.success('Signed in successfully');
-    } catch (error: any) {
-      console.error('Error signing in with email:', error);
-      toast.error(error.message || 'Error signing in');
-      throw error;
-    }
-  };
-
-  const signUpWithEmail = async (email: string, password: string, acceptedTerms: boolean) => {
-    try {
-      if (!acceptedTerms) {
-        throw new Error('You must accept the terms and conditions');
-      }
-
-      const { error, data } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            accepted_terms: acceptedTerms,
-          }
-        }
-      });
-      
-      if (error) throw error;
-      
-      // With email confirmation disabled, the user should be automatically logged in
-      if (data.user) {
-        toast.success('Account created successfully!');
-      } else {
-        throw new Error('Failed to create account');
-      }
-    } catch (error: any) {
-      console.error('Error signing up with email:', error);
-      toast.error(error.message || 'Error creating account');
-      throw error;
-    }
-  };
-
-  const signInWithGoogle = async () => {
-    try {
-      // Construct full redirect URL
-      const origin = window.location.origin;
-      const redirectTo = `${origin}/auth/callback`;
-      console.log("Using redirect URL:", redirectTo);
-      
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo,
-          queryParams: {
-            prompt: 'select_account' // Force account selection, prevents automatic sign-in
-          }
-        }
+        password
       });
       
       if (error) {
-        console.error('Error signing in with Google:', error);
+        console.error('Sign in error:', error);
         throw error;
       }
-    } catch (error) {
-      console.error('Unexpected error during Google sign-in:', error);
+      
+      toast.success('Signed in successfully');
+    } catch (error: any) {
+      toast.error(`Sign in failed: ${error.message}`);
+      throw error;
+    }
+  };
+
+  const signUpWithEmail = async (email: string, password: string, acceptTerms: boolean) => {
+    try {
+      if (!acceptTerms) {
+        toast.error('You must accept the terms and conditions');
+        throw new Error('Terms and conditions not accepted');
+      }
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password
+      });
+      
+      if (error) {
+        console.error('Sign up error:', error);
+        throw error;
+      }
+      
+      toast.success('Account created successfully');
+    } catch (error: any) {
+      toast.error(`Sign up failed: ${error.message}`);
+      throw error;
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Sign out error:', error);
+        throw error;
+      }
+      
+      // No need for toast on signout as it will refresh/redirect
+    } catch (error: any) {
+      toast.error(`Sign out failed: ${error.message}`);
       throw error;
     }
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      session, 
-      loading, 
-      signOut,
-      signInWithEmail,
-      signUpWithEmail,
-      signInWithGoogle
-    }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        session,
+        loading, 
+        signInWithEmail, 
+        signUpWithEmail, 
+        signOut 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { PromptState, TestPromptParams, TestPromptResult } from '@/hooks/prompting';
 import { UseMutationResult } from '@tanstack/react-query';
 
@@ -27,15 +27,10 @@ export const usePromptActions = ({
   setCompiledPrompt,
   testPrompt,
 }: UsePromptActionsProps) => {
-  const { toast } = useToast();
 
   const handleSavePrompt = () => {
     if (!activePrompt.title.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please provide a title for your prompt."
-      });
+      toast.error("Please provide a title for your prompt.");
       return;
     }
     
@@ -44,11 +39,7 @@ export const usePromptActions = ({
   
   const handleTestPrompt = async () => {
     if (!activePrompt.modelId) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please select a model before testing."
-      });
+      toast.error("Please select a model before testing.");
       return;
     }
     
@@ -67,17 +58,10 @@ export const usePromptActions = ({
       setPromptResponse(response.completion || 'No response received.');
       setRequestCount(prev => prev + 1);
       
-      toast({
-        title: "Test Completed",
-        description: "The model has responded to your prompt."
-      });
+      toast.success("The model has responded to your prompt.");
     } catch (error) {
       console.error('Error testing prompt:', error);
-      toast({
-        variant: "destructive",
-        title: "Test Failed",
-        description: error instanceof Error ? error.message : "An error occurred while testing the prompt."
-      });
+      toast.error(error instanceof Error ? error.message : "An error occurred while testing the prompt.");
     } finally {
       setIsTestingPrompt(false);
     }

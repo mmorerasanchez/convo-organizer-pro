@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { usePromptImprovement } from '@/hooks/use-prompt-improvement';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export function usePromptScanner() {
   const [promptInput, setPromptInput] = useState('');
@@ -10,7 +10,6 @@ export function usePromptScanner() {
   const [currentFeedback, setCurrentFeedback] = useState('');
   const [requestCount, setRequestCount] = useState(0);
   const [requestLimit] = useState(10); // Free tier limit
-  const { toast } = useToast();
   
   const {
     isProcessing,
@@ -40,11 +39,7 @@ export function usePromptScanner() {
 
   const handleInitialScan = () => {
     if (!promptInput.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter a prompt to improve.",
-      });
+      toast.error("Please enter a prompt to improve.");
       return;
     }
     handleImprovePrompt();
@@ -63,10 +58,7 @@ export function usePromptScanner() {
       setImprovedPrompt(previousState.improvedPrompt);
       setFeedbackHistory(feedbackHistory.slice(0, -1));
       
-      toast({
-        title: "Reverted to Previous Version",
-        description: "You've returned to the previous prompt improvement.",
-      });
+      toast.info("Reverted to previous version");
     }
   };
 
@@ -74,17 +66,10 @@ export function usePromptScanner() {
     if (!improvedPrompt) return;
     
     navigator.clipboard.writeText(improvedPrompt).then(() => {
-      toast({
-        title: "Prompt Accepted",
-        description: "The improved prompt has been copied to your clipboard and is ready to use.",
-      });
+      toast.success("Improved prompt copied to clipboard");
     }).catch(err => {
       console.error('Failed to copy to clipboard:', err);
-      toast({
-        variant: "destructive",
-        title: "Copy Failed",
-        description: "Unable to copy to clipboard. Please try again or copy manually.",
-      });
+      toast.error("Unable to copy to clipboard. Please try again or copy manually.");
     });
   };
 
