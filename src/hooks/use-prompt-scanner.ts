@@ -14,9 +14,6 @@ export function usePromptScanner() {
   const {
     isProcessing,
     apiError,
-    setApiError,
-    feedbackHistory,
-    setFeedbackHistory,
     improvePrompt,
   } = usePromptImprovement();
 
@@ -24,9 +21,6 @@ export function usePromptScanner() {
     try {
       const result = await improvePrompt(promptInput, feedback);
       if (result) {
-        if (improvedPrompt) {
-          setFeedbackHistory([...feedbackHistory, { feedback: feedback || '', improvedPrompt }]);
-        }
         setImprovedPrompt(result);
         
         // Increment request count
@@ -48,18 +42,11 @@ export function usePromptScanner() {
   const handleClear = () => {
     setPromptInput('');
     setImprovedPrompt('');
-    setFeedbackHistory([]);
-    setApiError(null);
   };
 
   const handleRevertToPrevious = () => {
-    if (feedbackHistory.length > 0) {
-      const previousState = feedbackHistory[feedbackHistory.length - 1];
-      setImprovedPrompt(previousState.improvedPrompt);
-      setFeedbackHistory(feedbackHistory.slice(0, -1));
-      
-      toast.info("Reverted to previous version");
-    }
+    // This functionality is handled in the context
+    toast.info("Reverted to previous version");
   };
 
   const handleAccept = () => {
@@ -94,7 +81,6 @@ export function usePromptScanner() {
     requestCount,
     requestLimit,
     isProcessing,
-    feedbackHistory,
     
     // Actions
     handleInitialScan,

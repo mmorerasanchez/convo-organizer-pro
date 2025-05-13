@@ -1,9 +1,30 @@
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { usePromptScanner } from '@/hooks/use-prompt-scanner';
+import { usePromptImprovement } from '@/hooks/use-prompt-improvement';
 import { toast } from 'sonner';
 
-type PromptScannerContextValue = ReturnType<typeof usePromptScanner>;
+type PromptScannerContextValue = {
+  // State
+  promptInput: string;
+  setPromptInput: (value: string) => void;
+  improvedPrompt: string;
+  apiError: string | null;
+  feedbackDialogOpen: boolean;
+  setFeedbackDialogOpen: (open: boolean) => void;
+  currentFeedback: string;
+  setCurrentFeedback: (feedback: string) => void;
+  requestCount: number;
+  requestLimit: number;
+  isProcessing: boolean;
+  feedbackHistory: Array<{ feedback: string; improvedPrompt: string }>;
+  
+  // Actions
+  handleInitialScan: () => void;
+  handleClear: () => void;
+  handleRevertToPrevious: () => void;
+  handleAccept: () => void;
+  handleSubmitFeedback: () => void;
+};
 
 const PromptScannerContext = createContext<PromptScannerContextValue | undefined>(undefined);
 
@@ -14,15 +35,13 @@ export const PromptScannerProvider = ({ children }: { children: ReactNode }) => 
   const [currentFeedback, setCurrentFeedback] = useState('');
   const [requestCount, setRequestCount] = useState(0);
   const [requestLimit] = useState(10); // Free tier limit
+  const [feedbackHistory, setFeedbackHistory] = useState<Array<{ feedback: string; improvedPrompt: string }>>([]);
   
   const {
     isProcessing,
     apiError,
-    setApiError,
-    feedbackHistory,
-    setFeedbackHistory,
     improvePrompt,
-  } = usePromptScanner();
+  } = usePromptImprovement();
 
   const handleImprovePrompt = async (feedback?: string) => {
     try {
@@ -58,7 +77,6 @@ export const PromptScannerProvider = ({ children }: { children: ReactNode }) => 
     setPromptInput('');
     setImprovedPrompt('');
     setFeedbackHistory([]);
-    setApiError(null);
   };
 
   const handleRevertToPrevious = () => {
@@ -90,7 +108,7 @@ export const PromptScannerProvider = ({ children }: { children: ReactNode }) => 
     }
   };
   
-  const contextValue = {
+  const contextValue: PromptScannerContextValue = {
     // State
     promptInput,
     setPromptInput,
