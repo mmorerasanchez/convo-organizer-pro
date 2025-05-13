@@ -8,6 +8,7 @@ import PromptDesigner from '@/components/prompting/PromptDesigner';
 import { BookOpen, Lightbulb, Wand2 } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 import { PromptingProvider } from '@/components/prompting/context/PromptingContext';
+import { PromptScannerProvider } from '@/components/prompting/context/usePromptScanner';
 
 const Prompting = () => {
   const [activeTab, setActiveTab] = React.useState('guide');
@@ -48,7 +49,9 @@ const Prompting = () => {
             </TabsContent>
             
             <TabsContent value="scanner" className="space-y-6 mt-0">
-              <PromptScanner />
+              <PromptScannerProvider>
+                <PromptScanner />
+              </PromptScannerProvider>
             </TabsContent>
             
             <TabsContent value="designer" className="space-y-6 mt-0">

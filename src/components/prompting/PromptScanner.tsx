@@ -9,7 +9,6 @@ import { SaveToProjectDialog } from './SaveToProjectDialog';
 
 const PromptScanner = () => {
   const [saveToProjectDialogOpen, setSaveToProjectDialogOpen] = useState(false);
-  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
   
   const {
     // State
@@ -17,6 +16,8 @@ const PromptScanner = () => {
     setPromptInput,
     improvedPrompt,
     apiError,
+    feedbackDialogOpen,
+    setFeedbackDialogOpen,
     currentFeedback,
     setCurrentFeedback,
     requestCount,
