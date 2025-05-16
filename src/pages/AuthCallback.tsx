@@ -42,9 +42,6 @@ const AuthCallback = () => {
           // Check if user profile exists and create if not
           await ensureUserProfile(data.session.user.id, data.session.user);
           
-          // Check if user has roles assigned and assign default if not
-          await checkUserRoles(data.session.user.id);
-          
           // Clear any hash or query parameters from the URL to avoid leaving tokens exposed
           window.history.replaceState({}, document.title, window.location.pathname);
           
@@ -111,47 +108,6 @@ const AuthCallback = () => {
       }
     } catch (error) {
       console.error("Error in profile management:", error);
-    }
-  };
-
-  // Check if user has roles and create one if missing
-  const checkUserRoles = async (userId: string) => {
-    try {
-      console.log("Checking user roles for:", userId);
-      
-      // First check if user has any roles
-      const { data: roleData, error: roleError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId);
-      
-      if (roleError) {
-        console.error("Error checking user roles:", roleError);
-        return;
-      }
-      
-      console.log("User roles data:", roleData);
-      
-      // If no roles found, assign the default 'customer' role
-      if (!roleData || roleData.length === 0) {
-        console.log("No roles found, assigning default 'customer' role");
-        
-        const { error: insertError } = await supabase
-          .from('user_roles')
-          .insert([
-            { user_id: userId, role: 'customer' }
-          ]);
-        
-        if (insertError) {
-          console.error("Failed to assign customer role:", insertError);
-        } else {
-          console.log("Successfully assigned 'customer' role to user");
-        }
-      } else {
-        console.log("User already has roles assigned:", roleData);
-      }
-    } catch (error) {
-      console.error("Error in role assignment:", error);
     }
   };
 

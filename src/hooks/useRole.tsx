@@ -35,21 +35,23 @@ export const useRole = () => {
           const userRoles = data.map(item => item.role as UserRole);
           console.log("Fetched user roles:", userRoles);
           
-          // If no roles found, try to assign the default 'customer' role
+          // If no roles found, try to assign the default 'customer' role using upsert
           if (userRoles.length === 0) {
             console.log("No roles found for user, attempting to assign default 'customer' role");
             
             try {
-              const { error: insertError } = await supabase
+              // Use upsert operation with on_conflict to prevent duplicates
+              const { error: upsertError } = await supabase
                 .from('user_roles')
-                .insert([
-                  { user_id: user.id, role: 'customer' }
-                ]);
+                .upsert(
+                  [{ user_id: user.id, role: 'customer' }],
+                  { onConflict: 'user_id,role', ignoreDuplicates: true }
+                );
               
-              if (insertError) {
-                console.error("Failed to assign customer role:", insertError);
+              if (upsertError) {
+                console.error("Failed to assign customer role:", upsertError);
               } else {
-                console.log("Successfully assigned 'customer' role to user");
+                console.log("Successfully assigned or confirmed 'customer' role to user");
                 setRoles(['customer']);
               }
             } catch (assignError) {
