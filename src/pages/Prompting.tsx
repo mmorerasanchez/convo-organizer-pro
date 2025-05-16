@@ -11,13 +11,13 @@ import { PromptingProvider } from '@/components/prompting/context/PromptingConte
 import { PromptScannerProvider } from '@/components/prompting/context/usePromptScanner';
 
 const Prompting = () => {
-  const [activeTab, setActiveTab] = React.useState('guide');
+  const [activeTab, setActiveTab] = React.useState('designer');
 
   const tabs = [
     {
-      value: 'guide',
-      label: 'Prompting Guide',
-      icon: <BookOpen className="h-4 w-4" />
+      value: 'designer',
+      label: 'Prompt Designer',
+      icon: <Lightbulb className="h-4 w-4" />
     },
     {
       value: 'scanner',
@@ -25,9 +25,9 @@ const Prompting = () => {
       icon: <Wand2 className="h-4 w-4" />
     },
     {
-      value: 'designer',
-      label: 'Prompt Designer',
-      icon: <Lightbulb className="h-4 w-4" />
+      value: 'guide',
+      label: 'Prompting Guide',
+      icon: <BookOpen className="h-4 w-4" />
     }
   ];
 
@@ -44,8 +44,8 @@ const Prompting = () => {
           />
           
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsContent value="guide" className="space-y-6 mt-0">
-              <PromptingGuide />
+            <TabsContent value="designer" className="space-y-6 mt-0">
+              <PromptDesigner />
             </TabsContent>
             
             <TabsContent value="scanner" className="space-y-6 mt-0">
@@ -54,8 +54,8 @@ const Prompting = () => {
               </PromptScannerProvider>
             </TabsContent>
             
-            <TabsContent value="designer" className="space-y-6 mt-0">
-              <PromptDesigner />
+            <TabsContent value="guide" className="space-y-6 mt-0">
+              <PromptingGuide />
             </TabsContent>
           </Tabs>
         </div>

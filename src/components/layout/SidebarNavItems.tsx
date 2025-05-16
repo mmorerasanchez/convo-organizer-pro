@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -24,9 +23,9 @@ import {
 
 export const activeModules = [
   { icon: Home, label: 'Dashboard', path: '/' },
-  { icon: BookOpen, label: 'Projects', path: '/projects' },
-  { icon: Wrench, label: 'Tools', path: '/tools' },
   { icon: Lightbulb, label: 'Prompting', path: '/prompting' },
+  { icon: Wrench, label: 'Tools', path: '/tools' },
+  { icon: BookOpen, label: 'Projects', path: '/projects' },
 ];
 
 export const comingSoonModules = [
