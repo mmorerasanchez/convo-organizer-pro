@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { PromptState } from '@/hooks/prompting';
-import { Zap } from 'lucide-react';
+import { Zap, RefreshCw } from 'lucide-react';
 
 interface FrameworkFieldsProps {
   activePrompt: PromptState;
@@ -62,7 +62,11 @@ export function FrameworkFields({
           disabled={isTestingPrompt} 
           className="gap-2 mr-2"
         >
-          <Zap size={16} />
+          {isTestingPrompt ? (
+            <RefreshCw size={16} className="animate-spin h-3.5 w-3.5" />
+          ) : (
+            <Zap size={16} className="h-3.5 w-3.5" />
+          )}
           {isTestingPrompt ? 'Generating...' : 'Generate model response'}
         </Button>
         <Button 
