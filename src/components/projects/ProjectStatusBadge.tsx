@@ -22,7 +22,7 @@ const ProjectStatusBadge: React.FC<ProjectStatusBadgeProps> = ({ status, classNa
   };
 
   return (
-    <Badge variant="outline" className={`${getStatusColor()} ${className || ''}`}>
+    <Badge variant="outline" className={`px-2.5 py-0.5 text-xs font-medium ${getStatusColor()} ${className || ''}`}>
       {status}
     </Badge>
   );
