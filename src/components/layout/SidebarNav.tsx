@@ -12,7 +12,6 @@ import {
   useSidebar
 } from '@/components/ui/sidebar';
 import SidebarNavItems from './SidebarNavItems';
-import JoinProjectDialog from '@/components/projects/JoinProjectDialog';
 import { Button } from '@/components/ui/button';
 
 const SidebarNav: React.FC = () => {
@@ -32,9 +31,7 @@ const SidebarNav: React.FC = () => {
       <SidebarContent>
         <SidebarNavItems />
         
-        <div className="px-3 py-2">
-          <JoinProjectDialog />
-        </div>
+        {/* Removed the JoinProjectDialog component from here */}
       </SidebarContent>
 
       <SidebarFooter className="border-t p-2">

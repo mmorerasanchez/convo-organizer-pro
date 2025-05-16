@@ -4,7 +4,6 @@ import { Project } from '@/lib/types';
 import ProjectFilters from './ProjectFilters';
 import ProjectGrid from './ProjectGrid';
 import ProjectsByStatus from './ProjectsByStatus';
-import JoinProjectDialog from './JoinProjectDialog';
 import NewProjectDialog from './NewProjectDialog';
 
 interface AllProjectsTabContentProps {
@@ -38,7 +37,7 @@ const AllProjectsTabContent: React.FC<AllProjectsTabContentProps> = ({
           setViewMode={setViewMode}
         />
         <div className="flex items-center space-x-2">
-          <JoinProjectDialog />
+          {/* Removed JoinProjectDialog from here */}
           <NewProjectDialog />
         </div>
       </div>
