@@ -3,10 +3,9 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CardContent, CardDescription } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Checkbox } from '@/components/ui/checkbox';
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -62,12 +61,7 @@ const SignUpForm = ({ setIsLoading, isLoading }: SignUpFormProps) => {
             Create a new account to get started
           </CardDescription>
           
-          <Alert className="bg-blue-50 text-blue-800 border-blue-200 mb-4">
-            <CheckCircle className="h-4 w-4 mr-2" />
-            <AlertDescription>
-              You'll be immediately logged in after creating your account.
-            </AlertDescription>
-          </Alert>
+          {/* Removed the blue Alert box here */}
           
           <FormField
             control={signUpForm.control}
