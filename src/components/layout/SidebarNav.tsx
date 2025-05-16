@@ -26,7 +26,7 @@ const SidebarNav: React.FC = () => {
       variant="sidebar"
     >
       <SidebarHeader className="flex items-center p-3 border-b h-14">
-        <SidebarTrigger className="ml-0" />
+        {/* Removed SidebarTrigger from here */}
       </SidebarHeader>
       
       <SidebarContent>

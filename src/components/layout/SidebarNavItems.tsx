@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -9,7 +10,8 @@ import {
   BarChart,
   LineChart,
   FileCode,
-  UsersRound
+  UsersRound,
+  ArrowUpRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -23,13 +25,18 @@ import {
 
 export const activeModules = [
   { icon: Home, label: 'Dashboard', path: '/' },
+  { icon: BookOpen, label: 'Projects', path: '/projects' },
   { icon: Lightbulb, label: 'Prompting', path: '/prompting' },
   { icon: Wrench, label: 'Tools', path: '/tools' },
-  { icon: BookOpen, label: 'Projects', path: '/projects' },
+  { 
+    icon: MessageSquare, 
+    label: 'Feedback', 
+    path: 'https://ruby-lake-4b9.notion.site/1f51e6060c368025b845c6dc2f75c1c2?pvs=105',
+    external: true
+  },
 ];
 
 export const comingSoonModules = [
-  { icon: MessageSquare, label: 'Feedback', path: '/feedback' },
   { icon: BarChart, label: 'Metrics', path: '/metrics' },
   { icon: LineChart, label: 'Roadmap', path: '/roadmap' },
   { icon: FileCode, label: 'Templates', path: '/templates' },
@@ -53,15 +60,29 @@ const SidebarNavItems: React.FC<SidebarNavItemsProps> = ({ onNavItemClick }) => 
         <SidebarMenuItem key={item.path}>
           <SidebarMenuButton 
             asChild 
-            isActive={isActive(item.path)}
+            isActive={!item.external && isActive(item.path)}
             tooltip={item.label}
             className={cn(disabled && "opacity-50 pointer-events-none")}
             aria-disabled={disabled}
           >
-            <Link to={disabled ? "#" : item.path} onClick={onNavItemClick}>
-              <item.icon className="h-4 w-4" />
-              <span>{item.label}</span>
-            </Link>
+            {item.external ? (
+              <a 
+                href={item.path} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center"
+                onClick={onNavItemClick}
+              >
+                <item.icon className="h-4 w-4" />
+                <span>{item.label}</span>
+                <ArrowUpRight className="h-3 w-3 ml-1" />
+              </a>
+            ) : (
+              <Link to={disabled ? "#" : item.path} onClick={onNavItemClick}>
+                <item.icon className="h-4 w-4" />
+                <span>{item.label}</span>
+              </Link>
+            )}
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}
