@@ -35,31 +35,9 @@ export const useRole = () => {
           const userRoles = data.map(item => item.role as UserRole);
           console.log("Fetched user roles:", userRoles);
           
-          // If no roles found, try to assign the default 'customer' role using upsert
-          if (userRoles.length === 0) {
-            console.log("No roles found for user, attempting to assign default 'customer' role");
-            
-            try {
-              // Use upsert operation with on_conflict to prevent duplicates
-              const { error: upsertError } = await supabase
-                .from('user_roles')
-                .upsert(
-                  [{ user_id: user.id, role: 'customer' }],
-                  { onConflict: 'user_id,role', ignoreDuplicates: true }
-                );
-              
-              if (upsertError) {
-                console.error("Failed to assign customer role:", upsertError);
-              } else {
-                console.log("Successfully assigned or confirmed 'customer' role to user");
-                setRoles(['customer']);
-              }
-            } catch (assignError) {
-              console.error("Error assigning default role:", assignError);
-            }
-          } else {
-            setRoles(userRoles);
-          }
+          // Set roles directly from database
+          // This avoids conflicting with database triggers
+          setRoles(userRoles.length > 0 ? userRoles : ['customer']);
         }
       } catch (error) {
         console.error('Unexpected error fetching roles:', error);
