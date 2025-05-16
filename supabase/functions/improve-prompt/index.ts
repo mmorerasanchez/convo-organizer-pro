@@ -52,6 +52,15 @@ serve(async (req) => {
   try {
     console.log("Request received at improve-prompt function");
     
+    // Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
     // Parse request
     const { originalPrompt, feedback } = await req.json();
     console.log("Request payload:", { originalPrompt, feedback });
@@ -86,9 +95,14 @@ ${feedback ? `Additionally, consider this specific feedback: ${feedback}` : ''}
 Your task is to improve the given prompt by making it more effective, clearer, and following the best practices above.
 Explain the reasoning behind your improvements.`;
 
+      // Set up API call with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
+
       // Attempt to use the OpenAI API
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
+        signal: controller.signal,
         headers: {
           'Authorization': `Bearer ${openAIApiKey}`,
           'Content-Type': 'application/json',
@@ -103,6 +117,8 @@ Explain the reasoning behind your improvements.`;
           max_tokens: 1000,
         }),
       });
+      
+      clearTimeout(timeoutId);
 
       console.log("OpenAI API response status:", response.status);
 
@@ -110,13 +126,24 @@ Explain the reasoning behind your improvements.`;
         const errorData = await response.json();
         console.error("OpenAI API error:", errorData);
         
-        // Detailed error logging
+        // Classify error for better client experience
+        let statusCode = response.status;
+        let errorMessage = "OpenAI API call failed";
+        
+        if (errorData.error?.type === 'insufficient_quota') {
+          errorMessage = "API quota exceeded. Please try again later.";
+        } else if (response.status === 429) {
+          errorMessage = "Rate limit exceeded. Please try again later.";
+        } else if (response.status >= 500) {
+          errorMessage = "OpenAI service unavailable. Please try again later.";
+        }
+        
         return new Response(
           JSON.stringify({ 
-            error: "OpenAI API call failed",
+            error: errorMessage,
             details: errorData
           }),
-          { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: statusCode, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
@@ -131,12 +158,20 @@ Explain the reasoning behind your improvements.`;
     } catch (apiError) {
       console.error("Error calling OpenAI API:", apiError);
       
+      let errorMessage = "An unexpected error occurred while processing your prompt";
+      let statusCode = 500;
+      
+      if (apiError.name === 'AbortError') {
+        errorMessage = "Request timed out. Please try again.";
+        statusCode = 408;
+      }
+      
       return new Response(
         JSON.stringify({ 
-          error: "An unexpected error occurred while processing your prompt",
+          error: errorMessage,
           details: apiError.message
         }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: statusCode, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
   } catch (error) {

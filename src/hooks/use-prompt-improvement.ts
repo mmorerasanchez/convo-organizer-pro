@@ -8,11 +8,23 @@ interface PromptImprovement {
   improvedPrompt: string;
 }
 
+interface ErrorDetails {
+  message: string;
+  code?: string;
+  type?: string;
+}
+
 export function usePromptImprovement() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [feedbackHistory, setFeedbackHistory] = useState<PromptImprovement[]>([]);
 
+  /**
+   * Improves a prompt using the OpenAI API
+   * @param originalPrompt - The original prompt to improve
+   * @param userFeedback - Optional user feedback to guide the improvement
+   * @returns The improved prompt or null if an error occurred
+   */
   const improvePrompt = async (originalPrompt: string, userFeedback?: string) => {
     if (!originalPrompt.trim()) return;
     
@@ -20,6 +32,12 @@ export function usePromptImprovement() {
     setApiError(null);
     
     try {
+      // Check authentication status
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Authentication required to use this feature');
+      }
+      
       // Use Supabase client to call edge function
       const { data, error } = await supabase.functions.invoke('improve-prompt', {
         body: {
@@ -29,18 +47,23 @@ export function usePromptImprovement() {
       });
       
       if (error) {
-        throw new Error(error.message || 'Failed to improve prompt');
+        const errorMsg = error.message || 'Failed to improve prompt';
+        console.error('Edge function error:', errorMsg);
+        throw new Error(errorMsg);
       }
       
       if (!data) {
+        console.error('No response data returned');
         throw new Error('No response data returned');
       }
       
       if (data.error) {
+        console.error('API error:', data.error);
         throw new Error(data.error);
       }
       
       if (!data.improvedPrompt) {
+        console.error('No improvement data returned');
         throw new Error('No improvement data returned');
       }
       
@@ -51,6 +74,14 @@ export function usePromptImprovement() {
         toast.success(userFeedback 
           ? "Prompt refined based on your feedback" 
           : "Prompt enhanced with best practices");
+      }
+      
+      // Store in feedback history if there was user feedback
+      if (userFeedback) {
+        setFeedbackHistory(prev => [
+          { feedback: userFeedback, improvedPrompt: data.improvedPrompt },
+          ...prev
+        ]);
       }
 
       // Extract just the improved prompt if the response contains explanation
@@ -74,6 +105,8 @@ export function usePromptImprovement() {
         toast.error("API quota exceeded. Please try again later.");
       } else if (errorMessage.includes("internet") || errorMessage.includes("network") || errorMessage.includes("connection")) {
         toast.error("Network error. Please check your connection and try again.");
+      } else if (errorMessage.includes("Authentication required")) {
+        toast.error("Please sign in to use this feature");
       } else {
         toast.error("Failed to improve prompt. Please try again.");
       }
