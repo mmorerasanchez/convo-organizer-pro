@@ -34,11 +34,16 @@ export const activeModules = [
     path: 'https://ruby-lake-4b9.notion.site/1f51e6060c368025b845c6dc2f75c1c2?pvs=105',
     external: true
   },
+  {
+    icon: LineChart,
+    label: 'Roadmap',
+    path: 'https://promptito.super.site/product-roadmap',
+    external: true
+  }
 ];
 
 export const comingSoonModules = [
   { icon: BarChart, label: 'Metrics', path: '/metrics' },
-  { icon: LineChart, label: 'Roadmap', path: '/roadmap' },
   { icon: FileCode, label: 'Templates', path: '/templates' },
   { icon: UsersRound, label: 'Agents', path: '/agents' },
 ];
