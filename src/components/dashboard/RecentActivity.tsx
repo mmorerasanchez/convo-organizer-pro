@@ -10,7 +10,7 @@ interface RecentActivityProps {
 
 const RecentActivity: React.FC<RecentActivityProps> = ({ conversations }) => {
   return (
-    <Card className="col-span-1 lg:col-span-2">
+    <Card className="col-span-1">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-medium">Recent Activity</CardTitle>
       </CardHeader>

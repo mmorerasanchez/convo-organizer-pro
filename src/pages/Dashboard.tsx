@@ -1,4 +1,3 @@
-
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import StatCard from '@/components/dashboard/StatCard';
@@ -101,7 +100,7 @@ const Dashboard = () => {
               </TabsList>
               
               <TabsContent value="overview" className="space-y-0">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                   <RecentActivity conversations={sortedConversations} />
                   <ProjectList projects={sortedProjects} />
                 </div>
