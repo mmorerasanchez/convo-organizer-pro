@@ -33,7 +33,6 @@ export const PromptFieldsPanel = ({
       handleSavePrompt={handleSavePrompt}
       handleTestPrompt={handleTestPrompt}
       isTestingPrompt={isTestingPrompt}
-      showSaveModal={handleSavePrompt}
       handleNewPrompt={handleNewPrompt}
     />
   );

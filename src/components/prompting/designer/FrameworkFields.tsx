@@ -15,7 +15,7 @@ interface FrameworkFieldsProps {
   handleSavePrompt: () => void;
   handleTestPrompt: () => void;
   isTestingPrompt: boolean;
-  showSaveModal: () => void;
+  showSaveModal?: () => void;
   handleNewPrompt: () => void;
 }
 
@@ -24,10 +24,8 @@ export function FrameworkFields({
   frameworkFields,
   frameworks,
   handleFieldChange,
-  handleSavePrompt,
   handleTestPrompt,
   isTestingPrompt,
-  showSaveModal,
   handleNewPrompt,
 }: FrameworkFieldsProps) {
   const selectedFramework = frameworks?.find(f => f.id === activePrompt.frameworkId);
@@ -66,13 +64,6 @@ export function FrameworkFields({
         >
           <Zap size={16} />
           {isTestingPrompt ? 'Generating...' : 'Generate model response'}
-        </Button>
-        <Button 
-          onClick={showSaveModal}
-          variant="outline" 
-          className="gap-2 mr-2" 
-        >
-          Save Version
         </Button>
         <Button 
           onClick={handleNewPrompt}

@@ -62,13 +62,14 @@ export const PromptDesignerContainer = ({
             handleNewPrompt={handleClear}
           />
         )}
-        
-        {/* Compiled Prompt Preview */}
-        <CompiledPromptPreview compiledPrompt={compiledPrompt} />
       </div>
       
-      {/* Right column - Model Response */}
+      {/* Right column - Compiled Prompt and Model Response */}
       <div className="space-y-6">
+        {/* Compiled Prompt Preview - moved to the top of right column */}
+        <CompiledPromptPreview compiledPrompt={compiledPrompt} />
+        
+        {/* Model Response */}
         <ModelResponse 
           promptResponse={promptResponse}
           compiledPrompt={compiledPrompt}
