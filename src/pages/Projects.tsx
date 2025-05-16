@@ -9,6 +9,7 @@ import { BookOpen, Users } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 import AllProjectsTabContent from '@/components/projects/AllProjectsTabContent';
 import SharedProjectsTabContent from '@/components/projects/SharedProjectsTabContent';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const Projects = () => {
   useRequireAuth();
@@ -26,17 +27,36 @@ const Projects = () => {
     queryFn: getSharedProjects
   });
 
+  // Define a custom tab renderer for the disabled shared projects tab
+  const sharedProjectsTab = {
+    value: 'shared-projects',
+    label: 'Shared Projects',
+    icon: <Users className="h-4 w-4" />,
+    disabled: true,
+    custom: (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="h-7 px-3 text-sm flex items-center gap-1.5 font-mono opacity-60 cursor-not-allowed filter blur-[0.3px]">
+              <Users className="h-4 w-4" />
+              Shared Projects
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>This feature is currently unavailable</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    )
+  };
+
   const tabs = [
     {
       value: 'all-projects',
       label: 'My Projects',
       icon: <BookOpen className="h-4 w-4" />
     },
-    {
-      value: 'shared-projects',
-      label: 'Shared Projects',
-      icon: <Users className="h-4 w-4" />
-    }
+    sharedProjectsTab
   ];
 
   // Filter and sort projects based on search term and sort option

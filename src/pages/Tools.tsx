@@ -11,6 +11,7 @@ import { Filter, Plus, Wrench, X, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import PageHeader from '@/components/common/PageHeader';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   Popover,
   PopoverContent,
@@ -28,18 +29,36 @@ const Tools = () => {
     queryFn: fetchTools
   });
 
+  // Define a custom tab renderer for the disabled tool finder tab
+  const toolFinderTab = {
+    value: 'tool-finder',
+    label: 'Tool Finder',
+    icon: <Search className="h-4 w-4" />,
+    disabled: true,
+    custom: (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="h-7 px-3 text-sm flex items-center gap-1.5 font-mono opacity-60 cursor-not-allowed filter blur-[0.3px]">
+              <Search className="h-4 w-4" />
+              Tool Finder
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>This feature is currently unavailable</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    )
+  };
+
   const tabs = [
     {
       value: 'my-tools',
       label: 'My Tools',
       icon: <Wrench className="h-4 w-4" />
     },
-    {
-      value: 'tool-finder',
-      label: 'Tool Finder',
-      icon: <Search className="h-4 w-4" />,
-      disabled: true
-    }
+    toolFinderTab
   ];
 
   // Filter and sort tools based on search term and sort option

@@ -11,6 +11,8 @@ interface PageHeaderProps {
     value: string;
     label: string;
     icon?: React.ReactNode;
+    disabled?: boolean;
+    custom?: React.ReactNode;
   }[];
   activeTab?: string;
   onTabChange?: (value: string) => void;
@@ -47,14 +49,21 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           <Tabs value={activeTab} onValueChange={onTabChange} className="w-full max-w-[600px]">
             <TabsList className="h-9 p-1 bg-muted/50">
               {tabs.map((tab) => (
-                <TabsTrigger 
-                  key={tab.value}
-                  value={tab.value} 
-                  className="h-7 px-3 text-sm flex items-center gap-1.5 font-mono"
-                >
-                  {tab.icon}
-                  {tab.label}
-                </TabsTrigger>
+                tab.custom ? (
+                  <React.Fragment key={tab.value}>
+                    {tab.custom}
+                  </React.Fragment>
+                ) : (
+                  <TabsTrigger 
+                    key={tab.value}
+                    value={tab.value} 
+                    className="h-7 px-3 text-sm flex items-center gap-1.5 font-mono"
+                    disabled={tab.disabled}
+                  >
+                    {tab.icon}
+                    {tab.label}
+                  </TabsTrigger>
+                )
               ))}
             </TabsList>
           </Tabs>
