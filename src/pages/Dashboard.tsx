@@ -5,10 +5,10 @@ import StatCard from '@/components/dashboard/StatCard';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import ProjectList from '@/components/dashboard/ProjectList';
 import AITools from '@/components/dashboard/AITools';
-import { BookOpen, MessageCircle, Wrench, Database, Brain, BarChart } from 'lucide-react';
+import { BookOpen, MessageCircle, Database, BarChart } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
-import { fetchProjects, fetchConversations, fetchTools } from '@/lib/api';
+import { fetchProjects, fetchConversations } from '@/lib/api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { fetchKnowledgeCount } from '@/lib/api/knowledge';
@@ -25,12 +25,6 @@ const Dashboard = () => {
   const { data: conversations = [], isLoading: conversationsLoading } = useQuery({
     queryKey: ['conversations'],
     queryFn: fetchConversations,
-    enabled: !!user
-  });
-
-  const { data: tools = [], isLoading: toolsLoading } = useQuery({
-    queryKey: ['tools'],
-    queryFn: fetchTools,
     enabled: !!user
   });
 
@@ -52,9 +46,8 @@ const Dashboard = () => {
   
   const projectCount = projects.length;
   const conversationCount = conversations.length;
-  const toolCount = tools.length;
 
-  const isLoading = authLoading || projectsLoading || conversationsLoading || toolsLoading || knowledgeLoading;
+  const isLoading = authLoading || projectsLoading || conversationsLoading || knowledgeLoading;
 
   return (
     <MainLayout>
@@ -63,8 +56,8 @@ const Dashboard = () => {
         
         {isLoading ? (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[...Array(3)].map((_, i) => (
                 <Skeleton key={i} className="h-24 w-full" />
               ))}
             </div>
@@ -72,34 +65,27 @@ const Dashboard = () => {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <StatCard 
-                title="Total Projects" 
+                title="Projects" 
                 value={projectCount} 
                 icon={<BookOpen size={18} />} 
                 description="Across all categories"
-                className="bg-blue-50 text-blue-800"
-              />
-              <StatCard 
-                title="Conversations" 
-                value={conversationCount} 
-                icon={<MessageCircle size={18} />} 
-                description="From various platforms"
-                className="bg-violet-50 text-violet-800"
+                className="bg-red-50 text-red-800"
               />
               <StatCard 
                 title="Knowledge Files" 
                 value={knowledgeCount} 
                 icon={<Database size={18} />} 
                 description="Project documentation"
-                className="bg-amber-50 text-amber-800"
+                className="bg-yellow-50 text-yellow-800"
               />
               <StatCard 
-                title="Tools Added" 
-                value={toolCount} 
-                icon={<Wrench size={18} />} 
-                description="Available tools"
-                className="bg-emerald-50 text-emerald-800"
+                title="Conversations" 
+                value={conversationCount} 
+                icon={<MessageCircle size={18} />} 
+                description="From various platforms"
+                className="bg-blue-50 text-blue-800"
               />
             </div>
             
