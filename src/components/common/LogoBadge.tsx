@@ -25,7 +25,7 @@ const LogoBadge: React.FC<LogoBadgeProps> = ({ className }) => {
           </Badge>
         </div>
       </div>
-      <p className="text-muted-foreground">Store and organize your AI conversations</p>
+      <p className="text-muted-foreground">10X your prompt—ductivity</p>
     </div>
   );
 };

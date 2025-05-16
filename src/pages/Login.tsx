@@ -23,8 +23,7 @@ const Login = () => {
       <div className="w-full max-w-md space-y-6 bg-white p-8 rounded-lg shadow-sm border border-gray-100">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold">Sign in</h2>
-          <p className="text-sm text-muted-foreground mt-1">Continue to promptito</p>
-          <p className="text-xs text-green-600 mt-2 font-medium">No email verification required - sign up and use immediately!</p>
+          <p className="text-sm text-muted-foreground mt-2">Continue to promptito, no email verification required - sign up and use immediately!</p>
         </div>
 
         <div className="space-y-4">
