@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   Home, 
   BookOpen, 
-  CommandSquare, 
+  CodeSquare, 
   Bot, 
   MessageSquare,
   BarChart,
@@ -27,7 +27,7 @@ export const activeModules = [
   { icon: Home, label: 'Dashboard', path: '/' },
   { icon: BookOpen, label: 'Projects', path: '/projects' },
   { icon: Bot, label: 'Prompting', path: '/prompting' },
-  { icon: CommandSquare, label: 'Tools', path: '/tools' },
+  { icon: CodeSquare, label: 'Tools', path: '/tools' },
   { 
     icon: MessageSquare, 
     label: 'Feedback', 
