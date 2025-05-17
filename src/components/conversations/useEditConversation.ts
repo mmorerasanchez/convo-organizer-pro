@@ -13,7 +13,7 @@ export const useEditConversation = (conversation: Conversation) => {
   const [externalId, setExternalId] = useState(conversation.externalId || '');
   const [status, setStatus] = useState(conversation.status || 'active');
   const [type, setType] = useState<'input' | 'output'>(conversation.type || 'input');
-  const [modelId, setModelId] = useState(conversation.modelId || '');
+  const [modelId, setModelId] = useState(conversation.modelId || 'none');
   const [open, setOpen] = useState(false);
   
   const queryClient = useQueryClient();
@@ -27,7 +27,7 @@ export const useEditConversation = (conversation: Conversation) => {
     setExternalId(conversation.externalId || '');
     setStatus(conversation.status || 'active');
     setType(conversation.type || 'input');
-    setModelId(conversation.modelId || '');
+    setModelId(conversation.modelId || 'none');
   }, [conversation]);
   
   // Fetch projects for the dropdown
@@ -51,7 +51,7 @@ export const useEditConversation = (conversation: Conversation) => {
       externalId: externalId.trim() || null,
       status,
       type,
-      modelId: modelId || null
+      modelId: modelId === 'none' ? null : modelId
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['conversation', conversation.id] });

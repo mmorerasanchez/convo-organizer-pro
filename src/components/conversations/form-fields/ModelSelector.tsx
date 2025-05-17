@@ -22,7 +22,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange, m
           <SelectValue placeholder="Select AI model (optional)" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">None</SelectItem>
+          <SelectItem value="none">None</SelectItem>
           {models.map((model: AIModel) => (
             <SelectItem key={model.id} value={model.id}>
               {model.displayName} ({model.provider})

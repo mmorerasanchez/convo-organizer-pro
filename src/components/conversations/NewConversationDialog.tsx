@@ -5,13 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchProjects, createConversation, fetchModels } from '@/lib/api';
 import { AIModel } from '@/lib/types';
+import { PlatformSelector } from './form-fields/PlatformSelector';
+import { ProjectSelector } from './form-fields/ProjectSelector';
+import { ConversationTypeSelector } from './form-fields/ConversationTypeSelector';
+import { ModelSelector } from './form-fields/ModelSelector';
+import { StatusSelector } from './form-fields/StatusSelector';
 
 interface NewConversationDialogProps {
   trigger?: React.ReactNode;
@@ -29,7 +33,7 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
   const [externalId, setExternalId] = useState('');
   const [status, setStatus] = useState('Active');
   const [type, setType] = useState<'input' | 'output'>('input');
-  const [selectedModelId, setSelectedModelId] = useState<string>('');
+  const [selectedModelId, setSelectedModelId] = useState<string>('none');
   const [open, setOpen] = useState(false);
   
   const navigate = useNavigate();
@@ -84,21 +88,9 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
       externalId: externalId.trim() || undefined,
       status,
       type,
-      modelId: selectedModelId || undefined
+      modelId: selectedModelId === 'none' ? undefined : selectedModelId
     });
   };
-
-  const platformOptions = [
-    { value: 'ChatGPT', label: 'ChatGPT' },
-    { value: 'Claude', label: 'Claude' },
-    { value: 'Gemini', label: 'Gemini' },
-    { value: 'Multiple', label: 'Multiple' },
-    { value: 'Lovable', label: 'Lovable' },
-    { value: 'Replit', label: 'Replit' },
-    { value: 'DeepSeek', label: 'DeepSeek' },
-    { value: 'Mistral', label: 'Mistral' },
-    { value: 'Perplexity', label: 'Perplexity' }
-  ];
   
   const triggerButton = trigger || (
     <Button className="gap-2">
@@ -129,87 +121,17 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
           </div>
           
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="platform">Platform</Label>
-              <Select 
-                value={platform} 
-                onValueChange={setPlatform}
-              >
-                <SelectTrigger id="platform">
-                  <SelectValue placeholder="Select platform" />
-                </SelectTrigger>
-                <SelectContent>
-                  {platformOptions.map(option => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="project">Project</Label>
-              <Select 
-                value={selectedProjectId} 
-                onValueChange={setSelectedProjectId}
-                disabled={projects.length === 0}
-              >
-                <SelectTrigger id="project">
-                  <SelectValue placeholder="Select project" />
-                </SelectTrigger>
-                <SelectContent>
-                  {projects.map(project => (
-                    <SelectItem key={project.id} value={project.id}>
-                      {project.name}
-                    </SelectItem>
-                  ))}
-                  {projects.length === 0 && (
-                    <SelectItem value="no-projects" disabled>
-                      No projects available
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
+            <PlatformSelector value={platform} onChange={setPlatform} />
+            <ProjectSelector 
+              value={selectedProjectId} 
+              onChange={setSelectedProjectId}
+              projects={projects}
+            />
           </div>
           
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="type">Type</Label>
-              <Select 
-                value={type} 
-                onValueChange={(value: 'input' | 'output') => setType(value)}
-              >
-                <SelectTrigger id="type">
-                  <SelectValue placeholder="Conversation type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="input">Input</SelectItem>
-                  <SelectItem value="output">Output</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="model">Model</Label>
-              <Select 
-                value={selectedModelId} 
-                onValueChange={setSelectedModelId}
-              >
-                <SelectTrigger id="model">
-                  <SelectValue placeholder="Select AI model (optional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">None</SelectItem>
-                  {models.map((model: AIModel) => (
-                    <SelectItem key={model.id} value={model.id}>
-                      {model.displayName} ({model.provider})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <ConversationTypeSelector value={type} onChange={setType} />
+            <ModelSelector value={selectedModelId} onChange={setSelectedModelId} models={models} />
           </div>
           
           <div className="grid grid-cols-2 gap-4">
@@ -223,23 +145,7 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
               />
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select 
-                value={status} 
-                onValueChange={setStatus}
-              >
-                <SelectTrigger id="status">
-                  <SelectValue placeholder="Conversation status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="In Progress">In Progress</SelectItem>
-                  <SelectItem value="Draft">Draft</SelectItem>
-                  <SelectItem value="Final">Final</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <StatusSelector value={status} onChange={setStatus} />
           </div>
           
           <div className="space-y-2">
