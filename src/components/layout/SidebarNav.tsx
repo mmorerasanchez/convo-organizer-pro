@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { PanelLeftClose } from 'lucide-react';
+import { PanelLeftClose, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Sidebar, 
@@ -40,7 +40,11 @@ const SidebarNav: React.FC = () => {
           className="w-full justify-start gap-2" 
           onClick={toggleSidebar}
         >
-          <PanelLeftClose size={18} />
+          {isExpanded ? (
+            <PanelLeftClose size={18} />
+          ) : (
+            <ChevronRight size={18} />
+          )}
           {isExpanded && <span>Collapse</span>}
         </Button>
       </SidebarFooter>
