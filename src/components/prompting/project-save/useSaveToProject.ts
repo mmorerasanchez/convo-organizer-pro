@@ -14,6 +14,8 @@ export function useSaveToProject() {
   const [showNewProjectForm, setShowNewProjectForm] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showNavigationConfirm, setShowNavigationConfirm] = useState(false);
+  const [savedConversationId, setSavedConversationId] = useState<string>('');
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -69,10 +71,9 @@ export function useSaveToProject() {
       // Clear any previous errors
       setError(null);
       
-      // Ask if user wants to navigate to the conversation
-      if (confirm("Would you like to view the saved conversation?")) {
-        navigate(`/conversations/${conversation.id}`);
-      }
+      // Store the conversation ID for navigation and show confirmation dialog
+      setSavedConversationId(conversation.id);
+      setShowNavigationConfirm(true);
     },
     onError: (error) => {
       setError("Failed to save conversation. Please try again.");
@@ -80,6 +81,13 @@ export function useSaveToProject() {
       console.error("Error saving conversation:", error);
     }
   });
+
+  const handleNavigateToConversation = () => {
+    if (savedConversationId) {
+      navigate(`/conversations/${savedConversationId}`);
+    }
+    setShowNavigationConfirm(false);
+  };
 
   const handleSaveConversation = async (
     conversationTitle: string,
@@ -140,5 +148,9 @@ export function useSaveToProject() {
     error,
     projects,
     handleSaveConversation,
+    showNavigationConfirm,
+    setShowNavigationConfirm,
+    handleNavigateToConversation,
+    savedConversationId
   };
 }
