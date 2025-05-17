@@ -26,6 +26,9 @@ export const fetchConversations = async (): Promise<Conversation[]> => {
   return conversationsData.map((item) => {
     // Find tags for this conversation
     const tags = conversationTags[item.id] || [];
+    
+    // Ensure type is either "input" or "output"
+    const conversationType = (item.type === 'output' ? 'output' : 'input') as 'input' | 'output';
 
     return {
       id: item.id,
@@ -37,7 +40,7 @@ export const fetchConversations = async (): Promise<Conversation[]> => {
       projectId: item.project_id,
       externalId: item.external_id || undefined,
       status: item.status || 'active',
-      type: item.type || 'input',
+      type: conversationType,
       modelId: item.model_id || undefined,
       model: item.model?.display_name
     };
@@ -66,6 +69,9 @@ export const fetchConversationsByProjectId = async (projectId: string): Promise<
   return conversationsData.map((item) => {
     // Find tags for this conversation
     const tags = conversationTags[item.id] || [];
+    
+    // Ensure type is either "input" or "output"
+    const conversationType = (item.type === 'output' ? 'output' : 'input') as 'input' | 'output';
 
     return {
       id: item.id,
@@ -77,7 +83,7 @@ export const fetchConversationsByProjectId = async (projectId: string): Promise<
       projectId: item.project_id,
       externalId: item.external_id || undefined,
       status: item.status || 'active',
-      type: item.type || 'input',
+      type: conversationType,
       modelId: item.model_id || undefined,
       model: item.model?.display_name
     };
@@ -107,6 +113,9 @@ export const fetchConversationById = async (id: string): Promise<Conversation | 
   // Fetch tags for this conversation
   const conversationTags = await fetchTagsForConversations([id]);
   const tags = conversationTags[id] || [];
+  
+  // Ensure type is either "input" or "output"
+  const conversationType = (conversation.type === 'output' ? 'output' : 'input') as 'input' | 'output';
 
   return {
     id: conversation.id,
@@ -118,7 +127,7 @@ export const fetchConversationById = async (id: string): Promise<Conversation | 
     projectId: conversation.project_id,
     externalId: conversation.external_id || undefined,
     status: conversation.status || 'active',
-    type: conversation.type || 'input',
+    type: conversationType,
     modelId: conversation.model_id || undefined,
     model: conversation.model?.display_name
   };
@@ -134,6 +143,9 @@ export const createConversation = async (conversation: {
   type?: 'input' | 'output';
   modelId?: string;
 }): Promise<Conversation> => {
+  // Ensure type is either "input" or "output", default to "input"
+  const conversationType = conversation.type === 'output' ? 'output' : 'input';
+
   const { data, error } = await supabase
     .from('conversations')
     .insert([
@@ -144,7 +156,7 @@ export const createConversation = async (conversation: {
         project_id: conversation.projectId,
         external_id: conversation.externalId,
         status: conversation.status || 'active',
-        type: conversation.type || 'input',
+        type: conversationType,
         model_id: conversation.modelId
       }
     ])
@@ -167,7 +179,7 @@ export const createConversation = async (conversation: {
     projectId: data.project_id,
     externalId: data.external_id || undefined,
     status: data.status || 'active',
-    type: data.type || 'input',
+    type: (data.type === 'output' ? 'output' : 'input') as 'input' | 'output',
     modelId: data.model_id || undefined,
     model: data.model?.display_name
   };
@@ -194,7 +206,7 @@ export const updateConversation = async (
   if (updates.projectId) updatedData.project_id = updates.projectId;
   if (updates.externalId !== undefined) updatedData.external_id = updates.externalId;
   if (updates.status) updatedData.status = updates.status;
-  if (updates.type) updatedData.type = updates.type;
+  if (updates.type) updatedData.type = updates.type === 'output' ? 'output' : 'input';
   if (updates.modelId !== undefined) updatedData.model_id = updates.modelId;
   
   const { error } = await supabase
