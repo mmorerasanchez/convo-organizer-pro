@@ -62,7 +62,8 @@ export function useSaveToProject() {
         content,
         platform: "prompt-designer",
         projectId: projectId || '',
-        status: "active"
+        status: "active",
+        type: "input" // Default to input type for prompt designer
       });
     },
     onSuccess: (conversation) => {

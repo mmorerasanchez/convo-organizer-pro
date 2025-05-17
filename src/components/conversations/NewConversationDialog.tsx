@@ -10,7 +10,8 @@ import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchProjects, createConversation } from '@/lib/api';
+import { fetchProjects, createConversation, fetchModels } from '@/lib/api';
+import { AIModel } from '@/lib/types';
 
 interface NewConversationDialogProps {
   trigger?: React.ReactNode;
@@ -27,6 +28,8 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
   const [selectedProjectId, setSelectedProjectId] = useState(projectId || '');
   const [externalId, setExternalId] = useState('');
   const [status, setStatus] = useState('Active');
+  const [type, setType] = useState<'input' | 'output'>('input');
+  const [selectedModelId, setSelectedModelId] = useState<string>('');
   const [open, setOpen] = useState(false);
   
   const navigate = useNavigate();
@@ -36,6 +39,12 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
     queryFn: fetchProjects
+  });
+
+  // Fetch AI models for the dropdown
+  const { data: models = [] } = useQuery({
+    queryKey: ['ai-models'],
+    queryFn: fetchModels
   });
   
   // Update selected project when projectId prop changes
@@ -73,9 +82,23 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
       platform,
       projectId: selectedProjectId,
       externalId: externalId.trim() || undefined,
-      status
+      status,
+      type,
+      modelId: selectedModelId || undefined
     });
   };
+
+  const platformOptions = [
+    { value: 'ChatGPT', label: 'ChatGPT' },
+    { value: 'Claude', label: 'Claude' },
+    { value: 'Gemini', label: 'Gemini' },
+    { value: 'Multiple', label: 'Multiple' },
+    { value: 'Lovable', label: 'Lovable' },
+    { value: 'Replit', label: 'Replit' },
+    { value: 'DeepSeek', label: 'DeepSeek' },
+    { value: 'Mistral', label: 'Mistral' },
+    { value: 'Perplexity', label: 'Perplexity' }
+  ];
   
   const triggerButton = trigger || (
     <Button className="gap-2">
@@ -116,10 +139,11 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
                   <SelectValue placeholder="Select platform" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ChatGPT">ChatGPT</SelectItem>
-                  <SelectItem value="Claude">Claude</SelectItem>
-                  <SelectItem value="Gemini">Gemini</SelectItem>
-                  <SelectItem value="Multiple">Multiple</SelectItem>
+                  {platformOptions.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -145,6 +169,44 @@ const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
                       No projects available
                     </SelectItem>
                   )}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="type">Type</Label>
+              <Select 
+                value={type} 
+                onValueChange={(value: 'input' | 'output') => setType(value)}
+              >
+                <SelectTrigger id="type">
+                  <SelectValue placeholder="Conversation type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="input">Input</SelectItem>
+                  <SelectItem value="output">Output</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="model">Model</Label>
+              <Select 
+                value={selectedModelId} 
+                onValueChange={setSelectedModelId}
+              >
+                <SelectTrigger id="model">
+                  <SelectValue placeholder="Select AI model (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">None</SelectItem>
+                  {models.map((model: AIModel) => (
+                    <SelectItem key={model.id} value={model.id}>
+                      {model.displayName} ({model.provider})
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

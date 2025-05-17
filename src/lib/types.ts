@@ -15,6 +15,9 @@ export interface Conversation {
   projectId: string;
   externalId?: string;
   status?: string;
+  type: 'input' | 'output';
+  modelId?: string;
+  model?: string; // For displaying model name when fetched
 }
 
 export interface Project {
@@ -59,4 +62,11 @@ export interface Tool {
   description?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface AIModel {
+  id: string;
+  displayName: string;
+  provider: string;
+  contextWindow?: number;
 }

@@ -64,10 +64,12 @@ export type Database = {
           created_at: string
           external_id: string | null
           id: string
+          model_id: string | null
           platform: string
           project_id: string
           status: string | null
           title: string
+          type: string
           updated_at: string
         }
         Insert: {
@@ -76,10 +78,12 @@ export type Database = {
           created_at?: string
           external_id?: string | null
           id?: string
+          model_id?: string | null
           platform: string
           project_id: string
           status?: string | null
           title: string
+          type?: string
           updated_at?: string
         }
         Update: {
@@ -88,13 +92,22 @@ export type Database = {
           created_at?: string
           external_id?: string | null
           id?: string
+          model_id?: string | null
           platform?: string
           project_id?: string
           status?: string | null
           title?: string
+          type?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "conversations_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "models"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "conversations_project_id_fkey"
             columns: ["project_id"]

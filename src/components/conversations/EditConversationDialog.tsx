@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,9 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Edit } from 'lucide-react';
 import { toast } from 'sonner';
-import { Conversation } from '@/lib/types';
+import { Conversation, AIModel } from '@/lib/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchProjects, updateConversation } from '@/lib/api';
+import { fetchProjects, updateConversation, fetchModels } from '@/lib/api';
 
 interface EditConversationDialogProps {
   conversation: Conversation;
@@ -27,6 +27,8 @@ const EditConversationDialog: React.FC<EditConversationDialogProps> = ({
   const [projectId, setProjectId] = useState(conversation.projectId);
   const [externalId, setExternalId] = useState(conversation.externalId || '');
   const [status, setStatus] = useState(conversation.status || 'active');
+  const [type, setType] = useState<'input' | 'output'>(conversation.type || 'input');
+  const [modelId, setModelId] = useState(conversation.modelId || '');
   const [open, setOpen] = useState(false);
   
   const queryClient = useQueryClient();
@@ -36,6 +38,24 @@ const EditConversationDialog: React.FC<EditConversationDialogProps> = ({
     queryKey: ['projects'],
     queryFn: fetchProjects
   });
+
+  // Fetch AI models for the dropdown
+  const { data: models = [] } = useQuery({
+    queryKey: ['ai-models'],
+    queryFn: fetchModels
+  });
+
+  // Update local state when conversation prop changes
+  useEffect(() => {
+    setTitle(conversation.title);
+    setContent(conversation.content);
+    setPlatform(conversation.platform);
+    setProjectId(conversation.projectId);
+    setExternalId(conversation.externalId || '');
+    setStatus(conversation.status || 'active');
+    setType(conversation.type || 'input');
+    setModelId(conversation.modelId || '');
+  }, [conversation]);
   
   const updateConversationMutation = useMutation({
     mutationFn: () => updateConversation(conversation.id, {
@@ -44,7 +64,9 @@ const EditConversationDialog: React.FC<EditConversationDialogProps> = ({
       platform,
       projectId,
       externalId: externalId.trim() || null,
-      status
+      status,
+      type,
+      modelId: modelId || null
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['conversation', conversation.id] });
@@ -68,6 +90,18 @@ const EditConversationDialog: React.FC<EditConversationDialogProps> = ({
     e.preventDefault();
     updateConversationMutation.mutate();
   };
+
+  const platformOptions = [
+    { value: 'ChatGPT', label: 'ChatGPT' },
+    { value: 'Claude', label: 'Claude' },
+    { value: 'Gemini', label: 'Gemini' },
+    { value: 'Multiple', label: 'Multiple' },
+    { value: 'Lovable', label: 'Lovable' },
+    { value: 'Replit', label: 'Replit' },
+    { value: 'DeepSeek', label: 'DeepSeek' },
+    { value: 'Mistral', label: 'Mistral' },
+    { value: 'Perplexity', label: 'Perplexity' }
+  ];
   
   const triggerButton = trigger || (
     <Button variant="outline" size="icon">
@@ -107,10 +141,11 @@ const EditConversationDialog: React.FC<EditConversationDialogProps> = ({
                   <SelectValue placeholder="Select platform" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ChatGPT">ChatGPT</SelectItem>
-                  <SelectItem value="Claude">Claude</SelectItem>
-                  <SelectItem value="Gemini">Gemini</SelectItem>
-                  <SelectItem value="Multiple">Multiple</SelectItem>
+                  {platformOptions.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -136,6 +171,44 @@ const EditConversationDialog: React.FC<EditConversationDialogProps> = ({
                       No projects available
                     </SelectItem>
                   )}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="type">Type</Label>
+              <Select 
+                value={type} 
+                onValueChange={(value: 'input' | 'output') => setType(value)}
+              >
+                <SelectTrigger id="type">
+                  <SelectValue placeholder="Conversation type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="input">Input</SelectItem>
+                  <SelectItem value="output">Output</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="model">Model</Label>
+              <Select 
+                value={modelId} 
+                onValueChange={setModelId}
+              >
+                <SelectTrigger id="model">
+                  <SelectValue placeholder="Select AI model (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">None</SelectItem>
+                  {models.map((model: AIModel) => (
+                    <SelectItem key={model.id} value={model.id}>
+                      {model.displayName} ({model.provider})
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
