@@ -6,11 +6,11 @@ import NewProjectDialog from './NewProjectDialog';
 
 const NewProjectButton: React.FC = () => {
   return (
-    <div>
+    <div className="h-full">
       <NewProjectDialog 
         variant="card"
         trigger={
-          <Card className="h-full cursor-pointer hover:bg-secondary/50 transition-colors border-dashed">
+          <Card className="h-full cursor-pointer hover:bg-secondary/50 hover:shadow-md transition-all duration-300 border-dashed">
             <CardContent className="flex flex-col items-center justify-center h-full py-6">
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
                 <Plus size={24} />
