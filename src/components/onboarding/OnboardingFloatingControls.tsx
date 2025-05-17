@@ -52,7 +52,7 @@ export const OnboardingFloatingControls: React.FC<OnboardingFloatingControlsProp
       )}
       
       <Button 
-        variant="primary" 
+        variant="default" 
         size="sm" 
         onClick={() => onAction('next')}
       >
