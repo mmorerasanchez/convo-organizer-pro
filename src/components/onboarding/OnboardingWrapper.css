@@ -51,4 +51,16 @@
 /* Ensure onboarding elements are visible and interactive */
 .onboarding-target * {
   pointer-events: auto !important;
+  z-index: 61 !important;
+}
+
+/* Fix for elements being blocked by overlay */
+.onboarding-target button,
+.onboarding-target a,
+.onboarding-target input,
+.onboarding-target select,
+.onboarding-target textarea {
+  position: relative !important;
+  z-index: 62 !important;
+  pointer-events: auto !important;
 }

@@ -11,6 +11,9 @@ export const OnboardingSpotlight: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const elementCheckRef = useRef<number | null>(null);
+  const maxRetries = 5;
+  const retryInterval = 500; // ms
   
   useEffect(() => {
     if (!isOnboarding || !steps[currentStep]) {
@@ -18,18 +21,41 @@ export const OnboardingSpotlight: React.FC = () => {
       return;
     }
 
-    const positionSpotlight = () => {
+    // Clear any existing retry interval
+    if (elementCheckRef.current !== null) {
+      clearInterval(elementCheckRef.current);
+      elementCheckRef.current = null;
+    }
+
+    const positionSpotlight = (retryCount = 0) => {
       // If there's no element to highlight, just show the dialog
       if (!steps[currentStep].element) {
         setVisible(false);
-        return;
+        return true; // Success, no element needed
       }
       
       const targetElement = document.querySelector(steps[currentStep].element || '');
       if (!targetElement) {
-        console.warn(`Element not found: ${steps[currentStep].element}`);
-        setVisible(false);
-        return;
+        console.warn(`Element not found: ${steps[currentStep].element}, retry: ${retryCount}`);
+        
+        // If we've reached max retries, continue to next step that doesn't require an element
+        if (retryCount >= maxRetries) {
+          console.warn('Max retries reached, skipping to next viable step');
+          
+          // Find the next step that doesn't require an element
+          for (let i = currentStep + 1; i < steps.length; i++) {
+            if (!steps[i].element) {
+              skipToStep(i);
+              return true;
+            }
+          }
+          
+          // If no viable step found, end the onboarding
+          endOnboarding();
+          return false;
+        }
+        
+        return false; // Not found yet
       }
       
       const rect = targetElement.getBoundingClientRect();
@@ -55,7 +81,7 @@ export const OnboardingSpotlight: React.FC = () => {
       if (steps[currentStep].waitForAction) {
         const handleTargetClick = () => {
           // Wait a bit to allow the action to complete before moving to next step
-          setTimeout(() => nextStep(), 500);
+          setTimeout(() => nextStep(), 800);
         };
         
         targetElement.addEventListener('click', handleTargetClick, { once: true });
@@ -64,21 +90,51 @@ export const OnboardingSpotlight: React.FC = () => {
           targetElement.removeEventListener('click', handleTargetClick);
         };
       }
+      
+      return true; // Success
     };
 
-    // Position spotlight initially and when window resizes
-    const timer = setTimeout(positionSpotlight, 300);
-    window.addEventListener('resize', positionSpotlight);
-    
-    // Remove highlight class from all elements when cleaning up
+    // Check if we need to navigate first
+    if (steps[currentStep].route && window.location.pathname !== steps[currentStep].route) {
+      // Navigate and then retry positioning
+      navigate(steps[currentStep].route);
+      
+      // Start retry mechanism after navigation
+      elementCheckRef.current = window.setInterval(() => {
+        const success = positionSpotlight();
+        if (success && elementCheckRef.current !== null) {
+          clearInterval(elementCheckRef.current);
+          elementCheckRef.current = null;
+        }
+      }, retryInterval) as unknown as number;
+    } else {
+      // No navigation needed, try positioning immediately
+      const success = positionSpotlight();
+      
+      // If not successful, start retry mechanism
+      if (!success) {
+        elementCheckRef.current = window.setInterval(() => {
+          const retrySuccess = positionSpotlight();
+          if (retrySuccess && elementCheckRef.current !== null) {
+            clearInterval(elementCheckRef.current);
+            elementCheckRef.current = null;
+          }
+        }, retryInterval) as unknown as number;
+      }
+    }
+
+    // Clean up when the component unmounts or step changes
     return () => {
-      window.removeEventListener('resize', positionSpotlight);
-      clearTimeout(timer);
+      if (elementCheckRef.current !== null) {
+        clearInterval(elementCheckRef.current);
+        elementCheckRef.current = null;
+      }
+      
       document.querySelectorAll('.onboarding-target').forEach(el => {
         el.classList.remove('onboarding-target');
       });
     };
-  }, [isOnboarding, currentStep, steps, nextStep]);
+  }, [isOnboarding, currentStep, steps, nextStep, skipToStep, navigate, endOnboarding]);
 
   // Handle clicks on the overlay (outside the spotlight)
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -131,14 +187,12 @@ export const OnboardingSpotlight: React.FC = () => {
       >
         {/* Spotlight hole - this is the cutout where the highlighted element is visible */}
         <div 
-          className="absolute rounded-md"
+          className="absolute rounded-md spotlight-pulse"
           style={{
             top: position.top - 4,
             left: position.left - 4,
             width: position.width + 8,
             height: position.height + 8,
-            boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
-            border: '2px solid white',
             // Remove pointer events from the spotlight border/glow
             pointerEvents: 'none',
           }}
@@ -165,15 +219,6 @@ export const OnboardingSpotlight: React.FC = () => {
         isFirstStep={currentStep === 0}
         isLastStep={currentStep === steps.length - 1}
       />
-      
-      {/* Add a global style for onboarding target elements */}
-      <style>{`
-        .onboarding-target {
-          z-index: 51 !important; /* Ensure it's above the overlay */
-          position: relative !important; /* Needed for z-index to work */
-          pointer-events: auto !important; /* Force elements to be clickable */
-        }
-      `}</style>
     </>,
     document.body
   );

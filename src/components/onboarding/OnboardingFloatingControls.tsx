@@ -42,7 +42,7 @@ export const OnboardingFloatingControls: React.FC<OnboardingFloatingControlsProp
 
   return (
     <div 
-      className="fixed z-[60] bg-white shadow-lg rounded-lg p-3 transform -translate-x-1/2 flex gap-2"
+      className="fixed z-[70] bg-white shadow-lg rounded-lg p-3 transform -translate-x-1/2 flex gap-2"
       style={{
         top: `${controlPosition.top}px`,
         left: `${controlPosition.left}px`,

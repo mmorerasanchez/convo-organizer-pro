@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import PromptingGuide from '@/components/prompting/PromptingGuide';
@@ -10,21 +10,53 @@ import { BookOpen, Bot, Wand2 } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 import { PromptingProvider } from '@/components/prompting/context/PromptingContext';
 import { PromptScannerProvider } from '@/components/prompting/context/usePromptScanner';
+import { useOnboarding } from '@/components/onboarding/OnboardingContext';
 
 const Prompting = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const tabFromUrl = searchParams.get('tab');
   const [activeTab, setActiveTab] = React.useState(() => {
     // Initialize tab from URL parameter or default to 'designer'
     return tabFromUrl === 'scanner' || tabFromUrl === 'guide' ? tabFromUrl : 'designer';
   });
 
+  const { isOnboarding, currentFlow, currentStep, steps } = useOnboarding();
+
   // Update active tab when URL parameter changes
   useEffect(() => {
-    if (tabFromUrl === 'scanner' || tabFromUrl === 'guide') {
+    if (tabFromUrl === 'scanner' || tabFromUrl === 'guide' || tabFromUrl === 'designer') {
       setActiveTab(tabFromUrl);
     }
   }, [tabFromUrl]);
+
+  // Sync URL with active tab
+  useEffect(() => {
+    if (activeTab && activeTab !== 'designer') {
+      setSearchParams({ tab: activeTab });
+    } else {
+      // Remove tab parameter for default tab
+      if (tabFromUrl) {
+        setSearchParams({});
+      }
+    }
+  }, [activeTab, setSearchParams, tabFromUrl]);
+
+  // During onboarding, sync tab with onboarding step if in prompting flow
+  useEffect(() => {
+    if (isOnboarding && currentFlow === 'prompting') {
+      const currentStepData = steps[currentStep];
+      if (currentStepData?.route?.includes('prompting')) {
+        if (currentStepData.route.includes('tab=scanner')) {
+          setActiveTab('scanner');
+        } else if (currentStepData.route.includes('tab=guide')) {
+          setActiveTab('guide');
+        } else {
+          setActiveTab('designer');
+        }
+      }
+    }
+  }, [isOnboarding, currentFlow, currentStep, steps]);
 
   const tabs = [
     {
