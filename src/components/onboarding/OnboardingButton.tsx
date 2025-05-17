@@ -45,7 +45,7 @@ export const OnboardingButton: React.FC = () => {
         <Button 
           variant={hasCompletedOnboarding ? "outline" : "default"}
           size="sm" 
-          className={`flex gap-1 items-center ${hasCompletedOnboarding ? "border-primary text-primary hover:bg-primary/10" : ""}`}
+          className={`flex gap-1 items-center ${hasCompletedOnboarding ? "onboarding-button-completed" : "onboarding-button-new"}`}
         >
           <HelpCircle className="h-4 w-4" />
           Take a Tour

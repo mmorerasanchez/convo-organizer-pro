@@ -131,7 +131,7 @@ export const OnboardingSpotlight: React.FC = () => {
       >
         {/* Spotlight hole - this is the cutout where the highlighted element is visible */}
         <div 
-          className="absolute rounded-md animate-pulse"
+          className="absolute rounded-md"
           style={{
             top: position.top - 4,
             left: position.left - 4,

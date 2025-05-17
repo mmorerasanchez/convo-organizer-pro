@@ -20,7 +20,7 @@ export const OnboardingFloatingControls: React.FC<OnboardingFloatingControlsProp
   const viewportHeight = window.innerHeight;
   const isNearBottom = position.top + position.height + 80 > viewportHeight;
   
-  // Calculate optimal control position
+  // Calculate optimal control position - centered horizontally for better accessibility
   const controlPosition = {
     top: isNearBottom 
       ? position.top - 80 // Place above if near bottom
@@ -40,7 +40,7 @@ export const OnboardingFloatingControls: React.FC<OnboardingFloatingControlsProp
         variant="ghost" 
         size="sm" 
         onClick={() => onAction('end')} 
-        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+        className="text-gray-600 hover:text-gray-800 hover:bg-gray-100"
       >
         <X className="h-4 w-4 mr-1" />
         End Tour
@@ -48,9 +48,10 @@ export const OnboardingFloatingControls: React.FC<OnboardingFloatingControlsProp
       
       {!isLastStep && (
         <Button 
-          variant="ghost" 
+          variant="outline" 
           size="sm" 
           onClick={() => onAction('skip')}
+          className="text-gray-600"
         >
           <SkipForward className="h-4 w-4 mr-1" />
           Skip Step
@@ -61,6 +62,7 @@ export const OnboardingFloatingControls: React.FC<OnboardingFloatingControlsProp
         variant="default" 
         size="sm" 
         onClick={() => onAction('next')}
+        className="bg-blue-500 hover:bg-blue-600 text-white"
       >
         {isLastStep ? 'Finish' : 'Next'} 
         {!isLastStep && <ChevronRight className="h-4 w-4 ml-1" />}

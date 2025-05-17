@@ -3,7 +3,7 @@
 .onboarding-target {
   position: relative !important;
   z-index: 60 !important;
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.7) !important;
   transition: all 0.3s ease !important;
   pointer-events: auto !important;
 }
@@ -11,16 +11,27 @@
 /* Spotlight animation */
 @keyframes pulse-white {
   0% {
-    box-shadow: 0 0 0 0px rgba(255, 255, 255, 0.7), 0 0 0 9999px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0 0px rgba(255, 255, 255, 0.9), 0 0 0 9999px rgba(0, 0, 0, 0.5);
   }
   70% {
     box-shadow: 0 0 0 5px rgba(255, 255, 255, 0), 0 0 0 9999px rgba(0, 0, 0, 0.5);
   }
   100% {
-    box-shadow: 0 0 0 0px rgba(255, 255, 255, 0.7), 0 0 0 9999px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0 0px rgba(255, 255, 255, 0.9), 0 0 0 9999px rgba(0, 0, 0, 0.5);
   }
 }
 
 .spotlight-pulse {
   animation: pulse-white 2s infinite;
+}
+
+/* Onboarding button styles */
+.onboarding-button-new {
+  background-color: #3b82f6 !important; /* Blue */
+  color: white !important;
+}
+
+.onboarding-button-completed {
+  border: 1px solid #3b82f6 !important;
+  color: #3b82f6 !important;
 }

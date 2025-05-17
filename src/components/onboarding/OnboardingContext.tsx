@@ -178,12 +178,22 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setCurrentFlow(flow);
     setCurrentStep(0);
     setIsOnboarding(true);
+    
+    // If starting a specific flow, navigate to its route immediately
+    if (flow && onboardingFlows[flow] && onboardingFlows[flow][0]?.route) {
+      navigate(onboardingFlows[flow][0].route);
+    }
   };
 
   // End the onboarding process with improved cleanup
   const endOnboarding = () => {
     setIsOnboarding(false);
     setCurrentFlow(null);
+    
+    // Clear all onboarding-related classes
+    document.querySelectorAll('.onboarding-target').forEach(el => {
+      el.classList.remove('onboarding-target');
+    });
     
     // Mark onboarding as completed
     localStorage.setItem('onboardingCompleted', 'true');
@@ -197,7 +207,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       // Small delay to ensure cleanup before navigation
       setTimeout(() => {
         navigate(previousRoute);
-      }, 100);
+      }, 300);
     }
   };
 
@@ -205,18 +215,21 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
-    } else if (currentFlow === 'projects') {
-      setCurrentFlow('prompt-designer');
-      setCurrentStep(0);
-    } else if (currentFlow === 'prompt-designer') {
-      setCurrentFlow('prompt-scanner');
-      setCurrentStep(0);
-    } else if (currentFlow === 'prompt-scanner') {
-      setCurrentFlow('prompting-guide');
-      setCurrentStep(0);
     } else {
-      // End onboarding if we've reached the end of all flows
-      endOnboarding();
+      // If we've reached the end of one flow, move to the next flow
+      if (currentFlow === 'projects') {
+        setCurrentFlow('prompt-designer');
+        setCurrentStep(0);
+      } else if (currentFlow === 'prompt-designer') {
+        setCurrentFlow('prompt-scanner');
+        setCurrentStep(0);
+      } else if (currentFlow === 'prompt-scanner') {
+        setCurrentFlow('prompting-guide');
+        setCurrentStep(0);
+      } else {
+        // End onboarding if we've reached the end of all flows
+        endOnboarding();
+      }
     }
   };
 
@@ -224,15 +237,18 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const prevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
-    } else if (currentFlow === 'prompt-designer') {
-      setCurrentFlow('projects');
-      setCurrentStep(onboardingFlows.projects.length - 1);
-    } else if (currentFlow === 'prompt-scanner') {
-      setCurrentFlow('prompt-designer');
-      setCurrentStep(onboardingFlows['prompt-designer'].length - 1);
-    } else if (currentFlow === 'prompting-guide') {
-      setCurrentFlow('prompt-scanner');
-      setCurrentStep(onboardingFlows['prompt-scanner'].length - 1);
+    } else {
+      // If we're at the first step of a flow other than projects, go to the previous flow
+      if (currentFlow === 'prompt-designer') {
+        setCurrentFlow('projects');
+        setCurrentStep(onboardingFlows.projects.length - 1);
+      } else if (currentFlow === 'prompt-scanner') {
+        setCurrentFlow('prompt-designer');
+        setCurrentStep(onboardingFlows['prompt-designer'].length - 1);
+      } else if (currentFlow === 'prompting-guide') {
+        setCurrentFlow('prompt-scanner');
+        setCurrentStep(onboardingFlows['prompt-scanner'].length - 1);
+      }
     }
   };
 

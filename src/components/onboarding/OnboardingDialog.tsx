@@ -38,30 +38,33 @@ export const OnboardingDialog: React.FC = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
-        <div className="bg-primary text-primary-foreground p-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">{currentStepData?.title}</h2>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-primary-foreground hover:bg-primary/90"
-              onClick={handleClose}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          <Progress className="mt-2" value={progress} />
-          <div className="text-xs mt-1 text-primary-foreground/80">
-            Step {currentStep + 1} of {steps.length}
-          </div>
+      <DialogContent className="max-w-md p-0 gap-0 overflow-hidden bg-white border-0 shadow-lg rounded-lg">
+        {/* Dialog header with close button */}
+        <div className="relative p-6 pb-0">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full"
+            onClick={handleClose}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+          <h2 className="text-xl font-semibold text-gray-800 pr-8">{currentStepData?.title}</h2>
         </div>
         
-        <div className="p-6">
-          <p className="mb-6">{currentStepData?.description}</p>
+        {/* Dialog content */}
+        <div className="p-6 pt-3">
+          <p className="text-gray-600 mb-8">{currentStepData?.description}</p>
           
-          {/* Removed action field since users shouldn't need to take action */}
+          {/* Centered progress indicator */}
+          <div className="flex flex-col items-center mb-6">
+            <Progress className="w-full h-2 mb-2" value={progress} />
+            <div className="text-xs text-gray-500">
+              Step {currentStep + 1} of {steps.length}
+            </div>
+          </div>
           
+          {/* Action buttons */}
           <div className="flex justify-between mt-4">
             <div>
               {!isFirstStep && (
@@ -72,10 +75,19 @@ export const OnboardingDialog: React.FC = () => {
               )}
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={handleClose} size="sm">
+              <Button 
+                variant="outline" 
+                onClick={handleClose} 
+                size="sm"
+                className="text-gray-600"
+              >
                 Skip Tour
               </Button>
-              <Button onClick={nextStep} size="sm">
+              <Button 
+                onClick={nextStep} 
+                size="sm" 
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
                 {isLastStep ? 'Finish' : 'Continue'}
                 {!isLastStep && <ChevronRight className="ml-1 h-4 w-4" />}
               </Button>
