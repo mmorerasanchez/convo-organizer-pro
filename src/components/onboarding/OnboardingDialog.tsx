@@ -38,7 +38,8 @@ export const OnboardingDialog: React.FC = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="max-w-md p-0 gap-0 overflow-hidden bg-white border-0 shadow-lg rounded-lg">
+      <DialogContent className="max-w-md p-0 gap-0 overflow-hidden bg-white border-0 shadow-lg rounded-lg" 
+        closeButton={false}>
         {/* Dialog header with close button */}
         <div className="relative p-6 pb-0">
           <Button 
@@ -48,6 +49,7 @@ export const OnboardingDialog: React.FC = () => {
             onClick={handleClose}
           >
             <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
           </Button>
           <h2 className="text-xl font-semibold text-gray-800 pr-8">{currentStepData?.title}</h2>
         </div>

@@ -7,6 +7,7 @@ import { DialogWrapper } from '@/components/ui/dialog-wrapper';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { NewProjectForm } from '@/components/prompting/project-save/NewProjectForm';
+import { useOnboarding } from '@/components/onboarding/OnboardingContext';
 
 interface NewProjectDialogProps {
   variant?: 'default' | 'card';
@@ -22,6 +23,7 @@ const NewProjectDialog: React.FC<NewProjectDialogProps> = ({
   const [projectDescription, setProjectDescription] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const queryClient = useQueryClient();
+  const { nextStep, isOnboarding } = useOnboarding();
 
   const createProjectMutation = useMutation({
     mutationFn: createProject,
@@ -31,6 +33,11 @@ const NewProjectDialog: React.FC<NewProjectDialogProps> = ({
       setIsOpen(false);
       setProjectName('');
       setProjectDescription('');
+      
+      if (isOnboarding) {
+        // Move to next step in onboarding after project creation
+        setTimeout(nextStep, 500);
+      }
     },
     onError: (error) => {
       toast.error('Failed to create project');
@@ -66,7 +73,6 @@ const NewProjectDialog: React.FC<NewProjectDialogProps> = ({
     <DialogWrapper
       trigger={trigger || defaultTrigger}
       title="Create New Project"
-      description="Create a new project to organize your prompts and conversations."
       open={isOpen}
       onOpenChange={setIsOpen}
       showCancel

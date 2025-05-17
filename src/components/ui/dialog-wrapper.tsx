@@ -30,6 +30,7 @@ interface DialogWrapperProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   defaultOpen?: boolean;
+  closeButton?: boolean;
   
   // Cancel button
   showCancel?: boolean;
@@ -59,6 +60,7 @@ export function DialogWrapper({
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
   defaultOpen = false,
+  closeButton = true,
   
   // Cancel button
   showCancel = false,
@@ -94,7 +96,8 @@ export function DialogWrapper({
     <Dialog open={open} onOpenChange={onOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       
-      <DialogContent className={cn("sm:max-w-[425px]", className, contentClassName)}>
+      <DialogContent className={cn("sm:max-w-[425px]", className, contentClassName)}
+        closeButton={closeButton}>
         {(title || description) && (
           <DialogHeader className={headerClassName}>
             {title && <DialogTitle>{title}</DialogTitle>}

@@ -33,7 +33,6 @@ export function NewProjectForm({
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back
         </Button>
-        <h3 className="font-medium">Create New Project</h3>
       </div>
       
       <div className="space-y-2">

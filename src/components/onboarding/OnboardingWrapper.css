@@ -35,3 +35,20 @@
   border: 1px solid #3b82f6 !important;
   color: #3b82f6 !important;
 }
+
+/* Center the onboarding dialog and controls */
+[role="dialog"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Make sure dialogs are centered */
+.fixed.left-\[50\%\].top-\[50\%\] {
+  transform: translate(-50%, -50%) !important;
+}
+
+/* Ensure onboarding elements are visible and interactive */
+.onboarding-target * {
+  pointer-events: auto !important;
+}

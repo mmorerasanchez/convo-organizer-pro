@@ -169,8 +169,8 @@ export const OnboardingSpotlight: React.FC = () => {
       {/* Add a global style for onboarding target elements */}
       <style>{`
         .onboarding-target {
-          z-index: 51; /* Ensure it's above the overlay */
-          position: relative; /* Needed for z-index to work */
+          z-index: 51 !important; /* Ensure it's above the overlay */
+          position: relative !important; /* Needed for z-index to work */
           pointer-events: auto !important; /* Force elements to be clickable */
         }
       `}</style>

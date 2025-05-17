@@ -18,15 +18,27 @@ export const OnboardingFloatingControls: React.FC<OnboardingFloatingControlsProp
 }) => {
   // Position the controls below the spotlight, but adjust if near bottom of viewport
   const viewportHeight = window.innerHeight;
+  const viewportWidth = window.innerWidth;
+  
+  // Calculate if the element is near edges
   const isNearBottom = position.top + position.height + 80 > viewportHeight;
+  const isNearRight = position.left + position.width / 2 + 150 > viewportWidth;
+  const isNearLeft = position.left + position.width / 2 - 150 < 0;
   
   // Calculate optimal control position - centered horizontally for better accessibility
-  const controlPosition = {
+  let controlPosition = {
     top: isNearBottom 
       ? position.top - 80 // Place above if near bottom
       : position.top + position.height + 16, // Place below by default
     left: position.left + position.width / 2, // Centered horizontally
   };
+  
+  // Adjust horizontal position if near edges
+  if (isNearRight) {
+    controlPosition.left = viewportWidth - 160;
+  } else if (isNearLeft) {
+    controlPosition.left = 160;
+  }
 
   return (
     <div 

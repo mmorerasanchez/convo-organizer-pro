@@ -19,24 +19,12 @@ export const OnboardingButton: React.FC = () => {
     hasCompletedOnboarding 
   } = useOnboarding();
   
-  const handleStartFullTour = () => {
-    startOnboarding('projects');
-  };
-  
   const handleStartProjectsTour = () => {
     startOnboarding('projects');
   };
   
-  const handleStartDesignerTour = () => {
-    startOnboarding('prompt-designer');
-  };
-  
-  const handleStartScannerTour = () => {
-    startOnboarding('prompt-scanner');
-  };
-  
-  const handleStartGuideTour = () => {
-    startOnboarding('prompting-guide');
+  const handleStartPromptingTour = () => {
+    startOnboarding('prompting');
   };
   
   return (
@@ -51,25 +39,15 @@ export const OnboardingButton: React.FC = () => {
           Take a Tour
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-56 bg-white">
         <DropdownMenuLabel>App Tour</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={handleStartFullTour}>
-            Complete Tour
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleStartProjectsTour}>
             Project Management
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleStartDesignerTour}>
-            Prompt Designer
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleStartScannerTour}>
-            Prompt Scanner
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleStartGuideTour}>
-            Prompting Guide
+          <DropdownMenuItem onClick={handleStartPromptingTour}>
+            Prompting Tools
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
