@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Copy, Save } from 'lucide-react';
-import { Textarea } from '@/components/ui/textarea';
+import { Copy, Save } from "lucide-react";
+import { toast } from "sonner";
 
 interface ModelResponseProps {
   promptResponse: string;
@@ -14,51 +14,60 @@ interface ModelResponseProps {
 export const ModelResponse = ({ 
   promptResponse,
   compiledPrompt,
-  onSaveToProject
+  onSaveToProject 
 }: ModelResponseProps) => {
   const handleCopy = () => {
     navigator.clipboard.writeText(promptResponse);
+    toast.success("Response copied to clipboard");
   };
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="bg-muted/50 pb-4">
-        <CardTitle className="text-md">Model Response</CardTitle>
-        <CardDescription>The response from the AI model</CardDescription>
+    <Card className="h-full">
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center justify-between">
+          <span>AI Response</span>
+          {promptResponse && (
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="h-8 px-3 text-xs"
+                onClick={handleCopy}
+              >
+                <Copy className="h-3.5 w-3.5 mr-1" /> Copy
+              </Button>
+              {onSaveToProject && (
+                <Button 
+                  size="sm" 
+                  className="h-8 px-3 text-xs"
+                  onClick={onSaveToProject}
+                >
+                  <Save className="h-3.5 w-3.5 mr-1" /> Save to Project
+                </Button>
+              )}
+            </div>
+          )}
+        </CardTitle>
+        <CardDescription>
+          Response from the AI model based on your prompt
+        </CardDescription>
       </CardHeader>
-      <CardContent className="p-0">
+      <CardContent>
         {promptResponse ? (
-          <Textarea 
-            value={promptResponse}
-            readOnly
-            className="min-h-[300px] font-mono text-sm border-0 rounded-none resize-none focus-visible:ring-0"
-          />
+          <div className="whitespace-pre-wrap p-4 bg-muted/30 rounded-md overflow-auto max-h-[500px] text-sm font-mono">
+            {promptResponse}
+          </div>
         ) : (
-          <div className="flex items-center justify-center h-[300px] text-muted-foreground bg-muted/30 p-8 text-center">
-            <p>No response yet. Click "Test Prompt" to see the model's response.</p>
+          <div className="text-center py-12 text-muted-foreground">
+            <p>AI response will appear here after testing your prompt</p>
           </div>
         )}
       </CardContent>
       {promptResponse && (
-        <CardFooter className="flex justify-end gap-2 p-2 border-t">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 gap-1.5"
-            onClick={handleCopy}
-          >
-            <Copy className="h-3.5 w-3.5" />
-            Copy
-          </Button>
-          <Button 
-            variant="secondary"
-            size="sm"
-            className="h-8 gap-1.5"
-            onClick={onSaveToProject}
-          >
-            <Save className="h-3.5 w-3.5" />
-            Save to Project
-          </Button>
+        <CardFooter className="text-xs text-muted-foreground border-t pt-4">
+          <p>
+            Save successful prompts and responses to your projects for future reference and collaboration.
+          </p>
         </CardFooter>
       )}
     </Card>

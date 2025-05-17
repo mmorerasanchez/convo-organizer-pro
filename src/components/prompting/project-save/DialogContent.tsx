@@ -56,7 +56,7 @@ export function SaveDialogContent({
       <DialogHeader>
         <DialogTitle>Save to Project</DialogTitle>
         <DialogDescription>
-          Save this prompt and response to your conversations and link it to a project.
+          Organize your prompts and responses in projects for better knowledge management and collaboration.
         </DialogDescription>
       </DialogHeader>
       
@@ -75,6 +75,9 @@ export function SaveDialogContent({
             onChange={onConversationTitleChange}
             placeholder="Enter a title for this conversation"
           />
+          <p className="text-xs text-muted-foreground">
+            This title will help you identify your prompt in your project's conversation list.
+          </p>
         </div>
         
         {!showNewProjectForm ? (
@@ -107,7 +110,7 @@ export function SaveDialogContent({
           onClick={onSave}
           disabled={isProcessing || !conversationTitle.trim()}
         >
-          {isProcessing ? "Saving..." : "Save"}
+          {isProcessing ? "Saving..." : "Save to Project"}
         </Button>
       </DialogFooter>
     </DialogContent>

@@ -173,6 +173,23 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({ conversation, p
           </div>
         </CardContent>
       </Card>
+      
+      {/* Project context section if project exists */}
+      {project && (
+        <div className="bg-muted/30 p-4 rounded-md">
+          <h3 className="text-sm font-medium mb-2">Part of Project: {project.name}</h3>
+          <p className="text-sm text-muted-foreground">
+            This conversation is organized within a project that may contain other related conversations and knowledge files.
+          </p>
+          <div className="mt-3">
+            <Button variant="outline" size="sm" asChild>
+              <Link to={`/projects/${project.id}`}>
+                View Project
+              </Link>
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -50,7 +50,9 @@ export const useSaveToProject = () => {
       
       setNewConversationId(newConversation.id);
       setShowNavigationConfirm(true);
-      toast.success('Conversation saved successfully');
+      toast.success('Conversation saved successfully to your project', {
+        description: 'You can now find it in your project for future reference',
+      });
       setIsProcessing(false);
     },
     onError: (error: Error) => {
@@ -102,7 +104,7 @@ export const useSaveToProject = () => {
       const promptResult = await createConversationMutation.mutateAsync({
         title: title.trim(),
         content: content.trim(),
-        platform: 'Lovable',
+        platform: 'Promptito',
         projectId,
         type: 'input',
         status: 'Active',
@@ -114,7 +116,7 @@ export const useSaveToProject = () => {
         await createConversationMutation.mutateAsync({
           title: `${title.trim()} (Response)`,
           content: responseContent.trim(),
-          platform: 'Lovable',
+          platform: 'Promptito',
           projectId,
           type: 'output',
           status: 'Active',
