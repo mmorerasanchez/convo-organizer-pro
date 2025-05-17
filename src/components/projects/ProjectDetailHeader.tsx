@@ -61,34 +61,35 @@ const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project, isSh
             <Button 
               variant="outline" 
               size="sm" 
-              className="gap-2"
-              onClick={() => setShowShareDialog(true)}
+              className="gap-2 opacity-60 cursor-not-allowed"
+              disabled
             >
               <Share className="h-4 w-4" />
               Share
             </Button>
             
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreHorizontal className="h-4 w-4" />
+            <EditProjectDialog 
+              project={project} 
+              trigger={
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Edit className="h-4 w-4" />
+                  Edit
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit Project
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  className="text-red-600" 
-                  onClick={() => setShowDeleteDialog(true)}
-                >
-                  <Trash className="mr-2 h-4 w-4" />
-                  Delete Project
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              }
+            />
+            
+            <DeleteDialog 
+              itemType="project"
+              itemName={project.name}
+              trigger={
+                <Button variant="outline" size="sm" className="gap-2 text-red-600 hover:bg-red-50">
+                  <Trash className="h-4 w-4" />
+                  Delete
+                </Button>
+              }
+              onDelete={handleDelete}
+              isDeleting={deleteMutation.isPending}
+            />
           </div>
         )}
       </div>

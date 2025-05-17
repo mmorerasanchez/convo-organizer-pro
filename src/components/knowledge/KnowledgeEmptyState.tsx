@@ -10,7 +10,7 @@ interface KnowledgeEmptyStateProps {
 
 const KnowledgeEmptyState: React.FC<KnowledgeEmptyStateProps> = ({ projectId }) => {
   return (
-    <div className="text-center py-16 empty-state rounded-lg border-2 border-dashed">
+    <div className="text-center py-16 empty-state rounded-lg border">
       <Book className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
       <h3 className="text-lg font-medium mb-2">No documentation yet</h3>
       <p className="text-muted-foreground mb-4">
