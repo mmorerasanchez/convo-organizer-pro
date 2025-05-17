@@ -68,8 +68,8 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({ conversation, p
     }
     
     // If we came from a shared project view, use that URL format
-    if (isFromSharedProject) {
-      return `/projects/shared/${project.share_link}`;
+    if (isFromSharedProject && project.shareLink) {
+      return `/projects/shared/${project.shareLink}`;
     }
     
     // Otherwise, use the regular project URL

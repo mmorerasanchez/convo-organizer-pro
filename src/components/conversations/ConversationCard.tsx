@@ -8,11 +8,12 @@ import TagList from './TagList';
 
 interface ConversationCardProps {
   conversation: Conversation;
+  linkState?: { fromShared: boolean };
 }
 
-const ConversationCard: React.FC<ConversationCardProps> = ({ conversation }) => {
+const ConversationCard: React.FC<ConversationCardProps> = ({ conversation, linkState }) => {
   return (
-    <Link to={`/conversations/${conversation.id}`}>
+    <Link to={`/conversations/${conversation.id}`} state={linkState}>
       <Card className="h-full convo-card">
         <CardContent className="pt-6">
           <div className="mb-1">
