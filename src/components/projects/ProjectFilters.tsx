@@ -2,16 +2,18 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowUpDown, LayoutGrid, ListFilter, X } from 'lucide-react';
+import { ArrowUpDown, LayoutGrid, ListFilter, Table, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { cn } from '@/lib/utils';
 
 interface ProjectFiltersProps {
   searchTerm: string;
   sortBy: 'updated' | 'name';
   setSortBy: (value: 'updated' | 'name') => void;
   resetFilters: () => void;
-  viewMode?: 'grid' | 'status';
-  setViewMode?: (mode: 'grid' | 'status') => void;
+  viewMode?: 'grid' | 'status' | 'table';
+  setViewMode?: (mode: 'grid' | 'status' | 'table') => void;
 }
 
 const ProjectFilters: React.FC<ProjectFiltersProps> = ({
@@ -37,26 +39,44 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
         </SelectContent>
       </Select>
       
-      {/* View mode toggle */}
+      {/* View mode toggle - updated to match header tabs styling */}
       {setViewMode && (
-        <div className="flex items-center bg-muted/60 rounded-md">
+        <div className="inline-flex h-9 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
           <Button 
-            variant={viewMode === 'grid' ? 'secondary' : 'ghost'} 
+            variant="ghost" 
             size="sm" 
-            className="h-9"
+            className={cn(
+              "rounded-sm h-7 px-3 text-sm", 
+              viewMode === 'grid' ? "bg-background text-foreground shadow-sm" : ""
+            )}
             onClick={() => setViewMode('grid')}
           >
             <LayoutGrid className="h-4 w-4 mr-2" />
             <span>Grid</span>
           </Button>
           <Button 
-            variant={viewMode === 'status' ? 'secondary' : 'ghost'} 
+            variant="ghost" 
             size="sm" 
-            className="h-9"
+            className={cn(
+              "rounded-sm h-7 px-3 text-sm", 
+              viewMode === 'status' ? "bg-background text-foreground shadow-sm" : ""
+            )}
             onClick={() => setViewMode('status')}
           >
             <ListFilter className="h-4 w-4 mr-2" />
             <span>By Status</span>
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={cn(
+              "rounded-sm h-7 px-3 text-sm", 
+              viewMode === 'table' ? "bg-background text-foreground shadow-sm" : ""
+            )}
+            onClick={() => setViewMode('table')}
+          >
+            <Table className="h-4 w-4 mr-2" />
+            <span>Table</span>
           </Button>
         </div>
       )}

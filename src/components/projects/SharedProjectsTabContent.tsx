@@ -4,6 +4,7 @@ import { Project } from '@/lib/types';
 import ProjectFilters from './ProjectFilters';
 import ProjectGrid from './ProjectGrid';
 import ProjectsByStatus from './ProjectsByStatus';
+import ProjectsTableView from './ProjectsTableView';
 import SharedProjectsEmptyState from './SharedProjectsEmptyState';
 
 interface SharedProjectsTabContentProps {
@@ -23,7 +24,7 @@ const SharedProjectsTabContent: React.FC<SharedProjectsTabContentProps> = ({
   setSortBy,
   resetFilters
 }) => {
-  const [viewMode, setViewMode] = useState<'grid' | 'status'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'status' | 'table'>('grid');
 
   if (!isLoading && projects.length === 0 && !searchTerm) {
     return <SharedProjectsEmptyState searchTerm={searchTerm} />;
@@ -50,11 +51,18 @@ const SharedProjectsTabContent: React.FC<SharedProjectsTabContentProps> = ({
           searchTerm={searchTerm}
           isShared={true}
         />
-      ) : (
+      ) : viewMode === 'status' ? (
         <ProjectsByStatus 
           projects={projects}
           isLoading={isLoading}
           showNewButton={false}
+        />
+      ) : (
+        <ProjectsTableView
+          projects={projects}
+          isLoading={isLoading}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
         />
       )}
     </div>

@@ -4,6 +4,7 @@ import { Project } from '@/lib/types';
 import ProjectFilters from './ProjectFilters';
 import ProjectGrid from './ProjectGrid';
 import ProjectsByStatus from './ProjectsByStatus';
+import ProjectsTableView from './ProjectsTableView';
 import NewProjectDialog from './NewProjectDialog';
 
 interface AllProjectsTabContentProps {
@@ -23,7 +24,7 @@ const AllProjectsTabContent: React.FC<AllProjectsTabContentProps> = ({
   setSortBy,
   resetFilters
 }) => {
-  const [viewMode, setViewMode] = useState<'grid' | 'status'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'status' | 'table'>('grid');
   
   return (
     <div className="space-y-6">
@@ -37,7 +38,6 @@ const AllProjectsTabContent: React.FC<AllProjectsTabContentProps> = ({
           setViewMode={setViewMode}
         />
         <div className="flex items-center space-x-2">
-          {/* Removed JoinProjectDialog from here */}
           <NewProjectDialog />
         </div>
       </div>
@@ -49,11 +49,18 @@ const AllProjectsTabContent: React.FC<AllProjectsTabContentProps> = ({
           showNewButton={true}
           searchTerm={searchTerm}
         />
-      ) : (
+      ) : viewMode === 'status' ? (
         <ProjectsByStatus 
           projects={projects}
           isLoading={isLoading}
           showNewButton={true}
+        />
+      ) : (
+        <ProjectsTableView
+          projects={projects}
+          isLoading={isLoading}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
         />
       )}
     </div>
