@@ -3,13 +3,10 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
 import NewProjectDialog from './NewProjectDialog';
-import { useOnboarding } from '../onboarding/OnboardingContext';
 
 const NewProjectButton: React.FC = () => {
-  const { isOnboarding } = useOnboarding();
-
   return (
-    <div data-onboarding="new-project">
+    <div>
       <NewProjectDialog 
         variant="card"
         trigger={

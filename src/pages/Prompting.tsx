@@ -10,7 +10,6 @@ import { BookOpen, Bot, Wand2 } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 import { PromptingProvider } from '@/components/prompting/context/PromptingContext';
 import { PromptScannerProvider } from '@/components/prompting/context/usePromptScanner';
-import { useOnboarding } from '@/components/onboarding/OnboardingContext';
 
 const Prompting = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -20,8 +19,6 @@ const Prompting = () => {
     // Initialize tab from URL parameter or default to 'designer'
     return tabFromUrl === 'scanner' || tabFromUrl === 'guide' ? tabFromUrl : 'designer';
   });
-
-  const { isOnboarding, currentFlow, currentStep, steps } = useOnboarding();
 
   // Update active tab when URL parameter changes
   useEffect(() => {
@@ -41,22 +38,6 @@ const Prompting = () => {
       }
     }
   }, [activeTab, setSearchParams, tabFromUrl]);
-
-  // During onboarding, sync tab with onboarding step if in prompting flow
-  useEffect(() => {
-    if (isOnboarding && currentFlow === 'prompting') {
-      const currentStepData = steps[currentStep];
-      if (currentStepData?.route?.includes('prompting')) {
-        if (currentStepData.route.includes('tab=scanner')) {
-          setActiveTab('scanner');
-        } else if (currentStepData.route.includes('tab=guide')) {
-          setActiveTab('guide');
-        } else {
-          setActiveTab('designer');
-        }
-      }
-    }
-  }, [isOnboarding, currentFlow, currentStep, steps]);
 
   const tabs = [
     {
@@ -90,33 +71,17 @@ const Prompting = () => {
           
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsContent value="designer" className="space-y-6 mt-0">
-              <div data-onboarding="prompt-designer">
-                <div data-onboarding="prompt-framework">
-                  <div data-onboarding="model-selection">
-                    <div data-onboarding="test-prompt">
-                      <PromptDesigner />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <PromptDesigner />
             </TabsContent>
             
             <TabsContent value="scanner" className="space-y-6 mt-0">
               <PromptScannerProvider>
-                <div data-onboarding="scanner-input">
-                  <div data-onboarding="scanner-suggestions">
-                    <PromptScanner />
-                  </div>
-                </div>
+                <PromptScanner />
               </PromptScannerProvider>
             </TabsContent>
             
             <TabsContent value="guide" className="space-y-6 mt-0">
-              <div data-onboarding="guide-chapters">
-                <div data-onboarding="guide-content">
-                  <PromptingGuide />
-                </div>
-              </div>
+              <PromptingGuide />
             </TabsContent>
           </Tabs>
         </div>

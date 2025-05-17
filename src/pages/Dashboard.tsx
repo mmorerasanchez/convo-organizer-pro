@@ -12,7 +12,6 @@ import { fetchProjects, fetchConversations } from '@/lib/api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { fetchKnowledgeCount } from '@/lib/api/knowledge';
-import { OnboardingButton } from '@/components/onboarding/OnboardingButton';
 
 const Dashboard = () => {
   const { user, loading: authLoading } = useRequireAuth();
@@ -55,9 +54,6 @@ const Dashboard = () => {
       <div className="space-y-8">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-          <div className="flex gap-2">
-            <OnboardingButton />
-          </div>
         </div>
         
         {isLoading ? (

@@ -43,28 +43,24 @@ const PromptScanner = () => {
       />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div data-onboarding="scanner-input">
-          <PromptInputCard
-            promptInput={promptInput}
-            onChange={setPromptInput}
-            onScan={handleInitialScan}
-            onClear={handleClear}
-            isProcessing={isProcessing}
-          />
-        </div>
+        <PromptInputCard
+          promptInput={promptInput}
+          onChange={setPromptInput}
+          onScan={handleInitialScan}
+          onClear={handleClear}
+          isProcessing={isProcessing}
+        />
 
-        <div data-onboarding="scanner-suggestions">
-          <PromptOutputCard
-            improvedPrompt={improvedPrompt}
-            onTryAgain={() => setFeedbackDialogOpen(true)}
-            onRevert={handleRevertToPrevious}
-            onAccept={handleAccept}
-            isProcessing={isProcessing}
-            canRevert={feedbackHistory.length > 0}
-            originalPrompt={promptInput}
-            onSave={() => setSaveToProjectDialogOpen(true)}
-          />
-        </div>
+        <PromptOutputCard
+          improvedPrompt={improvedPrompt}
+          onTryAgain={() => setFeedbackDialogOpen(true)}
+          onRevert={handleRevertToPrevious}
+          onAccept={handleAccept}
+          isProcessing={isProcessing}
+          canRevert={feedbackHistory.length > 0}
+          originalPrompt={promptInput}
+          onSave={() => setSaveToProjectDialogOpen(true)}
+        />
       </div>
 
       <FeedbackDialog
