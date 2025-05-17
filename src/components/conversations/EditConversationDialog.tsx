@@ -1,16 +1,11 @@
 
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import React from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Edit } from 'lucide-react';
-import { toast } from 'sonner';
-import { Conversation, AIModel } from '@/lib/types';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchProjects, updateConversation, fetchModels } from '@/lib/api';
+import { Conversation } from '@/lib/types';
+import { useEditConversation } from './useEditConversation';
+import EditConversationForm from './EditConversationForm';
 
 interface EditConversationDialogProps {
   conversation: Conversation;
@@ -21,87 +16,30 @@ const EditConversationDialog: React.FC<EditConversationDialogProps> = ({
   conversation,
   trigger 
 }) => {
-  const [title, setTitle] = useState(conversation.title);
-  const [content, setContent] = useState(conversation.content);
-  const [platform, setPlatform] = useState(conversation.platform);
-  const [projectId, setProjectId] = useState(conversation.projectId);
-  const [externalId, setExternalId] = useState(conversation.externalId || '');
-  const [status, setStatus] = useState(conversation.status || 'active');
-  const [type, setType] = useState<'input' | 'output'>(conversation.type || 'input');
-  const [modelId, setModelId] = useState(conversation.modelId || '');
-  const [open, setOpen] = useState(false);
-  
-  const queryClient = useQueryClient();
-  
-  // Fetch projects for the dropdown
-  const { data: projects = [] } = useQuery({
-    queryKey: ['projects'],
-    queryFn: fetchProjects
-  });
-
-  // Fetch AI models for the dropdown
-  const { data: models = [] } = useQuery({
-    queryKey: ['ai-models'],
-    queryFn: fetchModels
-  });
-
-  // Update local state when conversation prop changes
-  useEffect(() => {
-    setTitle(conversation.title);
-    setContent(conversation.content);
-    setPlatform(conversation.platform);
-    setProjectId(conversation.projectId);
-    setExternalId(conversation.externalId || '');
-    setStatus(conversation.status || 'active');
-    setType(conversation.type || 'input');
-    setModelId(conversation.modelId || '');
-  }, [conversation]);
-  
-  const updateConversationMutation = useMutation({
-    mutationFn: () => updateConversation(conversation.id, {
-      title: title.trim(),
-      content: content.trim(),
-      platform,
-      projectId,
-      externalId: externalId.trim() || null,
-      status,
-      type,
-      modelId: modelId || null
-    }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['conversation', conversation.id] });
-      queryClient.invalidateQueries({ queryKey: ['conversations'] });
-      queryClient.invalidateQueries({ queryKey: ['conversations', 'project', projectId] });
-      
-      // If project changed, also invalidate the old project's conversations
-      if (projectId !== conversation.projectId) {
-        queryClient.invalidateQueries({ queryKey: ['conversations', 'project', conversation.projectId] });
-      }
-      
-      toast.success(`Conversation "${title}" updated successfully`);
-      setOpen(false);
-    },
-    onError: (error: Error) => {
-      toast.error(`Error updating conversation: ${error.message}`);
-    }
-  });
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateConversationMutation.mutate();
-  };
-
-  const platformOptions = [
-    { value: 'ChatGPT', label: 'ChatGPT' },
-    { value: 'Claude', label: 'Claude' },
-    { value: 'Gemini', label: 'Gemini' },
-    { value: 'Multiple', label: 'Multiple' },
-    { value: 'Lovable', label: 'Lovable' },
-    { value: 'Replit', label: 'Replit' },
-    { value: 'DeepSeek', label: 'DeepSeek' },
-    { value: 'Mistral', label: 'Mistral' },
-    { value: 'Perplexity', label: 'Perplexity' }
-  ];
+  const {
+    title,
+    setTitle,
+    content,
+    setContent,
+    platform,
+    setPlatform,
+    projectId,
+    setProjectId,
+    externalId,
+    setExternalId,
+    status,
+    setStatus,
+    type,
+    setType,
+    modelId,
+    setModelId,
+    open,
+    setOpen,
+    projects,
+    models,
+    isPending,
+    handleSubmit
+  } = useEditConversation(conversation);
   
   const triggerButton = trigger || (
     <Button variant="outline" size="icon">
@@ -118,158 +56,28 @@ const EditConversationDialog: React.FC<EditConversationDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Edit Conversation</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter conversation title"
-              required
-            />
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="platform">Platform</Label>
-              <Select 
-                value={platform} 
-                onValueChange={setPlatform}
-              >
-                <SelectTrigger id="platform">
-                  <SelectValue placeholder="Select platform" />
-                </SelectTrigger>
-                <SelectContent>
-                  {platformOptions.map(option => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="project">Project</Label>
-              <Select 
-                value={projectId} 
-                onValueChange={setProjectId}
-                disabled={projects.length === 0}
-              >
-                <SelectTrigger id="project">
-                  <SelectValue placeholder="Select project" />
-                </SelectTrigger>
-                <SelectContent>
-                  {projects.map(project => (
-                    <SelectItem key={project.id} value={project.id}>
-                      {project.name}
-                    </SelectItem>
-                  ))}
-                  {projects.length === 0 && (
-                    <SelectItem value="no-projects" disabled>
-                      No projects available
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="type">Type</Label>
-              <Select 
-                value={type} 
-                onValueChange={(value: 'input' | 'output') => setType(value)}
-              >
-                <SelectTrigger id="type">
-                  <SelectValue placeholder="Conversation type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="input">Input</SelectItem>
-                  <SelectItem value="output">Output</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="model">Model</Label>
-              <Select 
-                value={modelId} 
-                onValueChange={setModelId}
-              >
-                <SelectTrigger id="model">
-                  <SelectValue placeholder="Select AI model (optional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">None</SelectItem>
-                  {models.map((model: AIModel) => (
-                    <SelectItem key={model.id} value={model.id}>
-                      {model.displayName} ({model.provider})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="externalId">External ID</Label>
-              <Input
-                id="externalId"
-                value={externalId}
-                onChange={(e) => setExternalId(e.target.value)}
-                placeholder="External conversation ID"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select 
-                value={status} 
-                onValueChange={setStatus}
-              >
-                <SelectTrigger id="status">
-                  <SelectValue placeholder="Conversation status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="In Progress">In Progress</SelectItem>
-                  <SelectItem value="Draft">Draft</SelectItem>
-                  <SelectItem value="Final">Final</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="content">Conversation Content</Label>
-            <Textarea
-              id="content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Paste the conversation content here"
-              rows={5}
-              required
-            />
-          </div>
-          
-          <DialogFooter>
-            <Button 
-              type="submit" 
-              disabled={
-                updateConversationMutation.isPending || 
-                !title.trim() || 
-                !content.trim() || 
-                !projectId
-              }
-            >
-              {updateConversationMutation.isPending ? 'Saving...' : 'Save Changes'}
-            </Button>
-          </DialogFooter>
-        </form>
+        <EditConversationForm
+          title={title}
+          setTitle={setTitle}
+          content={content}
+          setContent={setContent}
+          platform={platform}
+          setPlatform={setPlatform}
+          projectId={projectId}
+          setProjectId={setProjectId}
+          externalId={externalId}
+          setExternalId={setExternalId}
+          status={status}
+          setStatus={setStatus}
+          type={type}
+          setType={setType}
+          modelId={modelId}
+          setModelId={setModelId}
+          projects={projects}
+          models={models}
+          isPending={isPending}
+          handleSubmit={handleSubmit}
+        />
       </DialogContent>
     </Dialog>
   );
