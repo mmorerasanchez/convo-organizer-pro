@@ -22,7 +22,7 @@ const ConversationCard: React.FC<ConversationCardProps> = ({ conversation, linkS
             </span>
           </div>
           <div className="mb-2 text-lg font-semibold">{conversation.title}</div>
-          <p className="text-sm text-muted-foreground line-clamp-3 h-16">
+          <p className="text-sm text-muted-foreground line-clamp-3 h-16 font-mono">
             {conversation.content}
           </p>
         </CardContent>
