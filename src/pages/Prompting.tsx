@@ -1,5 +1,6 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import PromptingGuide from '@/components/prompting/PromptingGuide';
@@ -11,7 +12,19 @@ import { PromptingProvider } from '@/components/prompting/context/PromptingConte
 import { PromptScannerProvider } from '@/components/prompting/context/usePromptScanner';
 
 const Prompting = () => {
-  const [activeTab, setActiveTab] = React.useState('designer');
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab');
+  const [activeTab, setActiveTab] = React.useState(() => {
+    // Initialize tab from URL parameter or default to 'designer'
+    return tabFromUrl === 'scanner' || tabFromUrl === 'guide' ? tabFromUrl : 'designer';
+  });
+
+  // Update active tab when URL parameter changes
+  useEffect(() => {
+    if (tabFromUrl === 'scanner' || tabFromUrl === 'guide') {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl]);
 
   const tabs = [
     {

@@ -1,6 +1,7 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export type OnboardingStep = {
   id: string;
@@ -9,6 +10,8 @@ export type OnboardingStep = {
   route?: string;
   element?: string; // CSS selector for the element to highlight
   position?: 'top' | 'bottom' | 'left' | 'right';
+  action?: string; // Description of the action to take
+  waitForAction?: boolean; // If true, wait for user action before proceeding
 };
 
 type OnboardingFlow = 'projects' | 'prompt-designer' | 'prompt-scanner' | 'prompting-guide';
@@ -28,11 +31,12 @@ type OnboardingContextType = {
   prevStep: () => void;
   skipToStep: (index: number) => void;
   hasCompletedOnboarding: boolean;
+  previousRoute: string | null;
 };
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
 
-// Define the steps for each flow - updated to be observational (not requiring actions)
+// Updated onboarding flow based on the new sequence
 const onboardingFlows: OnboardingFlowSteps = {
   projects: [
     {
@@ -44,23 +48,18 @@ const onboardingFlows: OnboardingFlowSteps = {
     {
       id: 'new-project',
       title: 'Creating New Projects',
-      description: 'This button allows you to create new projects to organize your work. You can add details, invite team members, and more.',
+      description: 'Click this button to create a new project to organize your work.',
       element: '[data-onboarding="new-project"]',
       position: 'bottom',
+      action: 'Click the "New Project" button to continue',
+      waitForAction: true,
     },
     {
-      id: 'project-list',
-      title: 'Your Project List',
-      description: 'Here you can see all your projects. You can filter them by status and search for specific projects.',
-      route: '/projects',
-      element: '.project-grid',
+      id: 'project-form',
+      title: 'Project Details',
+      description: 'Enter a name for your new project and click Create Project when you\'re ready.',
+      element: '.new-project-form',
       position: 'top',
-    },
-    {
-      id: 'conversations',
-      title: 'Conversations',
-      description: 'Conversations allow you to manage interactions with AI models and track important dialogues.',
-      route: '/conversations',
     }
   ],
   'prompt-designer': [
@@ -97,7 +96,7 @@ const onboardingFlows: OnboardingFlowSteps = {
       id: 'scanner-intro',
       title: 'Prompt Scanner',
       description: 'Analyze and improve your existing prompts. This tool helps identify issues and suggests enhancements.',
-      route: '/prompting',
+      route: '/prompting?tab=scanner',
     },
     {
       id: 'enter-prompt',
@@ -119,7 +118,7 @@ const onboardingFlows: OnboardingFlowSteps = {
       id: 'guide-intro',
       title: 'Prompting Guide',
       description: 'Learn prompt engineering through structured lessons and examples. Perfect for beginners and advanced users alike.',
-      route: '/prompting',
+      route: '/prompting?tab=guide',
     },
     {
       id: 'chapters',
@@ -140,10 +139,12 @@ const onboardingFlows: OnboardingFlowSteps = {
 
 export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isOnboarding, setIsOnboarding] = useState(false);
   const [currentFlow, setCurrentFlow] = useState<OnboardingFlow | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+  const [previousRoute, setPreviousRoute] = useState<string | null>(null);
 
   // Check if user has completed onboarding
   useEffect(() => {
@@ -152,6 +153,13 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setHasCompletedOnboarding(true);
     }
   }, []);
+
+  // Store current path before starting onboarding
+  useEffect(() => {
+    if (!isOnboarding) {
+      setPreviousRoute(location.pathname + location.search);
+    }
+  }, [isOnboarding, location]);
 
   // Get current steps based on flow
   const steps = currentFlow ? onboardingFlows[currentFlow] : [];
@@ -165,20 +173,35 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   // Start the onboarding process
   const startOnboarding = (flow: OnboardingFlow = 'projects') => {
+    // Store current route before beginning
+    setPreviousRoute(location.pathname + location.search);
     setCurrentFlow(flow);
     setCurrentStep(0);
     setIsOnboarding(true);
   };
 
-  // End the onboarding process
+  // End the onboarding process with improved cleanup
   const endOnboarding = () => {
     setIsOnboarding(false);
     setCurrentFlow(null);
+    
+    // Mark onboarding as completed
     localStorage.setItem('onboardingCompleted', 'true');
     setHasCompletedOnboarding(true);
+    
+    // Show a toast to confirm completion
+    toast.success('Onboarding tour completed!');
+    
+    // Return to previous route if it exists and is not the current route
+    if (previousRoute && previousRoute !== (location.pathname + location.search)) {
+      // Small delay to ensure cleanup before navigation
+      setTimeout(() => {
+        navigate(previousRoute);
+      }, 100);
+    }
   };
 
-  // Move to the next step
+  // Move to the next step with improved flow navigation
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -245,6 +268,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     prevStep,
     skipToStep,
     hasCompletedOnboarding,
+    previousRoute,
   };
 
   return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>;

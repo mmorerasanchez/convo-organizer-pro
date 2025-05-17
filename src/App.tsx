@@ -9,6 +9,7 @@ import Projects from "./pages/Projects";
 import ProjectDetail from "./pages/ProjectDetail";
 import SharedProjectDetail from "./pages/SharedProjectDetail";
 import ConversationDetail from "./pages/ConversationDetail";
+import Conversations from "./pages/Conversations"; // Added import
 import Prompting from "./pages/Prompting";
 import Tools from "./pages/Tools";
 import Auth from "./pages/Auth";
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
               <Route path="/projects/shared/:shareLink" element={<SharedProjectDetail />} />
               <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
+              <Route path="/conversations" element={<ProtectedRoute><Conversations /></ProtectedRoute>} /> {/* Added route */}
               <Route path="/conversations/:id" element={<ProtectedRoute><ConversationDetail /></ProtectedRoute>} />
               <Route path="/prompting" element={<ProtectedRoute><Prompting /></ProtectedRoute>} />
               <Route path="/tools" element={<ProtectedRoute><Tools /></ProtectedRoute>} />
