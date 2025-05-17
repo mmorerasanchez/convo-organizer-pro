@@ -45,17 +45,33 @@ const Prompting = () => {
           
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsContent value="designer" className="space-y-6 mt-0">
-              <PromptDesigner />
+              <div data-onboarding="prompt-designer">
+                <div data-onboarding="prompt-framework">
+                  <div data-onboarding="model-selection">
+                    <div data-onboarding="test-prompt">
+                      <PromptDesigner />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
             
             <TabsContent value="scanner" className="space-y-6 mt-0">
               <PromptScannerProvider>
-                <PromptScanner />
+                <div data-onboarding="scanner-input">
+                  <div data-onboarding="scanner-suggestions">
+                    <PromptScanner />
+                  </div>
+                </div>
               </PromptScannerProvider>
             </TabsContent>
             
             <TabsContent value="guide" className="space-y-6 mt-0">
-              <PromptingGuide />
+              <div data-onboarding="guide-chapters">
+                <div data-onboarding="guide-content">
+                  <PromptingGuide />
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
         </div>

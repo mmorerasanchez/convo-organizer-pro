@@ -17,6 +17,8 @@ import AuthCallback from "./pages/AuthCallback";
 import VerifySuccess from "./pages/VerifySuccess";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/common/ProtectedRoute";
+import { OnboardingProvider } from "./components/onboarding/OnboardingContext";
+import { OnboardingWrapper } from "./components/onboarding/OnboardingWrapper";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,20 +36,23 @@ const App = () => (
       <TooltipProvider>
         <Sonner position="top-right" closeButton />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
-            <Route path="/projects/shared/:shareLink" element={<SharedProjectDetail />} />
-            <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
-            <Route path="/conversations/:id" element={<ProtectedRoute><ConversationDetail /></ProtectedRoute>} />
-            <Route path="/prompting" element={<ProtectedRoute><Prompting /></ProtectedRoute>} />
-            <Route path="/tools" element={<ProtectedRoute><Tools /></ProtectedRoute>} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route path="/verify-success" element={<VerifySuccess />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <OnboardingProvider>
+            <OnboardingWrapper />
+            <Routes>
+              <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+              <Route path="/projects/shared/:shareLink" element={<SharedProjectDetail />} />
+              <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
+              <Route path="/conversations/:id" element={<ProtectedRoute><ConversationDetail /></ProtectedRoute>} />
+              <Route path="/prompting" element={<ProtectedRoute><Prompting /></ProtectedRoute>} />
+              <Route path="/tools" element={<ProtectedRoute><Tools /></ProtectedRoute>} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/verify-success" element={<VerifySuccess />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </OnboardingProvider>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
