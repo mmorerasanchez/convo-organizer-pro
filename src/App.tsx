@@ -37,8 +37,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
-            <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
             <Route path="/projects/shared/:shareLink" element={<SharedProjectDetail />} />
+            <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
             <Route path="/conversations/:id" element={<ProtectedRoute><ConversationDetail /></ProtectedRoute>} />
             <Route path="/prompting" element={<ProtectedRoute><Prompting /></ProtectedRoute>} />
             <Route path="/tools" element={<ProtectedRoute><Tools /></ProtectedRoute>} />

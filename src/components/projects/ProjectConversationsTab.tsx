@@ -6,6 +6,7 @@ import { Plus, MessageCircle } from 'lucide-react';
 import NewConversationDialog from '@/components/conversations/NewConversationDialog';
 import { Conversation } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useLocation } from 'react-router-dom';
 
 interface ProjectConversationsTabProps {
   projectId: string;
@@ -18,6 +19,10 @@ const ProjectConversationsTab: React.FC<ProjectConversationsTabProps> = ({
   conversations, 
   isLoading 
 }) => {
+  const location = useLocation();
+  // Check if we're in a shared project view
+  const isSharedProject = location.pathname.includes('/projects/shared/');
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -34,7 +39,11 @@ const ProjectConversationsTab: React.FC<ProjectConversationsTabProps> = ({
       ) : conversations.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {conversations.map((conversation) => (
-            <ConversationCard key={conversation.id} conversation={conversation} />
+            <ConversationCard 
+              key={conversation.id} 
+              conversation={conversation} 
+              linkState={{ fromShared: isSharedProject }}
+            />
           ))}
         </div>
       ) : (

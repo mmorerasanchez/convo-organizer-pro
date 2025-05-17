@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Conversation, Project } from '@/lib/types';
@@ -6,13 +5,12 @@ import { format } from 'date-fns';
 import TagList from './TagList';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import EditConversationDialog from './EditConversationDialog';
 import DeleteDialog from '../common/DeleteDialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteConversation } from '@/lib/api';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
 import TagManagement from './TagManagement';
 import { Badge } from '@/components/ui/badge';
 
@@ -23,7 +21,11 @@ interface ConversationDetailProps {
 
 const ConversationDetail: React.FC<ConversationDetailProps> = ({ conversation, project }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
+  
+  // Check if we came from a shared project view
+  const isFromSharedProject = location.state?.fromShared || false;
   
   const deleteConversationMutation = useMutation({
     mutationFn: () => deleteConversation(conversation.id),
@@ -58,12 +60,27 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({ conversation, p
         return 'bg-gray-500';
     }
   };
+  
+  // Determine where to navigate back to
+  const getBackLink = () => {
+    if (!project) {
+      return "/conversations";
+    }
+    
+    // If we came from a shared project view, use that URL format
+    if (isFromSharedProject) {
+      return `/projects/shared/${project.share_link}`;
+    }
+    
+    // Otherwise, use the regular project URL
+    return `/projects/${project.id}`;
+  };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Link to="/conversations">
+          <Link to={getBackLink()} state={{ activeTab: "conversations" }}>
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-4 w-4" />
             </Button>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import ConversationDetailComponent from '@/components/conversations/ConversationDetail';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 const ConversationDetailPage = () => {
   useRequireAuth();
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  
+  // Check if we're coming from a shared project view
+  const isFromSharedProject = location.state?.fromShared || false;
   
   const { 
     data: conversation, 
@@ -54,8 +58,8 @@ const ConversationDetailPage = () => {
         <div className="text-center py-12">
           <h1 className="text-2xl font-bold mb-4">Error loading conversation</h1>
           <p className="mb-4 text-red-500">{(error as Error).message}</p>
-          <Link to="/conversations">
-            <Button>Back to Conversations</Button>
+          <Link to="/projects">
+            <Button>Back to Projects</Button>
           </Link>
         </div>
       </MainLayout>
@@ -67,8 +71,8 @@ const ConversationDetailPage = () => {
       <MainLayout>
         <div className="text-center py-12">
           <h1 className="text-2xl font-bold mb-4">Conversation not found</h1>
-          <Link to="/conversations">
-            <Button>Back to Conversations</Button>
+          <Link to="/projects">
+            <Button>Back to Projects</Button>
           </Link>
         </div>
       </MainLayout>
@@ -77,7 +81,10 @@ const ConversationDetailPage = () => {
 
   return (
     <MainLayout>
-      <ConversationDetailComponent conversation={conversation} project={project || undefined} />
+      <ConversationDetailComponent 
+        conversation={conversation} 
+        project={project || undefined} 
+      />
     </MainLayout>
   );
 };
