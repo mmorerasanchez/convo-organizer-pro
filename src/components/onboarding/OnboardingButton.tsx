@@ -43,12 +43,12 @@ export const OnboardingButton: React.FC = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button 
-          variant="outline" 
+          variant={hasCompletedOnboarding ? "outline" : "default"}
           size="sm" 
           className="flex gap-1 items-center"
         >
           <HelpCircle className="h-4 w-4" />
-          {hasCompletedOnboarding ? "Help" : "Take a Tour"}
+          Take a Tour
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">

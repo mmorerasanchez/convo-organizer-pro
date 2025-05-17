@@ -5,7 +5,7 @@ import StatCard from '@/components/dashboard/StatCard';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import ProjectList from '@/components/dashboard/ProjectList';
 import AITools from '@/components/dashboard/AITools';
-import { BookOpen, MessageCircle, Database, BarChart, Lightbulb } from 'lucide-react';
+import { BookOpen, MessageCircle, Database, BarChart } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProjects, fetchConversations } from '@/lib/api';
@@ -13,12 +13,9 @@ import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { fetchKnowledgeCount } from '@/lib/api/knowledge';
 import { OnboardingButton } from '@/components/onboarding/OnboardingButton';
-import { Button } from '@/components/ui/button';
-import { useOnboarding } from '@/components/onboarding/OnboardingContext';
 
 const Dashboard = () => {
   const { user, loading: authLoading } = useRequireAuth();
-  const { startOnboarding, hasCompletedOnboarding } = useOnboarding();
   
   const { data: projects = [], isLoading: projectsLoading } = useQuery({
     queryKey: ['projects'],
@@ -53,26 +50,12 @@ const Dashboard = () => {
 
   const isLoading = authLoading || projectsLoading || conversationsLoading || knowledgeLoading;
 
-  const startFullOnboarding = () => {
-    startOnboarding('projects');
-  };
-
   return (
     <MainLayout>
       <div className="space-y-8">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
           <div className="flex gap-2">
-            {!hasCompletedOnboarding && (
-              <Button 
-                onClick={startFullOnboarding}
-                className="flex gap-1.5 items-center"
-                size="sm"
-              >
-                <Lightbulb className="h-4 w-4" />
-                Show Interactive Tour
-              </Button>
-            )}
             <OnboardingButton />
           </div>
         </div>

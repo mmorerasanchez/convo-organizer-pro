@@ -19,8 +19,8 @@ export const OnboardingDialog: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   
   useEffect(() => {
-    setIsOpen(isOnboarding);
-  }, [isOnboarding]);
+    setIsOpen(isOnboarding && !steps[currentStep]?.element);
+  }, [isOnboarding, currentStep, steps]);
 
   if (!steps.length) return null;
 
@@ -52,16 +52,15 @@ export const OnboardingDialog: React.FC = () => {
             </Button>
           </div>
           <Progress className="mt-2" value={progress} />
+          <div className="text-xs mt-1 text-primary-foreground/80">
+            Step {currentStep + 1} of {steps.length}
+          </div>
         </div>
         
         <div className="p-6">
           <p className="mb-6">{currentStepData?.description}</p>
           
-          {currentStepData?.action && (
-            <div className="bg-muted p-3 rounded-md mb-6 text-sm">
-              {currentStepData.action}
-            </div>
-          )}
+          {/* Removed action field since users shouldn't need to take action */}
           
           <div className="flex justify-between mt-4">
             <div>

@@ -49,26 +49,30 @@ const PromptingGuide = () => {
 
   return (
     <div className="space-y-4">
-      <ChapterList
-        chapters={chapters}
-        currentChapter={currentChapter}
-        onChapterSelect={handleChapterSelect}
-      />
-      <SlideContent
-        chapterIndex={currentChapter}
-        totalChapters={chapters.length}
-        slideIndex={currentSlide}
-        totalSlides={totalSlides}
-        title={currentSlideData.title}
-        content={currentSlideData.content}
-        onPrevSlide={goToPreviousSlide}
-        onNextSlide={goToNextSlide}
-        onPrevChapter={goToPreviousChapter}
-        onNextChapter={goToNextChapter}
-      />
+      <div data-onboarding="guide-chapters">
+        <ChapterList
+          chapters={chapters}
+          currentChapter={currentChapter}
+          onChapterSelect={handleChapterSelect}
+        />
+      </div>
+      
+      <div data-onboarding="guide-content">
+        <SlideContent
+          chapterIndex={currentChapter}
+          totalChapters={chapters.length}
+          slideIndex={currentSlide}
+          totalSlides={totalSlides}
+          title={currentSlideData.title}
+          content={currentSlideData.content}
+          onPrevSlide={goToPreviousSlide}
+          onNextSlide={goToNextSlide}
+          onPrevChapter={goToPreviousChapter}
+          onNextChapter={goToNextChapter}
+        />
+      </div>
     </div>
   );
 };
 
 export default PromptingGuide;
-

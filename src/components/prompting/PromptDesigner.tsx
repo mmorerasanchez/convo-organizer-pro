@@ -57,26 +57,28 @@ const PromptDesigner = () => {
 
   return (
     <>
-      <PromptDesignerLayout
-        activePrompt={activePrompt}
-        setActivePrompt={setActivePrompt}
-        promptResponse={promptResponse}
-        setPromptResponse={setPromptResponse}
-        isTestingPrompt={isTestingPrompt}
-        setIsTestingPrompt={setIsTestingPrompt}
-        requestCount={requestCount}
-        setRequestCount={setRequestCount}
-        requestLimit={10}
-        saveModalOpen={saveModalOpen}
-        setSaveModalOpen={setSaveModalOpen}
-        compiledPrompt={compiledPrompt}
-        setCompiledPrompt={setCompiledPrompt}
-        createPrompt={createPrompt}
-        saveVersion={saveVersion}
-        testPrompt={testPrompt}
-        compilePromptText={compilePromptText}
-        onSaveToProject={() => setSaveToProjectDialogOpen(true)}
-      />
+      <div data-onboarding="prompt-designer">
+        <PromptDesignerLayout
+          activePrompt={activePrompt}
+          setActivePrompt={setActivePrompt}
+          promptResponse={promptResponse}
+          setPromptResponse={setPromptResponse}
+          isTestingPrompt={isTestingPrompt}
+          setIsTestingPrompt={setIsTestingPrompt}
+          requestCount={requestCount}
+          setRequestCount={setRequestCount}
+          requestLimit={10}
+          saveModalOpen={saveModalOpen}
+          setSaveModalOpen={setSaveModalOpen}
+          compiledPrompt={compiledPrompt}
+          setCompiledPrompt={setCompiledPrompt}
+          createPrompt={createPrompt}
+          saveVersion={saveVersion}
+          testPrompt={testPrompt}
+          compilePromptText={compilePromptText}
+          onSaveToProject={() => setSaveToProjectDialogOpen(true)}
+        />
+      </div>
       
       <PromptManagerModal
         open={saveModalOpen}

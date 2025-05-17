@@ -9,7 +9,6 @@ export type OnboardingStep = {
   route?: string;
   element?: string; // CSS selector for the element to highlight
   position?: 'top' | 'bottom' | 'left' | 'right';
-  action?: string; // Description of the action to take
 };
 
 type OnboardingFlow = 'projects' | 'prompt-designer' | 'prompt-scanner' | 'prompting-guide';
@@ -33,56 +32,62 @@ type OnboardingContextType = {
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
 
-// Define the steps for each flow
+// Define the steps for each flow - updated to be observational (not requiring actions)
 const onboardingFlows: OnboardingFlowSteps = {
   projects: [
     {
       id: 'welcome',
       title: 'Welcome to Project Management',
-      description: 'Projects help you organize related prompts, conversations, and knowledge files in one place.',
+      description: 'Projects help you organize related prompts, conversations, and knowledge files in one place. Let\'s explore how to use them effectively.',
       route: '/projects',
     },
     {
       id: 'new-project',
-      title: 'Create New Projects',
-      description: 'Start by creating a new project to organize your work.',
+      title: 'Creating New Projects',
+      description: 'This button allows you to create new projects to organize your work. You can add details, invite team members, and more.',
       element: '[data-onboarding="new-project"]',
       position: 'bottom',
-      action: 'Click "Create New Project" to see how you can set up a new project.'
     },
     {
-      id: 'project-detail',
-      title: 'Project Details',
-      description: 'Here you can see all conversations and knowledge files related to a project.',
+      id: 'project-list',
+      title: 'Your Project List',
+      description: 'Here you can see all your projects. You can filter them by status and search for specific projects.',
       route: '/projects',
-      action: 'Projects help you keep track of your work and collaborate with others.'
+      element: '.project-grid',
+      position: 'top',
+    },
+    {
+      id: 'conversations',
+      title: 'Conversations',
+      description: 'Conversations allow you to manage interactions with AI models and track important dialogues.',
+      route: '/conversations',
     }
   ],
   'prompt-designer': [
     {
       id: 'designer-intro',
       title: 'Prompt Designer',
-      description: 'Create sophisticated prompts using proven frameworks.',
+      description: 'Create sophisticated prompts using proven frameworks. This tool helps you craft effective prompts for different AI models.',
       route: '/prompting',
     },
     {
       id: 'frameworks',
       title: 'Prompt Frameworks',
-      description: 'Choose from various frameworks to structure your prompts effectively.',
+      description: 'Choose from various frameworks to structure your prompts effectively. Each framework is designed for specific use cases.',
       element: '[data-onboarding="prompt-framework"]',
       position: 'right',
     },
     {
       id: 'model-selection',
       title: 'Model Selection',
-      description: 'Select different AI models and adjust parameters like temperature.',
+      description: 'Different AI models have different capabilities. Here you can select models and adjust parameters like temperature.',
       element: '[data-onboarding="model-selection"]',
       position: 'bottom',
     },
     {
       id: 'test-prompt',
-      title: 'Test Your Prompt',
-      description: 'See how your prompt performs in real-time.',
+      title: 'Testing Your Prompts',
+      description: 'You can test how your prompt performs in real-time with this feature, allowing you to refine and improve it.',
       element: '[data-onboarding="test-prompt"]',
       position: 'left',
     }
@@ -91,20 +96,20 @@ const onboardingFlows: OnboardingFlowSteps = {
     {
       id: 'scanner-intro',
       title: 'Prompt Scanner',
-      description: 'Analyze and improve your existing prompts.',
+      description: 'Analyze and improve your existing prompts. This tool helps identify issues and suggests enhancements.',
       route: '/prompting',
     },
     {
       id: 'enter-prompt',
-      title: 'Enter Your Prompt',
-      description: 'Paste an existing prompt to get improvement suggestions.',
+      title: 'Entering Your Prompt',
+      description: 'Paste an existing prompt here to get improvement suggestions from our AI.',
       element: '[data-onboarding="scanner-input"]',
       position: 'top',
     },
     {
       id: 'suggestions',
-      title: 'Review Suggestions',
-      description: 'The scanner will analyze your prompt and provide recommendations.',
+      title: 'AI Suggestions',
+      description: 'The scanner analyzes your prompt and provides detailed recommendations to improve effectiveness.',
       element: '[data-onboarding="scanner-suggestions"]',
       position: 'bottom',
     }
@@ -113,20 +118,20 @@ const onboardingFlows: OnboardingFlowSteps = {
     {
       id: 'guide-intro',
       title: 'Prompting Guide',
-      description: 'Learn prompt engineering through structured lessons.',
+      description: 'Learn prompt engineering through structured lessons and examples. Perfect for beginners and advanced users alike.',
       route: '/prompting',
     },
     {
       id: 'chapters',
-      title: 'Browse Chapters',
-      description: 'Explore different topics and techniques in prompt engineering.',
+      title: 'Guide Chapters',
+      description: 'Explore different topics and techniques in prompt engineering, from basic concepts to advanced strategies.',
       element: '[data-onboarding="guide-chapters"]',
       position: 'left',
     },
     {
       id: 'lessons',
       title: 'Interactive Lessons',
-      description: 'Step through lessons with practical examples and exercises.',
+      description: 'Each lesson includes practical examples and exercises to help you master prompt engineering techniques.',
       element: '[data-onboarding="guide-content"]',
       position: 'right',
     }
@@ -212,6 +217,20 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const skipToStep = (index: number) => {
     if (index >= 0 && index < steps.length) {
       setCurrentStep(index);
+    } else {
+      // If we try to skip past the end, move to next flow or end
+      if (currentFlow === 'projects') {
+        setCurrentFlow('prompt-designer');
+        setCurrentStep(0);
+      } else if (currentFlow === 'prompt-designer') {
+        setCurrentFlow('prompt-scanner');
+        setCurrentStep(0);
+      } else if (currentFlow === 'prompt-scanner') {
+        setCurrentFlow('prompting-guide');
+        setCurrentStep(0);
+      } else {
+        endOnboarding();
+      }
     }
   };
 
