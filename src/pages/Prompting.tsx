@@ -5,7 +5,7 @@ import { Tabs, TabsContent } from '@/components/ui/tabs';
 import PromptingGuide from '@/components/prompting/PromptingGuide';
 import PromptScanner from '@/components/prompting/PromptScanner';
 import PromptDesigner from '@/components/prompting/PromptDesigner';
-import { BookOpen, Lightbulb, Wand2 } from 'lucide-react';
+import { BookOpen, Bot, Wand2 } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 import { PromptingProvider } from '@/components/prompting/context/PromptingContext';
 import { PromptScannerProvider } from '@/components/prompting/context/usePromptScanner';
@@ -17,7 +17,7 @@ const Prompting = () => {
     {
       value: 'designer',
       label: 'Prompt Designer',
-      icon: <Lightbulb className="h-4 w-4" />
+      icon: <Bot className="h-4 w-4" />
     },
     {
       value: 'scanner',
