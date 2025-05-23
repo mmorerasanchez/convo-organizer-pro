@@ -6,6 +6,12 @@ import { fetchProjects, createProject, createConversation } from '@/lib/api';
 import { fetchTags, createTag, assignTagToConversation } from '@/lib/api/tags';
 import { toast } from 'sonner';
 
+// Define a proper type for tag assignment
+type TagAssignmentParams = {
+  conversationId: string;
+  tagId: string;
+};
+
 export const useSaveToProject = () => {
   const [selectedProjectId, setSelectedProjectId] = useState('');
   const [newProjectName, setNewProjectName] = useState('');
@@ -59,9 +65,10 @@ export const useSaveToProject = () => {
     }
   });
 
-  // Assign tag to conversation mutation
+  // Assign tag to conversation mutation - fixed with proper parameter type
   const assignTagMutation = useMutation({
-    mutationFn: assignTagToConversation,
+    mutationFn: ({ conversationId, tagId }: TagAssignmentParams) => 
+      assignTagToConversation(conversationId, tagId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
     },
@@ -172,14 +179,19 @@ export const useSaveToProject = () => {
         projectId,
         type: 'input',
         status: 'Active',
-        modelId: 'none'
+        modelId: 'none',
+        source: source // Pass the source parameter to the conversation
       });
       
       // If source is provided, create or find a source tag and assign it
       if (source && promptResult) {
         const sourceTag = await getOrCreateSourceTag(source);
         if (sourceTag) {
-          await assignTagMutation.mutateAsync(promptResult.id, sourceTag.id);
+          // Fixed: Pass an object with the correct properties
+          await assignTagMutation.mutateAsync({
+            conversationId: promptResult.id,
+            tagId: sourceTag.id
+          });
         }
       }
       
@@ -192,14 +204,19 @@ export const useSaveToProject = () => {
           projectId,
           type: 'output',
           status: 'Active',
-          modelId: 'none'
+          modelId: 'none',
+          source: source // Pass the source parameter to the conversation
         });
         
         // Also tag the response with source if provided
         if (source && responseResult) {
           const sourceTag = await getOrCreateSourceTag(source);
           if (sourceTag) {
-            await assignTagMutation.mutateAsync(responseResult.id, sourceTag.id);
+            // Fixed: Pass an object with the correct properties
+            await assignTagMutation.mutateAsync({
+              conversationId: responseResult.id,
+              tagId: sourceTag.id
+            });
           }
         }
       }
