@@ -106,6 +106,7 @@ const PromptDesigner = () => {
         onSaveComplete={() => {
           // Additional actions after saving if needed
         }}
+        source="Prompt Designer" // Added source parameter
       />
     </>
   );

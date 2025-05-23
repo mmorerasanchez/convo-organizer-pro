@@ -18,6 +18,7 @@ export interface Conversation {
   type: 'input' | 'output';
   modelId?: string;
   model?: string; // For displaying model name when fetched
+  source?: string; // Added source field to track where conversation originated
 }
 
 export interface Project {

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { fetchProjects, createProject, createConversation } from '@/lib/api';
+import { fetchTags, createTag, assignTagToConversation } from '@/lib/api/tags';
 import { toast } from 'sonner';
 
 export const useSaveToProject = () => {
@@ -23,6 +24,12 @@ export const useSaveToProject = () => {
     queryKey: ['projects'],
     queryFn: fetchProjects
   });
+
+  // Fetch tags for source tags
+  const { data: tags = [] } = useQuery({
+    queryKey: ['tags'],
+    queryFn: fetchTags
+  });
   
   // Create new project mutation
   const createProjectMutation = useMutation({
@@ -37,6 +44,30 @@ export const useSaveToProject = () => {
       setError(`Error creating project: ${error.message}`);
       toast.error(`Error creating project: ${error.message}`);
       setIsProcessing(false);
+    }
+  });
+  
+  // Create tag mutation
+  const createTagMutation = useMutation({
+    mutationFn: createTag,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+    },
+    onError: (error: Error) => {
+      console.error('Error creating tag:', error);
+      // Continue with saving even if tag creation fails
+    }
+  });
+
+  // Assign tag to conversation mutation
+  const assignTagMutation = useMutation({
+    mutationFn: assignTagToConversation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+    },
+    onError: (error: Error) => {
+      console.error('Error assigning tag to conversation:', error);
+      // Continue even if tag assignment fails
     }
   });
   
@@ -61,12 +92,45 @@ export const useSaveToProject = () => {
       setIsProcessing(false);
     }
   });
+
+  // Helper function to find or create a source tag
+  const getOrCreateSourceTag = async (source: string) => {
+    // Check if tag already exists
+    const sourceTag = tags.find(tag => 
+      tag.name.toLowerCase() === `source:${source.toLowerCase()}`
+    );
+    
+    if (sourceTag) {
+      return sourceTag;
+    }
+
+    // Create a new tag with a color based on the source
+    let tagColor = '#6366F1'; // Default indigo color
+    
+    if (source.toLowerCase().includes('designer')) {
+      tagColor = '#2563EB'; // Blue for Designer
+    } else if (source.toLowerCase().includes('scanner')) {
+      tagColor = '#8B5CF6'; // Purple for Scanner
+    }
+    
+    try {
+      const newTag = await createTagMutation.mutateAsync({
+        name: `source:${source}`,
+        color: tagColor
+      });
+      return newTag;
+    } catch (error) {
+      console.error('Failed to create source tag:', error);
+      return null;
+    }
+  };
   
   const handleSaveConversation = async (
     title: string,
     content: string,
     responseContent?: string,
-    onSuccess?: () => void
+    onSuccess?: () => void,
+    source?: string
   ) => {
     try {
       setIsProcessing(true);
@@ -111,9 +175,17 @@ export const useSaveToProject = () => {
         modelId: 'none'
       });
       
+      // If source is provided, create or find a source tag and assign it
+      if (source && promptResult) {
+        const sourceTag = await getOrCreateSourceTag(source);
+        if (sourceTag) {
+          await assignTagMutation.mutateAsync(promptResult.id, sourceTag.id);
+        }
+      }
+      
       // Save the response as output if provided
       if (responseContent) {
-        await createConversationMutation.mutateAsync({
+        const responseResult = await createConversationMutation.mutateAsync({
           title: `${title.trim()} (Response)`,
           content: responseContent.trim(),
           platform: 'Promptito',
@@ -122,6 +194,14 @@ export const useSaveToProject = () => {
           status: 'Active',
           modelId: 'none'
         });
+        
+        // Also tag the response with source if provided
+        if (source && responseResult) {
+          const sourceTag = await getOrCreateSourceTag(source);
+          if (sourceTag) {
+            await assignTagMutation.mutateAsync(responseResult.id, sourceTag.id);
+          }
+        }
       }
       
       if (onSuccess) {

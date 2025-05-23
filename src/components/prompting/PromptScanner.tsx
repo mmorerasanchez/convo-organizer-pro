@@ -81,6 +81,7 @@ const PromptScanner = () => {
         onSaveComplete={() => {
           // Actions after saving if needed
         }}
+        source="Prompt Scanner" // Added source parameter
       />
     </div>
   );

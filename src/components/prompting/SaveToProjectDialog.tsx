@@ -12,6 +12,7 @@ interface SaveToProjectDialogProps {
   promptContent: string;
   responseContent?: string;
   onSaveComplete?: () => void;
+  source?: string; // Added source parameter to track where this save came from
 }
 
 export function SaveToProjectDialog({ 
@@ -20,7 +21,8 @@ export function SaveToProjectDialog({
   promptTitle,
   promptContent,
   responseContent,
-  onSaveComplete
+  onSaveComplete,
+  source
 }: SaveToProjectDialogProps) {
   const [conversationTitle, setConversationTitle] = React.useState(promptTitle || 'Untitled Prompt');
   
@@ -52,7 +54,8 @@ export function SaveToProjectDialog({
           onSaveComplete();
         }
         onOpenChange(false);
-      }
+      },
+      source // Pass the source parameter to handleSaveConversation
     );
   };
 
