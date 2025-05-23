@@ -8,6 +8,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import ToolsHeader from '@/components/tools/ToolsHeader';
 import MyToolsTab from '@/components/tools/MyToolsTab';
 import ToolFinderTab from '@/components/tools/ToolFinderTab';
+import ModelSectionsTab from '@/components/tools/ModelSectionsTab';
 import useToolsFilter from '@/hooks/useToolsFilter';
 
 const Tools = () => {
@@ -50,6 +51,10 @@ const Tools = () => {
               filteredTools={filteredTools}
               resetFilters={resetFilters}
             />
+          </TabsContent>
+          
+          <TabsContent value="llm-models" className="mt-0">
+            <ModelSectionsTab />
           </TabsContent>
           
           <TabsContent value="tool-finder">

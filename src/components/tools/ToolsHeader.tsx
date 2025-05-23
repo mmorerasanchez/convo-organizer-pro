@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Search, CodeSquare } from 'lucide-react';
+import { Search, CodeSquare, Cpu } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 
 interface ToolsHeaderProps {
@@ -36,6 +36,11 @@ const ToolsHeader: React.FC<ToolsHeaderProps> = ({
       label: 'My Tools',
       icon: <CodeSquare className="h-4 w-4" />
     },
+    {
+      value: 'llm-models',
+      label: 'LLM Models',
+      icon: <Cpu className="h-4 w-4" />
+    },
     toolFinderTab
   ];
 
@@ -46,7 +51,7 @@ const ToolsHeader: React.FC<ToolsHeaderProps> = ({
       tabs={tabs}
       activeTab={activeTab}
       onTabChange={setActiveTab}
-      showSearch={true}
+      showSearch={activeTab === 'my-tools'}
       searchPlaceholder="Search tools by name, description or model..."
       searchValue={searchTerm}
       onSearchChange={setSearchTerm}

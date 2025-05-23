@@ -70,3 +70,14 @@ export interface AIModel {
   provider: string;
   contextWindow?: number;
 }
+
+export interface LLMModel {
+  id: string;
+  name: string;
+  provider: 'openai' | 'google' | 'anthropic' | 'other';
+  description: string;
+  contextWindow: number;
+  status: 'available' | 'coming-soon';
+  capabilities: string[];
+  lastUsed?: string;
+}
