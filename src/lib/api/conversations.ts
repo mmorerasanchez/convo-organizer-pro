@@ -170,7 +170,9 @@ export const createConversation = async (conversation: {
   if (error) throw error;
   if (!data) throw new Error('Failed to create conversation');
 
-  return {
+  // We need to handle the source field differently since it's not included in the type
+  // Create a properly typed conversation object
+  const result: Conversation = {
     id: data.id,
     title: data.title,
     content: data.content,
@@ -182,9 +184,16 @@ export const createConversation = async (conversation: {
     status: data.status || 'active',
     type: (data.type === 'output' ? 'output' : 'input') as 'input' | 'output',
     modelId: data.model_id || undefined,
-    model: data.model?.display_name,
-    source: data.source // Return source in the response
+    model: data.model?.display_name
   };
+
+  // Add source field if available in the response
+  // Use type assertion to safely access the source property
+  if ('source' in data) {
+    result.source = (data as any).source;
+  }
+
+  return result;
 };
 
 export const updateConversation = async (
