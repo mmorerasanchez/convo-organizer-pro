@@ -59,6 +59,7 @@ export function SaveToProjectDialog({
     );
   };
 
+  // No changes needed here - the component uses the hook same way as before
   return (
     <>
       <DialogWrapper
