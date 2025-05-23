@@ -67,6 +67,7 @@ export type Database = {
           model_id: string | null
           platform: string
           project_id: string
+          source: string | null
           status: string | null
           title: string
           type: string
@@ -81,6 +82,7 @@ export type Database = {
           model_id?: string | null
           platform: string
           project_id: string
+          source?: string | null
           status?: string | null
           title: string
           type?: string
@@ -95,6 +97,7 @@ export type Database = {
           model_id?: string | null
           platform?: string
           project_id?: string
+          source?: string | null
           status?: string | null
           title?: string
           type?: string
