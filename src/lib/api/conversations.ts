@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Conversation, Tag } from '../types';
 import { fetchTagsForConversations } from './tags';
@@ -142,6 +141,7 @@ export const createConversation = async (conversation: {
   status?: string;
   type?: 'input' | 'output';
   modelId?: string;
+  source?: string; // Added source parameter
 }): Promise<Conversation> => {
   // Ensure type is either "input" or "output", default to "input"
   const conversationType = conversation.type === 'output' ? 'output' : 'input';
@@ -157,7 +157,8 @@ export const createConversation = async (conversation: {
         external_id: conversation.externalId,
         status: conversation.status || 'active',
         type: conversationType,
-        model_id: conversation.modelId
+        model_id: conversation.modelId,
+        source: conversation.source // Add source to database insert
       }
     ])
     .select(`
@@ -181,7 +182,8 @@ export const createConversation = async (conversation: {
     status: data.status || 'active',
     type: (data.type === 'output' ? 'output' : 'input') as 'input' | 'output',
     modelId: data.model_id || undefined,
-    model: data.model?.display_name
+    model: data.model?.display_name,
+    source: data.source // Return source in the response
   };
 };
 
