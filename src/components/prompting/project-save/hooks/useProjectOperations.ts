@@ -17,14 +17,20 @@ export const useProjectOperations = () => {
   const createProjectMutation = useMutation({
     mutationFn: createProject,
     onSuccess: (newProject) => {
+      console.log('Project created successfully:', newProject);
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       setSelectedProjectId(newProject.id);
       setShowNewProjectForm(false);
-      toast.success(`Project "${newProjectName}" created successfully`);
+      // Clear form fields after successful creation
+      setNewProjectName('');
+      setNewProjectDescription('');
+      toast.success(`Project "${newProject.name}" created successfully`);
     },
     onError: (error: Error) => {
-      setError(`Error creating project: ${error.message}`);
-      toast.error(`Error creating project: ${error.message}`);
+      console.error('Error creating project:', error);
+      const errorMessage = error.message || 'Unknown error occurred';
+      setError(`Error creating project: ${errorMessage}`);
+      toast.error(`Error creating project: ${errorMessage}`);
     }
   });
 

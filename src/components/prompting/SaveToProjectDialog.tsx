@@ -12,7 +12,7 @@ interface SaveToProjectDialogProps {
   promptContent: string;
   responseContent?: string;
   onSaveComplete?: () => void;
-  source?: string; // Added source parameter to track where this save came from
+  source?: string;
 }
 
 export function SaveToProjectDialog({ 
@@ -45,21 +45,35 @@ export function SaveToProjectDialog({
   } = useSaveToProject();
 
   const handleSave = async () => {
-    await handleSaveConversation(
-      conversationTitle, 
-      promptContent, 
-      responseContent,
-      () => {
-        if (onSaveComplete) {
-          onSaveComplete();
-        }
-        onOpenChange(false);
-      },
-      source // Pass the source parameter to handleSaveConversation
-    );
+    try {
+      console.log('Dialog: Starting save with source:', source);
+      
+      await handleSaveConversation(
+        conversationTitle, 
+        promptContent, 
+        responseContent,
+        () => {
+          console.log('Save completed successfully');
+          if (onSaveComplete) {
+            onSaveComplete();
+          }
+          onOpenChange(false);
+        },
+        source
+      );
+    } catch (error) {
+      console.error('Error in dialog save:', error);
+      // Error is already handled in the hook
+    }
   };
 
-  // No changes needed here - the component uses the hook same way as before
+  // Reset conversation title when dialog opens
+  React.useEffect(() => {
+    if (open) {
+      setConversationTitle(promptTitle || 'Untitled Prompt');
+    }
+  }, [open, promptTitle]);
+
   return (
     <>
       <DialogWrapper

@@ -38,8 +38,10 @@ export const useConversationOperations = (
       setIsProcessing(false);
     },
     onError: (error: Error) => {
-      setError(`Error saving conversation: ${error.message}`);
-      toast.error(`Error saving conversation: ${error.message}`);
+      console.error('Error saving conversation:', error);
+      const errorMessage = error.message || 'Unknown error occurred';
+      setError(`Error saving conversation: ${errorMessage}`);
+      toast.error(`Error saving conversation: ${errorMessage}`);
       setIsProcessing(false);
     }
   });
@@ -61,6 +63,17 @@ export const useConversationOperations = (
         return;
       }
       
+      console.log('Saving conversation with data:', {
+        title: title.trim(),
+        content: content.trim(),
+        platform: 'Promptito',
+        projectId: selectedProjectId,
+        type: 'input',
+        status: 'Active',
+        modelId: null, // Fixed: Use null instead of 'none'
+        source: source
+      });
+      
       // Save the prompt as input
       const promptResult = await createConversationMutation.mutateAsync({
         title: title.trim(),
@@ -69,23 +82,32 @@ export const useConversationOperations = (
         projectId: selectedProjectId,
         type: 'input',
         status: 'Active',
-        modelId: 'none',
+        modelId: null, // Fixed: Use null instead of 'none'
         source: source
       });
       
+      console.log('Prompt saved successfully:', promptResult);
+      
       // If source is provided, create or find a source tag and assign it
       if (source && promptResult) {
-        const sourceTag = await getOrCreateSourceTag(source, tags, createTagMutation);
-        if (sourceTag) {
-          await assignTagMutation.mutateAsync({
-            conversationId: promptResult.id,
-            tagId: sourceTag.id
-          });
+        try {
+          const sourceTag = await getOrCreateSourceTag(source, tags, createTagMutation);
+          if (sourceTag) {
+            await assignTagMutation.mutateAsync({
+              conversationId: promptResult.id,
+              tagId: sourceTag.id
+            });
+            console.log('Source tag assigned successfully');
+          }
+        } catch (tagError) {
+          console.error('Error with source tag:', tagError);
+          // Don't fail the entire save if tagging fails
         }
       }
       
       // Save the response as output if provided
       if (responseContent) {
+        console.log('Saving response content...');
         const responseResult = await createConversationMutation.mutateAsync({
           title: `${title.trim()} (Response)`,
           content: responseContent.trim(),
@@ -93,18 +115,25 @@ export const useConversationOperations = (
           projectId: selectedProjectId,
           type: 'output',
           status: 'Active',
-          modelId: 'none',
+          modelId: null, // Fixed: Use null instead of 'none'
           source: source
         });
         
+        console.log('Response saved successfully:', responseResult);
+        
         // Also tag the response with source if provided
         if (source && responseResult) {
-          const sourceTag = await getOrCreateSourceTag(source, tags, createTagMutation);
-          if (sourceTag) {
-            await assignTagMutation.mutateAsync({
-              conversationId: responseResult.id,
-              tagId: sourceTag.id
-            });
+          try {
+            const sourceTag = await getOrCreateSourceTag(source, tags, createTagMutation);
+            if (sourceTag) {
+              await assignTagMutation.mutateAsync({
+                conversationId: responseResult.id,
+                tagId: sourceTag.id
+              });
+            }
+          } catch (tagError) {
+            console.error('Error with response source tag:', tagError);
+            // Don't fail the entire save if tagging fails
           }
         }
       }
@@ -116,8 +145,10 @@ export const useConversationOperations = (
       return promptResult;
     } catch (error) {
       console.error('Error in handleSaveConversation:', error);
-      setError(`Unexpected error: ${error instanceof Error ? error.message : String(error)}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setError(`Unexpected error: ${errorMessage}`);
       setIsProcessing(false);
+      throw error; // Re-throw to allow parent components to handle
     }
   };
   

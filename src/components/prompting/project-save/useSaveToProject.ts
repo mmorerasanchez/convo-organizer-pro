@@ -56,6 +56,15 @@ export const useSaveToProject = () => {
       setIsProcessing(true);
       setError(null);
       
+      console.log('Starting save process with:', {
+        title,
+        showNewProjectForm,
+        selectedProjectId,
+        source
+      });
+      
+      let projectIdToUse = selectedProjectId;
+      
       // Create a new project if needed
       if (showNewProjectForm) {
         if (!newProjectName.trim()) {
@@ -64,24 +73,31 @@ export const useSaveToProject = () => {
           return;
         }
         
-        // Create the project first
-        await createProjectMutation.mutateAsync({
+        console.log('Creating new project:', newProjectName);
+        
+        // Create the project first and wait for it
+        const newProject = await createProjectMutation.mutateAsync({
           name: newProjectName.trim(),
           description: newProjectDescription.trim()
         });
+        
+        projectIdToUse = newProject.id;
+        console.log('Project created, using ID:', projectIdToUse);
       } else if (!selectedProjectId) {
         setError('Please select a project or create a new one');
         setIsProcessing(false);
         return;
       }
       
-      // Now save the conversation
+      // Now save the conversation using the correct project ID
       return await handleSaveConversation(title, content, responseContent, onSuccess, source);
       
     } catch (error) {
       console.error('Error in handleSaveWithProjectCheck:', error);
-      setError(`Unexpected error: ${error instanceof Error ? error.message : String(error)}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setError(`Unexpected error: ${errorMessage}`);
       setIsProcessing(false);
+      throw error;
     }
   };
   
