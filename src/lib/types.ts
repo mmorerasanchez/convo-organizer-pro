@@ -70,6 +70,19 @@ export interface AIModel {
   displayName: string;
   provider: string;
   contextWindow?: number;
+  icon?: string;
+  capabilities?: string[];
+  pricing?: 'free' | 'low' | 'medium' | 'high';
+  description?: string;
+  strengths?: string[];
+  bestFor?: string[];
+}
+
+export interface ModelProvider {
+  id: string;
+  name: string;
+  icon: string;
+  models: AIModel[];
 }
 
 export interface LLMModel {
@@ -81,4 +94,8 @@ export interface LLMModel {
   status: 'available' | 'coming-soon';
   capabilities: string[];
   lastUsed?: string;
+  icon?: string;
+  pricing?: 'free' | 'low' | 'medium' | 'high';
+  strengths?: string[];
+  bestFor?: string[];
 }

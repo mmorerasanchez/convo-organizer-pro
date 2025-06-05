@@ -9,3 +9,6 @@ verify_jwt = true
 
 [functions.send-verification-email]
 verify_jwt = false
+
+[functions.gemini-api]
+verify_jwt = false

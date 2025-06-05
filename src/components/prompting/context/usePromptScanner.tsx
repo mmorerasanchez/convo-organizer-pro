@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { usePromptImprovement } from '@/hooks/use-prompt-improvement';
+import { useEnhancedPromptImprovement } from '@/hooks/use-enhanced-prompt-improvement';
 import { toast } from 'sonner';
 
 type PromptScannerContextValue = {
@@ -17,6 +17,16 @@ type PromptScannerContextValue = {
   requestLimit: number;
   isProcessing: boolean;
   feedbackHistory: Array<{ feedback: string; improvedPrompt: string }>;
+  
+  // Model and parameters
+  selectedModelId: string;
+  setSelectedModelId: (modelId: string) => void;
+  temperature: number;
+  setTemperature: (temp: number) => void;
+  maxTokens: number;
+  setMaxTokens: (tokens: number) => void;
+  showAdvancedParams: boolean;
+  setShowAdvancedParams: (show: boolean) => void;
   
   // Actions
   handleInitialScan: () => void;
@@ -37,11 +47,17 @@ export const PromptScannerProvider = ({ children }: { children: ReactNode }) => 
   const [requestLimit] = useState(10); // Free tier limit
   const [feedbackHistory, setFeedbackHistory] = useState<Array<{ feedback: string; improvedPrompt: string }>>([]);
   
+  // Model and parameters state
+  const [selectedModelId, setSelectedModelId] = useState('gpt-4o-mini');
+  const [temperature, setTemperature] = useState(0.7);
+  const [maxTokens, setMaxTokens] = useState(1000);
+  const [showAdvancedParams, setShowAdvancedParams] = useState(false);
+  
   const {
     isProcessing,
     apiError,
     improvePrompt,
-  } = usePromptImprovement();
+  } = useEnhancedPromptImprovement();
 
   const handleImprovePrompt = async (feedback?: string) => {
     try {
@@ -50,7 +66,7 @@ export const PromptScannerProvider = ({ children }: { children: ReactNode }) => 
         return;
       }
       
-      const result = await improvePrompt(promptInput, feedback);
+      const result = await improvePrompt(promptInput, feedback, selectedModelId, temperature, maxTokens);
       if (result) {
         if (improvedPrompt) {
           setFeedbackHistory([...feedbackHistory, { feedback: feedback || '', improvedPrompt }]);
@@ -122,6 +138,16 @@ export const PromptScannerProvider = ({ children }: { children: ReactNode }) => 
     requestLimit,
     isProcessing,
     feedbackHistory,
+    
+    // Model and parameters
+    selectedModelId,
+    setSelectedModelId,
+    temperature,
+    setTemperature,
+    maxTokens,
+    setMaxTokens,
+    showAdvancedParams,
+    setShowAdvancedParams,
     
     // Actions
     handleInitialScan,

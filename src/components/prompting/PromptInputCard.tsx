@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Brain, RefreshCw, XCircle } from 'lucide-react';
+import { EnhancedModelSelector } from '@/components/common/EnhancedModelSelector';
+import { ModelParametersPanel } from './scanner/ModelParametersPanel';
 
 interface PromptInputCardProps {
   promptInput: string;
@@ -11,6 +13,14 @@ interface PromptInputCardProps {
   onScan: () => void;
   onClear: () => void;
   isProcessing: boolean;
+  selectedModelId: string;
+  onModelChange: (modelId: string) => void;
+  temperature: number;
+  onTemperatureChange: (temp: number) => void;
+  maxTokens: number;
+  onMaxTokensChange: (tokens: number) => void;
+  showAdvancedParams: boolean;
+  onToggleAdvancedParams: () => void;
 }
 
 export function PromptInputCard({
@@ -19,6 +29,14 @@ export function PromptInputCard({
   onScan,
   onClear,
   isProcessing,
+  selectedModelId,
+  onModelChange,
+  temperature,
+  onTemperatureChange,
+  maxTokens,
+  onMaxTokensChange,
+  showAdvancedParams,
+  onToggleAdvancedParams,
 }: PromptInputCardProps) {
   return (
     <Card className="overflow-hidden border">
@@ -28,7 +46,22 @@ export function PromptInputCard({
           Enter your informal prompt to get AI-powered improvement suggestions
         </CardDescription>
       </CardHeader>
-      <CardContent className="pt-4">
+      <CardContent className="pt-4 space-y-4">
+        <EnhancedModelSelector
+          value={selectedModelId}
+          onChange={onModelChange}
+          showRecommendations={true}
+        />
+        
+        <ModelParametersPanel
+          temperature={temperature}
+          onTemperatureChange={onTemperatureChange}
+          maxTokens={maxTokens}
+          onMaxTokensChange={onMaxTokensChange}
+          isOpen={showAdvancedParams}
+          onToggle={onToggleAdvancedParams}
+        />
+        
         <Textarea 
           placeholder="Enter your prompt here... (e.g., 'Tell me about climate change')"
           className="min-h-[180px] bg-background border text-sm font-mono prompt-area"

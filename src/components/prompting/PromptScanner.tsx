@@ -25,6 +25,16 @@ const PromptScanner = () => {
     isProcessing,
     feedbackHistory,
     
+    // Model and parameters
+    selectedModelId,
+    setSelectedModelId,
+    temperature,
+    setTemperature,
+    maxTokens,
+    setMaxTokens,
+    showAdvancedParams,
+    setShowAdvancedParams,
+    
     // Actions
     handleInitialScan,
     handleClear,
@@ -49,6 +59,14 @@ const PromptScanner = () => {
           onScan={handleInitialScan}
           onClear={handleClear}
           isProcessing={isProcessing}
+          selectedModelId={selectedModelId}
+          onModelChange={setSelectedModelId}
+          temperature={temperature}
+          onTemperatureChange={setTemperature}
+          maxTokens={maxTokens}
+          onMaxTokensChange={setMaxTokens}
+          showAdvancedParams={showAdvancedParams}
+          onToggleAdvancedParams={() => setShowAdvancedParams(!showAdvancedParams)}
         />
 
         <PromptOutputCard
