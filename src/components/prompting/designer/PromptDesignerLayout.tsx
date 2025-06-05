@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useFrameworks, useFrameworkFields, useModels } from '@/hooks/use-frameworks';
+import { useFrameworks, useFrameworkFields } from '@/hooks/use-frameworks';
 import { PromptDesignerHeader } from './PromptDesignerHeader';
 import { PromptState, TestPromptParams, TestPromptResult } from '@/hooks/prompting';
 import { UseMutationResult } from '@tanstack/react-query';
@@ -49,16 +49,13 @@ export function PromptDesignerLayout({
   onSaveToProject
 }: PromptDesignerLayoutProps) {
   const { data: frameworks = [] } = useFrameworks();
-  const { data: models = [] } = useModels();
   
   // Get framework-specific fields when framework changes
-  // Add null check to prevent accessing frameworkId of null
   const { data: frameworkFields = [] } = useFrameworkFields(
     activePrompt?.frameworkId || undefined
   );
   
   // Compile the prompt text whenever prompt state changes
-  // Add null check to prevent errors when activePrompt is null
   useEffect(() => {
     if (activePrompt) {
       const compiled = compilePromptText(activePrompt);
@@ -104,7 +101,7 @@ export function PromptDesignerLayout({
         promptResponse={promptResponse}
         compiledPrompt={compiledPrompt}
         frameworks={frameworks}
-        models={models}
+        models={[]} // Remove models dependency since we use enhanced selector
         frameworkFields={frameworkFields}
         isTestingPrompt={isTestingPrompt}
         handleFieldChange={handleFieldChange}

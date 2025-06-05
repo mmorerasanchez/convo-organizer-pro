@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { PromptSettings } from './PromptSettings';
 import { PromptState } from '@/hooks/prompting';
 
@@ -16,12 +16,15 @@ export const PromptSettingsPanel = ({
   frameworks,
   models,
 }: PromptSettingsPanelProps) => {
+  const [showAdvancedParams, setShowAdvancedParams] = useState(false);
+
   return (
     <PromptSettings
       activePrompt={activePrompt}
       setActivePrompt={setActivePrompt}
       frameworks={frameworks}
-      models={models}
+      showAdvancedParams={showAdvancedParams}
+      onToggleAdvancedParams={() => setShowAdvancedParams(!showAdvancedParams)}
     />
   );
 };

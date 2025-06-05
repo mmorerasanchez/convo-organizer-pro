@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { PromptState, TestPromptParams, TestPromptResult } from './types';
 import { toast } from 'sonner';
+import { getModelById } from '@/lib/modelData';
 
 export const fetchPrompts = async (userId?: string) => {
   if (!userId) return [];
@@ -123,27 +124,62 @@ export const deletePromptById = async (promptId: string) => {
 };
 
 export const testPromptRequest = async (params: TestPromptParams): Promise<TestPromptResult> => {
-  const { data, error } = await supabase.functions.invoke('test-prompt', {
-    body: params
-  });
+  const model = getModelById(params.modelId);
+  const isGemini = model?.provider === 'google';
   
-  if (error) throw error;
-  
-  // If there's a versionId, record the test
-  if (params.versionId) {
-    await supabase
-      .from('prompt_tests')
-      .insert({
-        version_id: params.versionId,
-        response_ms: data.response_ms,
-        tokens_in: data.tokens_in,
-        tokens_out: data.tokens_out,
-        cost_usd: data.cost_usd,
-        raw_response: data.completion
+  try {
+    let data, error;
+    
+    if (isGemini) {
+      // Use Gemini API
+      const response = await supabase.functions.invoke('gemini-api', {
+        body: { 
+          prompt: params.prompt,
+          model: params.modelId,
+          temperature: params.temperature || 0.7,
+          maxTokens: params.maxTokens || 1000
+        }
       });
+      
+      data = response.data;
+      error = response.error;
+    } else {
+      // Use OpenAI API (existing test-prompt function)
+      const response = await supabase.functions.invoke('test-prompt', {
+        body: params
+      });
+      
+      data = response.data;
+      error = response.error;
+    }
+    
+    if (error) throw error;
+    
+    // If there's a versionId, record the test
+    if (params.versionId) {
+      await supabase
+        .from('prompt_tests')
+        .insert({
+          version_id: params.versionId,
+          response_ms: data.response_ms || 0,
+          tokens_in: data.tokens_in || 0,
+          tokens_out: data.tokens_out || 0,
+          cost_usd: data.cost_usd || 0,
+          raw_response: data.completion || data.generatedText
+        });
+    }
+    
+    return {
+      completion: data.completion || data.generatedText,
+      tokens_in: data.tokens_in || 0,
+      tokens_out: data.tokens_out || 0,
+      response_ms: data.response_ms || 0,
+      cost_usd: data.cost_usd || 0
+    };
+  } catch (error) {
+    console.error('Error testing prompt:', error);
+    throw error;
   }
-  
-  return data;
 };
 
 // Compile prompt text from PromptState

@@ -66,7 +66,7 @@ export const PromptDesignerContainer = ({
       
       {/* Right column - Compiled Prompt and Model Response */}
       <div className="space-y-6">
-        {/* Compiled Prompt Preview - moved to the top of right column */}
+        {/* Compiled Prompt Preview */}
         <CompiledPromptPreview compiledPrompt={compiledPrompt} />
         
         {/* Model Response */}

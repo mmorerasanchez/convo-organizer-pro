@@ -4,21 +4,24 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 import { PromptState } from '@/hooks/prompting';
+import { EnhancedModelSelector } from '@/components/common/EnhancedModelSelector';
+import { ModelParametersPanel } from '@/components/prompting/scanner/ModelParametersPanel';
 
 interface PromptSettingsProps {
   activePrompt: PromptState;
   setActivePrompt: (prompt: PromptState) => void;
   frameworks?: any[];
-  models?: any[];
+  showAdvancedParams?: boolean;
+  onToggleAdvancedParams?: () => void;
 }
 
 export function PromptSettings({
   activePrompt,
   setActivePrompt,
   frameworks,
-  models,
+  showAdvancedParams = false,
+  onToggleAdvancedParams,
 }: PromptSettingsProps) {
   return (
     <Card className="border shadow-sm overflow-hidden">
@@ -61,67 +64,20 @@ export function PromptSettings({
           )}
         </div>
         
-        <div className="space-y-2">
-          <Label htmlFor="model" className="text-sm font-medium">Model</Label>
-          <Select 
-            value={activePrompt.modelId || undefined} 
-            onValueChange={(value) => setActivePrompt({ ...activePrompt, modelId: value })}
-          >
-            <SelectTrigger className="h-9 border">
-              <SelectValue placeholder="Select a model" />
-            </SelectTrigger>
-            <SelectContent>
-              {models?.map((model) => (
-                <SelectItem 
-                  key={model.id} 
-                  value={model.id}
-                  disabled={model.provider !== 'OpenAI'}
-                  className={model.provider !== 'OpenAI' ? 'opacity-50' : ''}
-                >
-                  {model.display_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {activePrompt.modelId && (
-            <p className="text-xs text-muted-foreground mt-1">
-              Provider: {models?.find(m => m.id === activePrompt.modelId)?.provider}
-              {" | "}
-              Context: {models?.find(m => m.id === activePrompt.modelId)?.context_window} tokens
-            </p>
-          )}
-        </div>
+        <EnhancedModelSelector
+          value={activePrompt.modelId || 'gpt-4o-mini'}
+          onChange={(value) => setActivePrompt({ ...activePrompt, modelId: value })}
+          showRecommendations={true}
+        />
         
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <Label htmlFor="temperature" className="text-sm font-medium">Temperature: {activePrompt.temperature.toFixed(1)}</Label>
-          </div>
-          <Slider 
-            id="temperature"
-            min={0} 
-            max={2} 
-            step={0.1}
-            value={[activePrompt.temperature]} 
-            onValueChange={(value) => setActivePrompt({ ...activePrompt, temperature: value[0] })}
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            Low = More consistent, High = More creative
-          </p>
-        </div>
-        
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <Label htmlFor="maxTokens" className="text-sm font-medium">Max Tokens: {activePrompt.maxTokens}</Label>
-          </div>
-          <Slider 
-            id="maxTokens"
-            min={100} 
-            max={4000} 
-            step={100}
-            value={[activePrompt.maxTokens]} 
-            onValueChange={(value) => setActivePrompt({ ...activePrompt, maxTokens: value[0] })}
-          />
-        </div>
+        <ModelParametersPanel
+          temperature={activePrompt.temperature}
+          onTemperatureChange={(temp) => setActivePrompt({ ...activePrompt, temperature: temp })}
+          maxTokens={activePrompt.maxTokens}
+          onMaxTokensChange={(tokens) => setActivePrompt({ ...activePrompt, maxTokens: tokens })}
+          isOpen={showAdvancedParams}
+          onToggle={onToggleAdvancedParams || (() => {})}
+        />
       </CardContent>
     </Card>
   );
