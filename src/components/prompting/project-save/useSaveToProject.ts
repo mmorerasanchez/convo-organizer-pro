@@ -10,29 +10,33 @@ import { errorHandler, AppError, LogLevel } from '@/lib/utils/errorHandler';
 export const useSaveToProject = () => {
   const [error, setError] = useState<string | null>(null);
   
-  // Fetch projects for the dropdown
-  const { data: projects = [] } = useQuery({
+  // Fetch projects for the dropdown - removed onError (deprecated in React Query v5)
+  const { data: projects = [], error: projectsError } = useQuery({
     queryKey: ['projects'],
-    queryFn: fetchProjects,
-    onError: (error: Error) => {
-      errorHandler.log(new AppError(error.message, LogLevel.ERROR, {
-        component: 'useSaveToProject',
-        action: 'fetchProjects'
-      }));
-    }
+    queryFn: fetchProjects
   });
 
-  // Fetch tags for source tags
-  const { data: tags = [] } = useQuery({
+  // Handle projects fetch error
+  if (projectsError) {
+    errorHandler.log(new AppError(projectsError.message, LogLevel.ERROR, {
+      component: 'useSaveToProject',
+      action: 'fetchProjects'
+    }));
+  }
+
+  // Fetch tags for source tags - removed onError (deprecated in React Query v5)
+  const { data: tags = [], error: tagsError } = useQuery({
     queryKey: ['tags'],
-    queryFn: fetchTags,
-    onError: (error: Error) => {
-      errorHandler.log(new AppError(error.message, LogLevel.ERROR, {
-        component: 'useSaveToProject',
-        action: 'fetchTags'
-      }));
-    }
+    queryFn: fetchTags
   });
+
+  // Handle tags fetch error
+  if (tagsError) {
+    errorHandler.log(new AppError(tagsError.message, LogLevel.ERROR, {
+      component: 'useSaveToProject',
+      action: 'fetchTags'
+    }));
+  }
   
   // Project operations
   const {

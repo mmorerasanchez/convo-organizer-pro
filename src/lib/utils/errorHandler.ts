@@ -52,9 +52,9 @@ export const errorHandler = {
 
     // Show user-friendly toast for errors
     if (errorData.level === LogLevel.ERROR) {
-      toast.error(this.getUserFriendlyMessage(error.message));
+      toast.error(errorHandler.getUserFriendlyMessage(error.message));
     } else if (errorData.level === LogLevel.WARN) {
-      toast.warning(this.getUserFriendlyMessage(error.message));
+      toast.warning(errorHandler.getUserFriendlyMessage(error.message));
     }
   },
 
@@ -95,7 +95,8 @@ export const errorHandler = {
 
   handleSuccess: (message: string, description?: string) => {
     console.log(`✅ SUCCESS: ${message}`);
-    toast.success(message, description ? { description } : undefined);
+    const toastOptions = description ? { description } : undefined;
+    toast.success(message, toastOptions);
   },
 
   handleInfo: (message: string, context: ErrorContext = {}) => {
