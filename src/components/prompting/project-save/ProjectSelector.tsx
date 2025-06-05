@@ -1,69 +1,84 @@
 
 import React from 'react';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Plus, FolderPlus } from 'lucide-react';
 import { Project } from '@/lib/types';
-import { Plus } from 'lucide-react';
 
 interface ProjectSelectorProps {
   projects: Project[];
   selectedProjectId: string;
   onSelectProject: (projectId: string) => void;
   onCreateNewProject: () => void;
+  disabled?: boolean;
 }
 
 export function ProjectSelector({
   projects,
   selectedProjectId,
   onSelectProject,
-  onCreateNewProject
+  onCreateNewProject,
+  disabled = false
 }: ProjectSelectorProps) {
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <Label htmlFor="project">Select Project</Label>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="h-8 px-2 text-xs flex items-center gap-1"
-          onClick={onCreateNewProject}
-        >
-          <Plus className="h-3.5 w-3.5" />
-          Create New Project
-        </Button>
-      </div>
+    <div className="space-y-3">
+      <Label htmlFor="project-select">Choose Project *</Label>
       
       {projects.length > 0 ? (
-        <>
+        <div className="space-y-2">
           <Select 
             value={selectedProjectId} 
             onValueChange={onSelectProject}
+            disabled={disabled}
           >
-            <SelectTrigger id="project">
-              <SelectValue placeholder="Select a project" />
+            <SelectTrigger id="project-select" className={!selectedProjectId ? 'border-destructive' : ''}>
+              <SelectValue placeholder="Select an existing project" />
             </SelectTrigger>
             <SelectContent>
-              {projects.map((project) => (
+              {projects.map(project => (
                 <SelectItem key={project.id} value={project.id}>
-                  {project.name}
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">{project.name}</span>
+                    {project.description && (
+                      <span className="text-xs text-muted-foreground truncate max-w-[200px]">
+                        {project.description}
+                      </span>
+                    )}
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <p className="text-xs text-muted-foreground">
-            Projects help you organize related prompts, conversations, and knowledge files in one place.
-          </p>
-        </>
+          
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>or</span>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onCreateNewProject}
+              disabled={disabled}
+              className="gap-2"
+            >
+              <Plus className="h-3 w-3" />
+              Create New Project
+            </Button>
+          </div>
+        </div>
       ) : (
-        <div className="bg-muted/60 p-4 rounded-md text-center">
-          <p className="text-sm mb-2">You don't have any projects yet.</p>
-          <Button 
-            size="sm" 
-            onClick={onCreateNewProject} 
-            className="w-full"
+        <div className="text-center py-6 border-2 border-dashed border-muted-foreground/25 rounded-lg">
+          <FolderPlus className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+          <p className="text-sm text-muted-foreground mb-3">
+            No projects found. Create your first project to save conversations.
+          </p>
+          <Button
+            type="button"
+            onClick={onCreateNewProject}
+            disabled={disabled}
+            className="gap-2"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4" />
             Create Your First Project
           </Button>
         </div>

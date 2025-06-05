@@ -5,6 +5,7 @@ import { fetchProjects } from '@/lib/api';
 import { fetchTags } from '@/lib/api/tags';
 import { useProjectOperations } from './hooks/useProjectOperations';
 import { useConversationOperations } from './hooks/useConversationOperations';
+import { errorHandler, AppError, LogLevel } from '@/lib/utils/errorHandler';
 
 export const useSaveToProject = () => {
   const [error, setError] = useState<string | null>(null);
@@ -12,13 +13,25 @@ export const useSaveToProject = () => {
   // Fetch projects for the dropdown
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
-    queryFn: fetchProjects
+    queryFn: fetchProjects,
+    onError: (error: Error) => {
+      errorHandler.log(new AppError(error.message, LogLevel.ERROR, {
+        component: 'useSaveToProject',
+        action: 'fetchProjects'
+      }));
+    }
   });
 
   // Fetch tags for source tags
   const { data: tags = [] } = useQuery({
     queryKey: ['tags'],
-    queryFn: fetchTags
+    queryFn: fetchTags,
+    onError: (error: Error) => {
+      errorHandler.log(new AppError(error.message, LogLevel.ERROR, {
+        component: 'useSaveToProject',
+        action: 'fetchTags'
+      }));
+    }
   });
   
   // Project operations
@@ -56,11 +69,16 @@ export const useSaveToProject = () => {
       setIsProcessing(true);
       setError(null);
       
-      console.log('Starting save process with:', {
-        title,
-        showNewProjectForm,
-        selectedProjectId,
-        source
+      errorHandler.handleInfo('Starting save process', {
+        component: 'useSaveToProject',
+        action: 'handleSaveWithProjectCheck',
+        metadata: {
+          title,
+          showNewProjectForm,
+          selectedProjectId,
+          source,
+          hasResponseContent: !!responseContent
+        }
       });
       
       let projectIdToUse = selectedProjectId;
@@ -68,12 +86,13 @@ export const useSaveToProject = () => {
       // Create a new project if needed
       if (showNewProjectForm) {
         if (!newProjectName.trim()) {
-          setError('Project name is required');
-          setIsProcessing(false);
-          return;
+          throw new AppError('Project name is required', LogLevel.ERROR, {
+            component: 'useSaveToProject',
+            action: 'projectValidation'
+          });
         }
         
-        console.log('Creating new project:', newProjectName);
+        errorHandler.handleInfo(`Creating new project: ${newProjectName}`);
         
         // Create the project first and wait for it
         const newProject = await createProjectMutation.mutateAsync({
@@ -82,22 +101,24 @@ export const useSaveToProject = () => {
         });
         
         projectIdToUse = newProject.id;
-        console.log('Project created, using ID:', projectIdToUse);
+        errorHandler.handleInfo(`Project created successfully, using ID: ${projectIdToUse}`);
+        
       } else if (!selectedProjectId) {
-        setError('Please select a project or create a new one');
-        setIsProcessing(false);
-        return;
+        throw new AppError('Please select a project or create a new one', LogLevel.ERROR, {
+          component: 'useSaveToProject',
+          action: 'projectValidation'
+        });
       }
       
       // Now save the conversation using the correct project ID
       return await handleSaveConversation(title, content, responseContent, onSuccess, source);
       
     } catch (error) {
-      console.error('Error in handleSaveWithProjectCheck:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      setError(`Unexpected error: ${errorMessage}`);
-      setIsProcessing(false);
-      throw error;
+      errorHandler.handleApiError(error, {
+        component: 'useSaveToProject',
+        action: 'handleSaveWithProjectCheck',
+        metadata: { selectedProjectId, source }
+      });
     }
   };
   

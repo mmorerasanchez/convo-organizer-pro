@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { ProjectSelector } from './ProjectSelector';
 import { NewProjectForm } from './NewProjectForm';
 import { Project } from '@/lib/types';
+import { Loader2 } from 'lucide-react';
 
 interface SaveDialogContentProps {
   error: string | null;
@@ -51,6 +52,12 @@ export function SaveDialogContent({
   onSave,
   isProcessing
 }: SaveDialogContentProps) {
+  
+  // Determine if save button should be disabled
+  const isSaveDisabled = isProcessing || 
+    !conversationTitle.trim() || 
+    (showNewProjectForm ? !newProjectName.trim() : !selectedProjectId);
+
   return (
     <DialogContent className="sm:max-w-[500px]">
       <DialogHeader>
@@ -62,18 +69,20 @@ export function SaveDialogContent({
       
       <div className="space-y-4 py-4">
         {error && (
-          <div className="bg-destructive/15 text-destructive p-3 rounded-md text-sm">
+          <div className="bg-destructive/15 text-destructive p-3 rounded-md text-sm border border-destructive/20">
             {error}
           </div>
         )}
         
         <div className="space-y-2">
-          <Label htmlFor="title">Conversation Title</Label>
+          <Label htmlFor="title">Conversation Title *</Label>
           <Input 
             id="title" 
             value={conversationTitle}
             onChange={onConversationTitleChange}
             placeholder="Enter a title for this conversation"
+            disabled={isProcessing}
+            className={!conversationTitle.trim() ? 'border-destructive' : ''}
           />
           <p className="text-xs text-muted-foreground">
             This title will help you identify your prompt in your project's conversation list.
@@ -86,6 +95,7 @@ export function SaveDialogContent({
             selectedProjectId={selectedProjectId}
             onSelectProject={onSelectProject}
             onCreateNewProject={onShowNewProjectForm}
+            disabled={isProcessing}
           />
         ) : (
           <NewProjectForm
@@ -94,6 +104,7 @@ export function SaveDialogContent({
             onProjectNameChange={onNewProjectNameChange}
             onProjectDescriptionChange={onNewProjectDescriptionChange}
             onBack={onHideNewProjectForm}
+            disabled={isProcessing}
           />
         )}
       </div>
@@ -108,9 +119,17 @@ export function SaveDialogContent({
         </Button>
         <Button 
           onClick={onSave}
-          disabled={isProcessing || !conversationTitle.trim()}
+          disabled={isSaveDisabled}
+          className="min-w-[120px]"
         >
-          {isProcessing ? "Saving..." : "Save to Project"}
+          {isProcessing ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            "Save to Project"
+          )}
         </Button>
       </DialogFooter>
     </DialogContent>

@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { useTagOperations, TagAssignmentParams } from './useTagOperations';
 import { getOrCreateSourceTag } from '../utils/tagUtils';
 import { Tag } from '@/lib/types';
+import { errorHandler, AppError, LogLevel } from '@/lib/utils/errorHandler';
 
 export const useConversationOperations = (
   selectedProjectId: string, 
@@ -22,7 +23,7 @@ export const useConversationOperations = (
   
   const { createTagMutation, assignTagMutation } = useTagOperations();
 
-  // Create conversation mutation
+  // Create conversation mutation with improved error handling
   const createConversationMutation = useMutation({
     mutationFn: createConversation,
     onSuccess: (newConversation) => {
@@ -32,16 +33,21 @@ export const useConversationOperations = (
       
       setNewConversationId(newConversation.id);
       setShowNavigationConfirm(true);
-      toast.success('Conversation saved successfully to your project', {
-        description: 'You can now find it in your project for future reference',
-      });
+      
+      errorHandler.handleSuccess(
+        'Conversation saved successfully!',
+        'You can now find it in your project for future reference'
+      );
       setIsProcessing(false);
     },
     onError: (error: Error) => {
-      console.error('Error saving conversation:', error);
-      const errorMessage = error.message || 'Unknown error occurred';
-      setError(`Error saving conversation: ${errorMessage}`);
-      toast.error(`Error saving conversation: ${errorMessage}`);
+      errorHandler.log(new AppError(error.message, LogLevel.ERROR, {
+        component: 'useConversationOperations',
+        action: 'createConversation',
+        metadata: { selectedProjectId }
+      }));
+      
+      setError(errorHandler.getUserFriendlyMessage(error.message));
       setIsProcessing(false);
     }
   });
@@ -58,37 +64,58 @@ export const useConversationOperations = (
       setError(null);
       
       if (!selectedProjectId) {
-        setError('No project selected');
-        setIsProcessing(false);
-        return;
+        throw new AppError('No project selected', LogLevel.ERROR, {
+          component: 'useConversationOperations',
+          action: 'handleSaveConversation'
+        });
+      }
+
+      // Validate inputs
+      if (!title.trim()) {
+        throw new AppError('Conversation title is required', LogLevel.ERROR, {
+          component: 'useConversationOperations',
+          action: 'handleSaveConversation'
+        });
+      }
+
+      if (!content.trim()) {
+        throw new AppError('Conversation content is required', LogLevel.ERROR, {
+          component: 'useConversationOperations',
+          action: 'handleSaveConversation'
+        });
       }
       
-      console.log('Saving conversation with data:', {
+      errorHandler.handleInfo('Starting conversation save process', {
+        component: 'useConversationOperations',
+        action: 'handleSaveConversation',
+        metadata: {
+          title: title.trim(),
+          hasResponseContent: !!responseContent,
+          source,
+          projectId: selectedProjectId
+        }
+      });
+      
+      // Save the prompt as input - Fixed: Use null instead of 'none' for modelId
+      const promptData = {
         title: title.trim(),
         content: content.trim(),
         platform: 'Promptito',
         projectId: selectedProjectId,
-        type: 'input',
+        type: 'input' as const,
         status: 'Active',
-        modelId: null, // Fixed: Use null instead of 'none'
+        modelId: null, // Always use null instead of 'none'
         source: source
+      };
+
+      const promptResult = await createConversationMutation.mutateAsync(promptData);
+      
+      errorHandler.handleInfo('Prompt saved successfully', {
+        component: 'useConversationOperations',
+        metadata: { promptId: promptResult.id }
       });
       
-      // Save the prompt as input
-      const promptResult = await createConversationMutation.mutateAsync({
-        title: title.trim(),
-        content: content.trim(),
-        platform: 'Promptito',
-        projectId: selectedProjectId,
-        type: 'input',
-        status: 'Active',
-        modelId: null, // Fixed: Use null instead of 'none'
-        source: source
-      });
-      
-      console.log('Prompt saved successfully:', promptResult);
-      
-      // If source is provided, create or find a source tag and assign it
+      // Handle source tagging with improved error handling
       if (source && promptResult) {
         try {
           const sourceTag = await getOrCreateSourceTag(source, tags, createTagMutation);
@@ -97,44 +124,78 @@ export const useConversationOperations = (
               conversationId: promptResult.id,
               tagId: sourceTag.id
             });
-            console.log('Source tag assigned successfully');
+            errorHandler.handleInfo('Source tag assigned successfully');
           }
         } catch (tagError) {
-          console.error('Error with source tag:', tagError);
-          // Don't fail the entire save if tagging fails
+          // Log tag error but don't fail the entire save
+          errorHandler.log(new AppError(
+            `Failed to create/assign source tag: ${tagError instanceof Error ? tagError.message : 'Unknown error'}`,
+            LogLevel.WARN,
+            {
+              component: 'useConversationOperations',
+              action: 'sourceTagging',
+              metadata: { source, promptId: promptResult.id }
+            }
+          ));
         }
       }
       
       // Save the response as output if provided
-      if (responseContent) {
-        console.log('Saving response content...');
-        const responseResult = await createConversationMutation.mutateAsync({
-          title: `${title.trim()} (Response)`,
-          content: responseContent.trim(),
-          platform: 'Promptito',
-          projectId: selectedProjectId,
-          type: 'output',
-          status: 'Active',
-          modelId: null, // Fixed: Use null instead of 'none'
-          source: source
-        });
-        
-        console.log('Response saved successfully:', responseResult);
-        
-        // Also tag the response with source if provided
-        if (source && responseResult) {
-          try {
-            const sourceTag = await getOrCreateSourceTag(source, tags, createTagMutation);
-            if (sourceTag) {
-              await assignTagMutation.mutateAsync({
-                conversationId: responseResult.id,
-                tagId: sourceTag.id
-              });
+      if (responseContent && responseContent.trim()) {
+        try {
+          errorHandler.handleInfo('Saving response content...');
+          
+          const responseData = {
+            title: `${title.trim()} (Response)`,
+            content: responseContent.trim(),
+            platform: 'Promptito',
+            projectId: selectedProjectId,
+            type: 'output' as const,
+            status: 'Active',
+            modelId: null, // Always use null instead of 'none'
+            source: source
+          };
+
+          const responseResult = await createConversationMutation.mutateAsync(responseData);
+          
+          errorHandler.handleInfo('Response saved successfully', {
+            component: 'useConversationOperations',
+            metadata: { responseId: responseResult.id }
+          });
+          
+          // Also tag the response with source if provided
+          if (source && responseResult) {
+            try {
+              const sourceTag = await getOrCreateSourceTag(source, tags, createTagMutation);
+              if (sourceTag) {
+                await assignTagMutation.mutateAsync({
+                  conversationId: responseResult.id,
+                  tagId: sourceTag.id
+                });
+              }
+            } catch (tagError) {
+              // Log but don't fail
+              errorHandler.log(new AppError(
+                `Failed to tag response: ${tagError instanceof Error ? tagError.message : 'Unknown error'}`,
+                LogLevel.WARN,
+                {
+                  component: 'useConversationOperations',
+                  action: 'responseTagging',
+                  metadata: { source, responseId: responseResult.id }
+                }
+              ));
             }
-          } catch (tagError) {
-            console.error('Error with response source tag:', tagError);
-            // Don't fail the entire save if tagging fails
           }
+        } catch (responseError) {
+          // Log response save error but don't fail entire operation
+          errorHandler.log(new AppError(
+            `Failed to save response: ${responseError instanceof Error ? responseError.message : 'Unknown error'}`,
+            LogLevel.WARN,
+            {
+              component: 'useConversationOperations',
+              action: 'saveResponse'
+            }
+          ));
         }
       }
       
@@ -144,11 +205,11 @@ export const useConversationOperations = (
       
       return promptResult;
     } catch (error) {
-      console.error('Error in handleSaveConversation:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      setError(`Unexpected error: ${errorMessage}`);
-      setIsProcessing(false);
-      throw error; // Re-throw to allow parent components to handle
+      errorHandler.handleApiError(error, {
+        component: 'useConversationOperations',
+        action: 'handleSaveConversation',
+        metadata: { selectedProjectId, source }
+      });
     }
   };
   

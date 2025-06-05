@@ -12,6 +12,7 @@ interface NewProjectFormProps {
   onProjectNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onProjectDescriptionChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onBack: () => void;
+  disabled?: boolean;
 }
 
 export function NewProjectForm({
@@ -19,46 +20,54 @@ export function NewProjectForm({
   projectDescription,
   onProjectNameChange,
   onProjectDescriptionChange,
-  onBack
+  onBack,
+  disabled = false
 }: NewProjectFormProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="h-8 px-2"
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
           onClick={onBack}
+          disabled={disabled}
+          className="gap-1 px-2"
         >
-          <ArrowLeft className="h-4 w-4 mr-1" />
+          <ArrowLeft className="h-3 w-3" />
           Back
         </Button>
+        <Label className="text-base font-medium">Create New Project</Label>
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="projectName">Project Name</Label>
+        <Label htmlFor="project-name">Project Name *</Label>
         <Input
-          id="projectName"
+          id="project-name"
           value={projectName}
           onChange={onProjectNameChange}
           placeholder="Enter project name"
+          disabled={disabled}
+          className={!projectName.trim() ? 'border-destructive' : ''}
         />
         <p className="text-xs text-muted-foreground">
-          Choose a descriptive name for your project to easily identify it later.
+          Choose a descriptive name for your project
         </p>
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="projectDescription">Description (Optional)</Label>
+        <Label htmlFor="project-description">Description (Optional)</Label>
         <Textarea
-          id="projectDescription"
+          id="project-description"
           value={projectDescription}
           onChange={onProjectDescriptionChange}
-          placeholder="Describe what this project is about"
+          placeholder="Describe what this project is about..."
+          disabled={disabled}
           rows={3}
+          className="resize-none"
         />
         <p className="text-xs text-muted-foreground">
-          Add details about this project's purpose, goals, or any important information for collaborators.
+          Help others understand the purpose of this project
         </p>
       </div>
     </div>

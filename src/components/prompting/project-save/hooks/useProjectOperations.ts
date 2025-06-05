@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createProject } from '@/lib/api';
-import { toast } from 'sonner';
+import { errorHandler, AppError, LogLevel } from '@/lib/utils/errorHandler';
 
 export const useProjectOperations = () => {
   const [selectedProjectId, setSelectedProjectId] = useState('');
@@ -13,24 +13,34 @@ export const useProjectOperations = () => {
   
   const queryClient = useQueryClient();
   
-  // Create new project mutation
+  // Create new project mutation with improved error handling
   const createProjectMutation = useMutation({
     mutationFn: createProject,
     onSuccess: (newProject) => {
-      console.log('Project created successfully:', newProject);
+      errorHandler.handleInfo('Project created successfully', {
+        component: 'useProjectOperations',
+        metadata: { projectId: newProject.id, projectName: newProject.name }
+      });
+      
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       setSelectedProjectId(newProject.id);
       setShowNewProjectForm(false);
+      
       // Clear form fields after successful creation
       setNewProjectName('');
       setNewProjectDescription('');
-      toast.success(`Project "${newProject.name}" created successfully`);
+      
+      errorHandler.handleSuccess(`Project "${newProject.name}" created successfully`);
     },
     onError: (error: Error) => {
-      console.error('Error creating project:', error);
-      const errorMessage = error.message || 'Unknown error occurred';
-      setError(`Error creating project: ${errorMessage}`);
-      toast.error(`Error creating project: ${errorMessage}`);
+      errorHandler.log(new AppError(error.message, LogLevel.ERROR, {
+        component: 'useProjectOperations',
+        action: 'createProject',
+        metadata: { projectName: newProjectName }
+      }));
+      
+      const friendlyMessage = errorHandler.getUserFriendlyMessage(error.message);
+      setError(friendlyMessage);
     }
   });
 
