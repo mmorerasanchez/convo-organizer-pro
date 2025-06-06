@@ -55,17 +55,30 @@ serve(async (req) => {
     // Verify authentication
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
+      console.error("No authorization header provided");
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
     
-    // Parse request
-    const { originalPrompt, feedback } = await req.json();
-    console.log("Request payload:", { originalPrompt, feedback });
+    // Parse request - handle both old and new parameter formats
+    const requestBody = await req.json();
+    console.log("Request payload:", requestBody);
 
-    if (!originalPrompt) {
+    const { 
+      prompt: originalPrompt, 
+      originalPrompt: altOriginalPrompt,
+      feedback,
+      temperature = 0.7,
+      maxTokens = 1000
+    } = requestBody;
+
+    // Use either prompt or originalPrompt parameter
+    const promptToImprove = originalPrompt || altOriginalPrompt;
+
+    if (!promptToImprove) {
+      console.error("No prompt provided in request");
       return new Response(
         JSON.stringify({ error: "Original prompt is required" }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -81,7 +94,7 @@ serve(async (req) => {
       );
     }
 
-    console.log("Calling OpenAI API");
+    console.log("Calling OpenAI API with temperature:", temperature, "maxTokens:", maxTokens);
     
     try {
       // Create a system prompt that incorporates both expert guidance and our best practices
@@ -93,11 +106,11 @@ ${promptingBestPractices}
 ${feedback ? `Additionally, consider this specific feedback: ${feedback}` : ''}
 
 Your task is to improve the given prompt by making it more effective, clearer, and following the best practices above.
-Explain the reasoning behind your improvements.`;
+Return only the improved prompt without explanations or additional text.`;
 
       // Set up API call with timeout
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
       // Attempt to use the OpenAI API
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -111,10 +124,10 @@ Explain the reasoning behind your improvements.`;
           model: 'gpt-4o-mini',
           messages: [
             { role: 'system', content: systemPrompt },
-            { role: 'user', content: `Please improve this prompt: ${originalPrompt}` }
+            { role: 'user', content: `Please improve this prompt: ${promptToImprove}` }
           ],
-          temperature: 0.7,
-          max_tokens: 1000,
+          temperature: Math.min(Math.max(temperature, 0), 2), // Clamp between 0 and 2
+          max_tokens: Math.min(Math.max(maxTokens, 100), 4000), // Clamp between 100 and 4000
         }),
       });
       
@@ -149,10 +162,18 @@ Explain the reasoning behind your improvements.`;
 
       const data = await response.json();
       const improvedPrompt = data.choices[0].message.content.trim();
-      console.log("Improved prompt generated successfully");
+      console.log("Improved prompt generated successfully, length:", improvedPrompt.length);
 
+      // Return standardized response format that matches both frontend expectations
       return new Response(
-        JSON.stringify({ improvedPrompt }),
+        JSON.stringify({ 
+          completion: improvedPrompt,
+          generatedText: improvedPrompt,
+          improvedPrompt: improvedPrompt,
+          tokens_in: data.usage?.prompt_tokens || 0,
+          tokens_out: data.usage?.completion_tokens || 0,
+          response_ms: 0 // We don't track this currently
+        }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     } catch (apiError) {

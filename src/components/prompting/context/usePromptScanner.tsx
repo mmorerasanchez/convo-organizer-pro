@@ -60,24 +60,33 @@ export const PromptScannerProvider = ({ children }: { children: ReactNode }) => 
   } = useEnhancedPromptImprovement();
 
   const handleImprovePrompt = async (feedback?: string) => {
+    if (!promptInput.trim()) {
+      toast.error("Please enter a prompt to improve.");
+      return;
+    }
+
     try {
-      if (!promptInput.trim()) {
-        toast.error("Please enter a prompt to improve.");
-        return;
+      // Store current improved prompt in history before generating new one
+      if (improvedPrompt && feedback) {
+        setFeedbackHistory(prev => [...prev, { feedback: feedback, improvedPrompt }]);
       }
       
       const result = await improvePrompt(promptInput, feedback, selectedModelId, temperature, maxTokens);
+      
       if (result) {
-        if (improvedPrompt) {
-          setFeedbackHistory([...feedbackHistory, { feedback: feedback || '', improvedPrompt }]);
-        }
         setImprovedPrompt(result);
-        
-        // Increment request count
         setRequestCount(prev => prev + 1);
+        
+        // Show success message
+        if (feedback) {
+          toast.success("Prompt refined based on your feedback");
+        } else {
+          toast.success("Prompt improved successfully");
+        }
       }
     } catch (error) {
       console.error('Error in handleImprovePrompt:', error);
+      // Error handling is already done in the hook
     }
   };
 
@@ -93,15 +102,16 @@ export const PromptScannerProvider = ({ children }: { children: ReactNode }) => 
     setPromptInput('');
     setImprovedPrompt('');
     setFeedbackHistory([]);
+    setCurrentFeedback('');
   };
 
   const handleRevertToPrevious = () => {
     if (feedbackHistory.length > 0) {
       const previousState = feedbackHistory[feedbackHistory.length - 1];
       setImprovedPrompt(previousState.improvedPrompt);
-      setFeedbackHistory(feedbackHistory.slice(0, -1));
+      setFeedbackHistory(prev => prev.slice(0, -1));
       
-      toast.info("Reverted to previous version.");
+      toast.info("Reverted to previous version");
     }
   };
 
@@ -109,7 +119,7 @@ export const PromptScannerProvider = ({ children }: { children: ReactNode }) => 
     if (!improvedPrompt) return;
     
     navigator.clipboard.writeText(improvedPrompt).then(() => {
-      toast.success("Prompt copied to clipboard.");
+      toast.success("Improved prompt copied to clipboard");
     }).catch(err => {
       console.error('Failed to copy to clipboard:', err);
       toast.error("Unable to copy to clipboard. Please try again or copy manually.");

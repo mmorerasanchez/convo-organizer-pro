@@ -27,17 +27,9 @@ export function useEnhancedPromptImprovement() {
       const model = getModelById(modelId);
       const isGemini = model?.provider === 'google';
       
-      // Create improvement prompt based on model capabilities
+      // Create improvement prompt based on model
       let improvementPrompt = `You are an expert prompt engineer. Please improve the following prompt to make it more effective, clear, and specific.`;
       
-      if (model?.capabilities?.includes('long-context')) {
-        improvementPrompt += ` Take advantage of the model's large context window capabilities.`;
-      }
-      
-      if (model?.capabilities?.includes('vision')) {
-        improvementPrompt += ` Consider that this model can process visual content if relevant.`;
-      }
-
       improvementPrompt += `\n\nOriginal prompt: "${originalPrompt}"`;
       
       if (feedback) {
@@ -65,33 +57,60 @@ Return only the improved prompt without explanations.`;
           }
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Gemini API error:', error);
+          throw error;
+        }
         result = data;
       } else {
-        // Use OpenAI API (existing improve-prompt function)
+        // Use OpenAI API (improve-prompt function)
         const { data, error } = await supabase.functions.invoke('improve-prompt', {
           body: { 
             prompt: improvementPrompt,
+            feedback: feedback || '',
             temperature,
             maxTokens
           }
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('OpenAI API error:', error);
+          throw error;
+        }
         result = data;
       }
 
       if (result.error) {
+        console.error('API returned error:', result.error);
         throw new Error(result.error);
       }
 
-      return result.completion || result.generatedText;
+      // Handle different response formats
+      const improvedText = result.completion || result.generatedText || result.improvedPrompt;
+      
+      if (!improvedText) {
+        console.error('No improved text in response:', result);
+        throw new Error('No improvement data returned');
+      }
+
+      return improvedText;
 
     } catch (error: any) {
       console.error('Error improving prompt:', error);
       const errorMessage = error.message || 'Failed to improve prompt';
       setApiError(errorMessage);
-      toast.error(errorMessage);
+      
+      // More specific error messages
+      if (errorMessage.includes("quota")) {
+        toast.error("API quota exceeded. Please try again later.");
+      } else if (errorMessage.includes("network") || errorMessage.includes("connection")) {
+        toast.error("Network error. Please check your connection and try again.");
+      } else if (errorMessage.includes("timeout")) {
+        toast.error("Request timed out. Please try again.");
+      } else {
+        toast.error("Failed to improve prompt. Please try again.");
+      }
+      
       return null;
     } finally {
       setIsProcessing(false);
