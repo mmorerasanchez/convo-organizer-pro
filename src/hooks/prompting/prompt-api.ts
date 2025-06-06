@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { PromptState, TestPromptParams, TestPromptResult } from './types';
 import { toast } from 'sonner';
 import { getModelById } from '@/lib/modelData';
+import { logger } from '@/lib/utils/logger';
+import { errorHandler } from '@/lib/utils/errorHandler';
 
 export const fetchPrompts = async (userId?: string) => {
   if (!userId) return [];
@@ -30,102 +32,123 @@ export const fetchPrompts = async (userId?: string) => {
       
     if (error) throw error;
     
+    logger.debug('Fetched prompts successfully', { count: data?.length || 0 });
     return data || [];
   } catch (error) {
-    console.error('Error fetching prompts:', error);
+    logger.error('Error fetching prompts', error as Error, { userId });
     return [];
   }
 };
 
 export const createNewPrompt = async (promptData: PromptState, userId: string) => {
-  // Insert the prompt first
-  const { data: newPrompt, error: promptError } = await supabase
-    .from('prompts')
-    .insert({
-      title: promptData.title,
-      framework_id: promptData.frameworkId,
-      owner_id: userId
-    })
-    .select()
-    .single();
+  try {
+    // Insert the prompt first
+    const { data: newPrompt, error: promptError } = await supabase
+      .from('prompts')
+      .insert({
+        title: promptData.title,
+        framework_id: promptData.frameworkId,
+        owner_id: userId
+      })
+      .select()
+      .single();
+      
+    if (promptError) throw promptError;
     
-  if (promptError) throw promptError;
-  
-  // Then insert the initial version
-  const { data: versionData, error: versionError } = await supabase
-    .from('prompt_versions')
-    .insert({
-      prompt_id: newPrompt.id,
-      version_number: 1,
-      field_values: promptData.fieldValues,
-      temperature: promptData.temperature,
-      max_tokens: promptData.maxTokens,
-      model_id: promptData.modelId,
-      compiled_text: compilePromptText(promptData)
-    })
-    .select()
-    .single();
+    // Then insert the initial version
+    const { data: versionData, error: versionError } = await supabase
+      .from('prompt_versions')
+      .insert({
+        prompt_id: newPrompt.id,
+        version_number: 1,
+        field_values: promptData.fieldValues,
+        temperature: promptData.temperature,
+        max_tokens: promptData.maxTokens,
+        model_id: promptData.modelId,
+        compiled_text: compilePromptText(promptData)
+      })
+      .select()
+      .single();
+      
+    if (versionError) throw versionError;
     
-  if (versionError) throw versionError;
-  
-  return { ...newPrompt, version: versionData };
+    logger.info('Created new prompt successfully', { promptId: newPrompt.id });
+    return { ...newPrompt, version: versionData };
+  } catch (error) {
+    logger.error('Error creating new prompt', error as Error, { userId });
+    throw error;
+  }
 };
 
 export const savePromptVersion = async (promptData: PromptState) => {
   if (!promptData.id) throw new Error('Prompt ID is required');
   
-  // Get the latest version number
-  const { data: versions, error: versionsError } = await supabase
-    .from('prompt_versions')
-    .select('version_number')
-    .eq('prompt_id', promptData.id)
-    .order('version_number', { ascending: false })
-    .limit(1);
+  try {
+    // Get the latest version number
+    const { data: versions, error: versionsError } = await supabase
+      .from('prompt_versions')
+      .select('version_number')
+      .eq('prompt_id', promptData.id)
+      .order('version_number', { ascending: false })
+      .limit(1);
+      
+    if (versionsError) throw versionsError;
     
-  if (versionsError) throw versionsError;
-  
-  const nextVersionNumber = versions && versions.length > 0 ? versions[0].version_number + 1 : 1;
-  
-  // Update the prompt title if needed
-  await supabase
-    .from('prompts')
-    .update({ title: promptData.title })
-    .eq('id', promptData.id);
-  
-  // Insert the new version
-  const { data, error } = await supabase
-    .from('prompt_versions')
-    .insert({
-      prompt_id: promptData.id,
-      version_number: nextVersionNumber,
-      field_values: promptData.fieldValues,
-      temperature: promptData.temperature,
-      max_tokens: promptData.maxTokens,
-      model_id: promptData.modelId,
-      compiled_text: compilePromptText(promptData)
-    })
-    .select()
-    .single();
+    const nextVersionNumber = versions && versions.length > 0 ? versions[0].version_number + 1 : 1;
     
-  if (error) throw error;
-  
-  return data;
+    // Update the prompt title if needed
+    await supabase
+      .from('prompts')
+      .update({ title: promptData.title })
+      .eq('id', promptData.id);
+    
+    // Insert the new version
+    const { data, error } = await supabase
+      .from('prompt_versions')
+      .insert({
+        prompt_id: promptData.id,
+        version_number: nextVersionNumber,
+        field_values: promptData.fieldValues,
+        temperature: promptData.temperature,
+        max_tokens: promptData.maxTokens,
+        model_id: promptData.modelId,
+        compiled_text: compilePromptText(promptData)
+      })
+      .select()
+      .single();
+      
+    if (error) throw error;
+    
+    logger.info('Saved prompt version successfully', { promptId: promptData.id, version: nextVersionNumber });
+    return data;
+  } catch (error) {
+    logger.error('Error saving prompt version', error as Error, { promptId: promptData.id });
+    throw error;
+  }
 };
 
 export const deletePromptById = async (promptId: string) => {
-  const { error } = await supabase
-    .from('prompts')
-    .delete()
-    .eq('id', promptId);
+  try {
+    const { error } = await supabase
+      .from('prompts')
+      .delete()
+      .eq('id', promptId);
+      
+    if (error) throw error;
     
-  if (error) throw error;
-  
-  return promptId;
+    logger.info('Deleted prompt successfully', { promptId });
+    return promptId;
+  } catch (error) {
+    logger.error('Error deleting prompt', error as Error, { promptId });
+    throw error;
+  }
 };
 
 export const testPromptRequest = async (params: TestPromptParams): Promise<TestPromptResult> => {
   const model = getModelById(params.modelId);
   const isGemini = model?.provider === 'google';
+  
+  logger.debug('Testing prompt', { modelId: params.modelId, provider: model?.provider });
   
   try {
     let data, error;
@@ -169,6 +192,11 @@ export const testPromptRequest = async (params: TestPromptParams): Promise<TestP
         });
     }
     
+    logger.info('Prompt test completed successfully', { 
+      modelId: params.modelId, 
+      responseTime: data.response_ms || 0 
+    });
+    
     return {
       completion: data.completion || data.generatedText,
       tokens_in: data.tokens_in || 0,
@@ -177,7 +205,7 @@ export const testPromptRequest = async (params: TestPromptParams): Promise<TestP
       cost_usd: data.cost_usd || 0
     };
   } catch (error) {
-    console.error('Error testing prompt:', error);
+    logger.error('Error testing prompt', error as Error, { modelId: params.modelId });
     throw error;
   }
 };

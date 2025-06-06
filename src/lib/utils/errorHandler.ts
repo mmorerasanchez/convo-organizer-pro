@@ -1,5 +1,6 @@
 
 import { toast } from 'sonner';
+import { logger } from './logger';
 
 export enum LogLevel {
   DEBUG = 'debug',
@@ -35,25 +36,15 @@ export class AppError extends Error {
 
 export const errorHandler = {
   log: (error: Error | AppError, context: ErrorContext = {}) => {
-    const errorData = {
-      message: error.message,
-      stack: error.stack,
-      timestamp: new Date().toISOString(),
-      context,
-      level: error instanceof AppError ? error.level : LogLevel.ERROR
-    };
-
-    // Log to console with proper formatting
-    console.group(`🚨 ${errorData.level.toUpperCase()}: ${error.message}`);
-    console.error('Error:', error);
-    console.log('Context:', context);
-    console.log('Timestamp:', errorData.timestamp);
-    console.groupEnd();
+    const errorLevel = error instanceof AppError ? error.level : LogLevel.ERROR;
+    
+    // Use the new logger instead of direct console access
+    logger.error(error.message, error, context);
 
     // Show user-friendly toast for errors
-    if (errorData.level === LogLevel.ERROR) {
+    if (errorLevel === LogLevel.ERROR) {
       toast.error(errorHandler.getUserFriendlyMessage(error.message));
-    } else if (errorData.level === LogLevel.WARN) {
+    } else if (errorLevel === LogLevel.WARN) {
       toast.warning(errorHandler.getUserFriendlyMessage(error.message));
     }
   },
@@ -65,7 +56,9 @@ export const errorHandler = {
       'User not authenticated': 'Please log in to continue.',
       'Failed to create': 'Unable to save. Please check your connection and try again.',
       'Network Error': 'Connection problem. Please check your internet and try again.',
-      '[object Object]': 'An unexpected error occurred. Please try again.'
+      '[object Object]': 'An unexpected error occurred. Please try again.',
+      'Invalid share link format': 'Please provide a valid share link or project ID.',
+      'Failed to extract a valid project ID': 'Invalid share link format. Please check the link and try again.'
     };
 
     for (const [key, message] of Object.entries(errorMap)) {
@@ -94,12 +87,12 @@ export const errorHandler = {
   },
 
   handleSuccess: (message: string, description?: string) => {
-    console.log(`✅ SUCCESS: ${message}`);
+    logger.info(`SUCCESS: ${message}`);
     const toastOptions = description ? { description } : undefined;
     toast.success(message, toastOptions);
   },
 
   handleInfo: (message: string, context: ErrorContext = {}) => {
-    console.log(`ℹ️ INFO: ${message}`, context);
+    logger.info(message, context);
   }
 };

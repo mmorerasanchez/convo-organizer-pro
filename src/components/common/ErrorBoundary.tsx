@@ -2,7 +2,8 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { errorHandler, AppError, LogLevel } from '@/lib/utils/errorHandler';
+import { logger } from '@/lib/utils/logger';
+import { AppError, LogLevel } from '@/lib/utils/errorHandler';
 
 interface Props {
   children: ReactNode;
@@ -24,15 +25,17 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    errorHandler.log(
-      new AppError(error.message, LogLevel.ERROR, {
+    logger.error(
+      'React Error Boundary caught an error',
+      error,
+      {
         component: 'ErrorBoundary',
         action: 'componentDidCatch',
         metadata: {
           componentStack: errorInfo.componentStack,
           errorBoundary: true
         }
-      })
+      }
     );
   }
 
@@ -72,7 +75,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 Refresh Page
               </Button>
             </div>
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <details className="mt-4 text-left">
                 <summary className="cursor-pointer text-sm text-muted-foreground">
                   Error Details (Development)
