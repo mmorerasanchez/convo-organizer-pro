@@ -4,7 +4,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AIModel } from '@/lib/types';
 import { getAllModels } from '@/lib/modelData';
-import { Brain, Zap, Sparkles } from 'lucide-react';
+import { Brain } from 'lucide-react';
+import { OpenAILogo } from '@/components/ui/logos/OpenAILogo';
+import { GoogleLogo } from '@/components/ui/logos/GoogleLogo';
 
 interface ModelSelectorProps {
   value: string;
@@ -15,11 +17,11 @@ interface ModelSelectorProps {
 const getProviderIcon = (provider: string) => {
   switch (provider) {
     case 'openai':
-      return <Brain className="h-4 w-4" />;
+      return <OpenAILogo size={16} />;
     case 'google':
-      return <Sparkles className="h-4 w-4" />;
+      return <GoogleLogo size={16} />;
     default:
-      return <Zap className="h-4 w-4" />;
+      return <Brain className="h-4 w-4" />;
   }
 };
 

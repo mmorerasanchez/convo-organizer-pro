@@ -3,9 +3,11 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Brain, Zap, Sparkles } from 'lucide-react';
+import { Brain, Zap } from 'lucide-react';
 import { AIModel } from '@/lib/types';
-import { modelProviders, getModelRecommendations } from '@/lib/modelData';
+import { modelProviders, comingSoonProviders, getModelRecommendations } from '@/lib/modelData';
+import { OpenAILogo } from '@/components/ui/logos/OpenAILogo';
+import { GoogleLogo } from '@/components/ui/logos/GoogleLogo';
 
 interface EnhancedModelSelectorProps {
   value: string;
@@ -14,29 +16,14 @@ interface EnhancedModelSelectorProps {
   className?: string;
 }
 
-const getProviderIcon = (provider: string) => {
+const getProviderIcon = (provider: string, size = 16) => {
   switch (provider) {
     case 'openai':
-      return <Brain className="h-4 w-4" />;
+      return <OpenAILogo size={size} />;
     case 'google':
-      return <Sparkles className="h-4 w-4" />;
+      return <GoogleLogo size={size} />;
     default:
-      return <Zap className="h-4 w-4" />;
-  }
-};
-
-const getCapabilityColor = (capability: string) => {
-  switch (capability) {
-    case 'vision':
-      return 'bg-blue-100 text-blue-800';
-    case 'reasoning':
-      return 'bg-purple-100 text-purple-800';
-    case 'speed':
-      return 'bg-green-100 text-green-800';
-    case 'long-context':
-      return 'bg-orange-100 text-orange-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
+      return <Brain className="h-4 w-4" />;
   }
 };
 
@@ -68,6 +55,7 @@ export const EnhancedModelSelector: React.FC<EnhancedModelSelectorProps> = ({
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
+            {/* Available Models */}
             {modelProviders.map((provider) => (
               <div key={provider.id}>
                 <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground flex items-center gap-2">
@@ -88,22 +76,39 @@ export const EnhancedModelSelector: React.FC<EnhancedModelSelectorProps> = ({
                         </Badge>
                       </div>
                       <p className="text-xs text-muted-foreground">{model.description}</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {model.capabilities?.map((capability) => (
-                          <Badge 
-                            key={capability} 
-                            variant="secondary" 
-                            className={`text-xs ${getCapabilityColor(capability)}`}
-                          >
-                            {capability}
-                          </Badge>
-                        ))}
-                      </div>
                     </div>
                   </SelectItem>
                 ))}
               </div>
             ))}
+
+            {/* Coming Soon Section */}
+            <div className="border-t mt-2 pt-2">
+              <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
+                Coming Soon
+              </div>
+              {comingSoonProviders.map((provider) => (
+                <div key={provider.id}>
+                  <div className="px-2 py-1 text-xs font-medium text-muted-foreground/70 flex items-center gap-2">
+                    <Zap className="h-3 w-3" />
+                    {provider.name}
+                  </div>
+                  {provider.models.map((model) => (
+                    <div key={model.id} className="pl-6 py-2 opacity-50 blur-[1px] cursor-not-allowed">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-sm">{model.displayName}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {model.pricing}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{model.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           </SelectContent>
         </Select>
       </div>

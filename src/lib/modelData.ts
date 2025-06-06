@@ -5,15 +5,14 @@ export const modelProviders: ModelProvider[] = [
   {
     id: 'openai',
     name: 'OpenAI',
-    icon: 'brain',
+    icon: 'openai-logo',
     models: [
       {
         id: 'gpt-4.1-2025-04-14',
         displayName: 'GPT-4.1 (Latest)',
         provider: 'openai',
         contextWindow: 128000,
-        icon: 'brain',
-        capabilities: ['text', 'vision', 'reasoning', 'code'],
+        icon: 'openai-logo',
         pricing: 'medium',
         description: 'Most advanced and capable OpenAI model',
         strengths: ['Complex reasoning', 'Code generation', 'Creative writing'],
@@ -24,8 +23,7 @@ export const modelProviders: ModelProvider[] = [
         displayName: 'GPT-4o Mini',
         provider: 'openai',
         contextWindow: 128000,
-        icon: 'zap',
-        capabilities: ['text', 'vision', 'speed'],
+        icon: 'openai-logo',
         pricing: 'low',
         description: 'Fast and efficient model for most tasks',
         strengths: ['Speed', 'Cost efficiency', 'General purpose'],
@@ -36,15 +34,14 @@ export const modelProviders: ModelProvider[] = [
   {
     id: 'google',
     name: 'Google',
-    icon: 'sparkles',
+    icon: 'google-logo',
     models: [
       {
         id: 'gemini-1.5-pro',
         displayName: 'Gemini 1.5 Pro',
         provider: 'google',
         contextWindow: 2000000,
-        icon: 'sparkles',
-        capabilities: ['text', 'vision', 'long-context', 'reasoning'],
+        icon: 'google-logo',
         pricing: 'medium',
         description: 'Google\'s most capable model with massive context',
         strengths: ['Long context', 'Multimodal', 'Research tasks'],
@@ -55,12 +52,79 @@ export const modelProviders: ModelProvider[] = [
         displayName: 'Gemini 1.5 Flash',
         provider: 'google',
         contextWindow: 1000000,
-        icon: 'zap',
-        capabilities: ['text', 'vision', 'speed', 'long-context'],
+        icon: 'google-logo',
         pricing: 'low',
         description: 'Fast Gemini model with large context window',
         strengths: ['Speed', 'Large context', 'Cost effective'],
         bestFor: ['Quick analysis', 'Summarization', 'Real-time tasks']
+      }
+    ]
+  }
+];
+
+export const comingSoonProviders: ModelProvider[] = [
+  {
+    id: 'anthropic',
+    name: 'Anthropic',
+    icon: 'generic',
+    models: [
+      {
+        id: 'claude-4-opus',
+        displayName: 'Claude 4 Opus',
+        provider: 'anthropic',
+        contextWindow: 200000,
+        icon: 'generic',
+        pricing: 'high',
+        description: 'Anthropic\'s most powerful reasoning model',
+        strengths: ['Advanced reasoning', 'Safety', 'Long-form content'],
+        bestFor: ['Complex analysis', 'Research', 'Content creation']
+      },
+      {
+        id: 'claude-4-sonnet',
+        displayName: 'Claude 4 Sonnet',
+        provider: 'anthropic',
+        contextWindow: 200000,
+        icon: 'generic',
+        pricing: 'medium',
+        description: 'Balanced performance and efficiency',
+        strengths: ['Reasoning', 'Speed', 'Reliability'],
+        bestFor: ['General tasks', 'Analysis', 'Writing']
+      }
+    ]
+  },
+  {
+    id: 'meta',
+    name: 'Meta',
+    icon: 'generic',
+    models: [
+      {
+        id: 'llama-3.1-405b',
+        displayName: 'Llama 3.1 405B',
+        provider: 'meta',
+        contextWindow: 128000,
+        icon: 'generic',
+        pricing: 'high',
+        description: 'Meta\'s largest and most capable open model',
+        strengths: ['Open source', 'Code generation', 'Reasoning'],
+        bestFor: ['Development', 'Research', 'Custom fine-tuning']
+      }
+    ]
+  },
+  {
+    id: 'mistral',
+    name: 'Mistral AI',
+    icon: 'generic',
+    models: [
+      {
+        id: 'mistral-large-2',
+        displayName: 'Mistral Large 2',
+        provider: 'mistral',
+        contextWindow: 128000,
+        icon: 'generic',
+        pricing: 'medium',
+        description: 'Mistral\'s flagship model for complex tasks',
+        strengths: ['Multilingual', 'Code generation', 'Reasoning'],
+        bestFor: ['International projects', 'Development', 'Analysis']
       }
     ]
   }
@@ -98,14 +162,6 @@ export const getModelRecommendations = (modelId: string): string[] => {
     recommendations.push('Leverage the large context window');
     recommendations.push('Use structured prompts for best results');
     recommendations.push('Take advantage of multimodal capabilities');
-  }
-
-  if (model.capabilities?.includes('vision')) {
-    recommendations.push('Can analyze images and visual content');
-  }
-  
-  if (model.capabilities?.includes('long-context')) {
-    recommendations.push('Excellent for processing long documents');
   }
 
   if (model.pricing === 'low') {
