@@ -32,7 +32,7 @@ export const fetchPrompts = async (userId?: string) => {
       
     if (error) throw error;
     
-    logger.debug('Fetched prompts successfully', { count: data?.length || 0 });
+    logger.debug('Fetched prompts successfully', { metadata: { count: data?.length || 0 } });
     return data || [];
   } catch (error) {
     logger.error('Error fetching prompts', error as Error, { userId });
@@ -72,7 +72,7 @@ export const createNewPrompt = async (promptData: PromptState, userId: string) =
       
     if (versionError) throw versionError;
     
-    logger.info('Created new prompt successfully', { promptId: newPrompt.id });
+    logger.info('Created new prompt successfully', { metadata: { promptId: newPrompt.id } });
     return { ...newPrompt, version: versionData };
   } catch (error) {
     logger.error('Error creating new prompt', error as Error, { userId });
@@ -119,10 +119,10 @@ export const savePromptVersion = async (promptData: PromptState) => {
       
     if (error) throw error;
     
-    logger.info('Saved prompt version successfully', { promptId: promptData.id, version: nextVersionNumber });
+    logger.info('Saved prompt version successfully', { metadata: { promptId: promptData.id, version: nextVersionNumber } });
     return data;
   } catch (error) {
-    logger.error('Error saving prompt version', error as Error, { promptId: promptData.id });
+    logger.error('Error saving prompt version', error as Error, { metadata: { promptId: promptData.id } });
     throw error;
   }
 };
@@ -136,10 +136,10 @@ export const deletePromptById = async (promptId: string) => {
       
     if (error) throw error;
     
-    logger.info('Deleted prompt successfully', { promptId });
+    logger.info('Deleted prompt successfully', { metadata: { promptId } });
     return promptId;
   } catch (error) {
-    logger.error('Error deleting prompt', error as Error, { promptId });
+    logger.error('Error deleting prompt', error as Error, { metadata: { promptId } });
     throw error;
   }
 };
@@ -148,7 +148,7 @@ export const testPromptRequest = async (params: TestPromptParams): Promise<TestP
   const model = getModelById(params.modelId);
   const isGemini = model?.provider === 'google';
   
-  logger.debug('Testing prompt', { modelId: params.modelId, provider: model?.provider });
+  logger.debug('Testing prompt', { metadata: { modelId: params.modelId, provider: model?.provider } });
   
   try {
     let data, error;
@@ -193,8 +193,10 @@ export const testPromptRequest = async (params: TestPromptParams): Promise<TestP
     }
     
     logger.info('Prompt test completed successfully', { 
-      modelId: params.modelId, 
-      responseTime: data.response_ms || 0 
+      metadata: { 
+        modelId: params.modelId, 
+        responseTime: data.response_ms || 0 
+      }
     });
     
     return {
@@ -205,7 +207,7 @@ export const testPromptRequest = async (params: TestPromptParams): Promise<TestP
       cost_usd: data.cost_usd || 0
     };
   } catch (error) {
-    logger.error('Error testing prompt', error as Error, { modelId: params.modelId });
+    logger.error('Error testing prompt', error as Error, { metadata: { modelId: params.modelId } });
     throw error;
   }
 };

@@ -38,7 +38,7 @@ export const extractShareId = (input: string): string => {
   try {
     // If it looks like a URL, try to parse it
     if (shareId.startsWith('http') || shareId.includes('/')) {
-      logger.debug('Input appears to be a URL, attempting to parse', { input: sanitizedInput });
+      logger.debug('Input appears to be a URL, attempting to parse', { metadata: { input: sanitizedInput } });
       
       try {
         // Try to create a URL object to parse it properly
@@ -51,12 +51,12 @@ export const extractShareId = (input: string): string => {
         );
         
         if (!isAllowedHost && import.meta.env.PROD) {
-          logger.warn('URL from unexpected domain', { hostname: url.hostname });
+          logger.warn('URL from unexpected domain', { metadata: { hostname: url.hostname } });
         }
         
         // Get the path segments
         const pathSegments = url.pathname.split('/').filter(Boolean);
-        logger.debug('URL path segments parsed', { segments: pathSegments });
+        logger.debug('URL path segments parsed', { metadata: { segments: pathSegments } });
         
         // Find the ID - it should be after 'shared' in the URL
         let foundSharedIndex = false;
@@ -66,7 +66,7 @@ export const extractShareId = (input: string): string => {
             // The next segment should be the ID
             if (i + 1 < pathSegments.length) {
               shareId = pathSegments[i + 1];
-              logger.debug('Found ID after "shared"', { shareId });
+              logger.debug('Found ID after "shared"', { metadata: { shareId } });
               break;
             }
           }
@@ -77,7 +77,7 @@ export const extractShareId = (input: string): string => {
           for (const segment of pathSegments) {
             if (isValidUuid(segment)) {
               shareId = segment;
-              logger.debug('Found UUID in path', { shareId });
+              logger.debug('Found UUID in path', { metadata: { shareId } });
               break;
             }
           }
@@ -90,7 +90,7 @@ export const extractShareId = (input: string): string => {
         
         if (match) {
           shareId = match[0];
-          logger.debug('Found UUID using regex', { shareId });
+          logger.debug('Found UUID using regex', { metadata: { shareId } });
         } else {
           // Just get the last path segment
           const segments = shareId.split('/').filter(Boolean);
@@ -99,11 +99,11 @@ export const extractShareId = (input: string): string => {
             // Verify it's not 'shared'
             if (lastSegment !== 'shared') {
               shareId = lastSegment;
-              logger.debug('Using last segment after split', { shareId });
+              logger.debug('Using last segment after split', { metadata: { shareId } });
             } else if (segments.length > 1) {
               // If the last segment is 'shared', try the one before
               shareId = segments[segments.length - 2];
-              logger.debug('Using segment before "shared"', { shareId });
+              logger.debug('Using segment before "shared"', { metadata: { shareId } });
             }
           }
         }
@@ -113,7 +113,7 @@ export const extractShareId = (input: string): string => {
     // Remove any trailing slashes or query params and sanitize again
     shareId = sanitizeInput(shareId.split('?')[0].split('#')[0].replace(/\/$/, ''));
     
-    logger.debug('Final extracted share ID', { shareId });
+    logger.debug('Final extracted share ID', { metadata: { shareId } });
     
     // Validate the extracted ID
     if (!shareId || shareId === 'shared' || shareId === 'projects') {
@@ -127,7 +127,7 @@ export const extractShareId = (input: string): string => {
     
     return shareId;
   } catch (error) {
-    logger.error('Error extracting share ID', error, { input: sanitizedInput });
+    logger.error('Error extracting share ID', error, { metadata: { input: sanitizedInput } });
     
     if (error instanceof Error) {
       throw error;
