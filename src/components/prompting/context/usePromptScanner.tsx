@@ -71,7 +71,7 @@ export const PromptScannerProvider = ({ children }: { children: ReactNode }) => 
         setFeedbackHistory(prev => [...prev, { feedback: feedback, improvedPrompt }]);
       }
       
-      const result = await improvePrompt(promptInput, feedback, selectedModelId, temperature, maxTokens);
+      const result = await improvePrompt(promptInput, feedback, 'scanner', temperature, maxTokens);
       
       if (result) {
         setImprovedPrompt(result);

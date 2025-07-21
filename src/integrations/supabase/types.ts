@@ -32,6 +32,92 @@ export type Database = {
         }
         Relationships: []
       }
+      content_embeddings: {
+        Row: {
+          chunk_index: number | null
+          chunk_text: string
+          content_id: string
+          content_type: string
+          created_at: string | null
+          embedding: string | null
+          id: string
+          metadata: Json | null
+          project_id: string
+        }
+        Insert: {
+          chunk_index?: number | null
+          chunk_text: string
+          content_id: string
+          content_type: string
+          created_at?: string | null
+          embedding?: string | null
+          id?: string
+          metadata?: Json | null
+          project_id: string
+        }
+        Update: {
+          chunk_index?: number | null
+          chunk_text?: string
+          content_id?: string
+          content_type?: string
+          created_at?: string | null
+          embedding?: string | null
+          id?: string
+          metadata?: Json | null
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_embeddings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      context_usage: {
+        Row: {
+          context_items: Json | null
+          conversation_id: string | null
+          created_at: string | null
+          effectiveness_score: number | null
+          id: string
+          project_id: string
+        }
+        Insert: {
+          context_items?: Json | null
+          conversation_id?: string | null
+          created_at?: string | null
+          effectiveness_score?: number | null
+          id?: string
+          project_id: string
+        }
+        Update: {
+          context_items?: Json | null
+          conversation_id?: string | null
+          created_at?: string | null
+          effectiveness_score?: number | null
+          id?: string
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "context_usage_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "context_usage_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversation_tags: {
         Row: {
           conversation_id: string
@@ -66,6 +152,7 @@ export type Database = {
         Row: {
           captured_at: string
           content: string
+          context_tags: Json | null
           created_at: string
           external_id: string | null
           id: string
@@ -77,10 +164,12 @@ export type Database = {
           title: string
           type: string
           updated_at: string
+          used_context_ids: string[] | null
         }
         Insert: {
           captured_at?: string
           content: string
+          context_tags?: Json | null
           created_at?: string
           external_id?: string | null
           id?: string
@@ -92,10 +181,12 @@ export type Database = {
           title: string
           type?: string
           updated_at?: string
+          used_context_ids?: string[] | null
         }
         Update: {
           captured_at?: string
           content?: string
+          context_tags?: Json | null
           created_at?: string
           external_id?: string | null
           id?: string
@@ -107,6 +198,7 @@ export type Database = {
           title?: string
           type?: string
           updated_at?: string
+          used_context_ids?: string[] | null
         }
         Relationships: [
           {
@@ -260,6 +352,53 @@ export type Database = {
           },
         ]
       }
+      learning_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          error_details: string | null
+          id: string
+          job_type: string
+          processed_items: number | null
+          project_id: string
+          started_at: string | null
+          status: string | null
+          total_items: number | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_details?: string | null
+          id?: string
+          job_type: string
+          processed_items?: number | null
+          project_id: string
+          started_at?: string | null
+          status?: string | null
+          total_items?: number | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_details?: string | null
+          id?: string
+          job_type?: string
+          processed_items?: number | null
+          project_id?: string
+          started_at?: string | null
+          status?: string | null
+          total_items?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_jobs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       models: {
         Row: {
           context_window: number | null
@@ -314,6 +453,47 @@ export type Database = {
         }
         Relationships: []
       }
+      project_contexts: {
+        Row: {
+          context_summary: string
+          created_at: string | null
+          id: string
+          key_themes: Json | null
+          learning_metadata: Json | null
+          project_id: string
+          updated_at: string | null
+          version: number | null
+        }
+        Insert: {
+          context_summary: string
+          created_at?: string | null
+          id?: string
+          key_themes?: Json | null
+          learning_metadata?: Json | null
+          project_id: string
+          updated_at?: string | null
+          version?: number | null
+        }
+        Update: {
+          context_summary?: string
+          created_at?: string | null
+          id?: string
+          key_themes?: Json | null
+          learning_metadata?: Json | null
+          project_id?: string
+          updated_at?: string | null
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_contexts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_shares: {
         Row: {
           created_at: string
@@ -345,9 +525,13 @@ export type Database = {
       }
       projects: {
         Row: {
+          context_enabled: boolean | null
+          context_quality_score: number | null
           created_at: string
           description: string | null
           id: string
+          last_learning_run: string | null
+          learning_frequency: string | null
           name: string
           share_link: string | null
           status: string
@@ -355,9 +539,13 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          context_enabled?: boolean | null
+          context_quality_score?: number | null
           created_at?: string
           description?: string | null
           id?: string
+          last_learning_run?: string | null
+          learning_frequency?: string | null
           name: string
           share_link?: string | null
           status?: string
@@ -365,9 +553,13 @@ export type Database = {
           user_id: string
         }
         Update: {
+          context_enabled?: boolean | null
+          context_quality_score?: number | null
           created_at?: string
           description?: string | null
           id?: string
+          last_learning_run?: string | null
+          learning_frequency?: string | null
           name?: string
           share_link?: string | null
           status?: string
@@ -701,6 +893,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      binary_quantize: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
+      }
+      halfvec_avg: {
+        Args: { "": number[] }
+        Returns: unknown
+      }
+      halfvec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      halfvec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      halfvec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
       has_role: {
         Args: {
           _user_id: string
@@ -708,9 +920,81 @@ export type Database = {
         }
         Returns: boolean
       }
+      hnsw_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_sparsevec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnswhandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
       is_admin: {
         Args: { user_id: string }
         Returns: boolean
+      }
+      ivfflat_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflathandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      l2_norm: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: number
+      }
+      l2_normalize: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: string
+      }
+      sparsevec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      sparsevec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      vector_avg: {
+        Args: { "": number[] }
+        Returns: string
+      }
+      vector_dims: {
+        Args: { "": string } | { "": unknown }
+        Returns: number
+      }
+      vector_norm: {
+        Args: { "": string }
+        Returns: number
+      }
+      vector_out: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      vector_send: {
+        Args: { "": string }
+        Returns: string
+      }
+      vector_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
       }
     }
     Enums: {
