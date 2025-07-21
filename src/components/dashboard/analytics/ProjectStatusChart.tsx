@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
-import { Clock, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 interface ProjectStatusChartProps {
   data: Record<string, number>;
@@ -13,7 +13,7 @@ interface ProjectStatusChartProps {
 
 const COLORS = {
   'not started': 'hsl(var(--muted))',
-  'in progress': 'hsl(var(--primary))',
+  'in progress': 'hsl(var(--chart-primary))',
   'active': 'hsl(var(--chart-1))',
   'completed': 'hsl(var(--chart-2))',
   'on hold': 'hsl(var(--chart-3))'
@@ -56,18 +56,6 @@ const ProjectStatusChart: React.FC<ProjectStatusChartProps> = ({
     return "Project distribution overview";
   };
 
-  const formatLastUpdated = (timestamp?: string) => {
-    if (!timestamp) return "Just now";
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    
-    if (diffHours < 1) return "Just now";
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return date.toLocaleDateString();
-  };
-
   if (totalProjects === 0) {
     return (
       <Card>
@@ -89,17 +77,11 @@ const ProjectStatusChart: React.FC<ProjectStatusChartProps> = ({
   return (
     <Card>
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <CardTitle className="text-lg">Project Status Distribution</CardTitle>
-            <CardDescription className="text-sm">
-              {getStatusInsight()} • {totalProjects} total projects
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Clock className="h-3 w-3" />
-            <span>{formatLastUpdated(lastUpdated)}</span>
-          </div>
+        <div className="space-y-1">
+          <CardTitle className="text-lg">Project Status Distribution</CardTitle>
+          <CardDescription className="text-sm">
+            {getStatusInsight()} • {totalProjects} total projects
+          </CardDescription>
         </div>
       </CardHeader>
       <CardContent>

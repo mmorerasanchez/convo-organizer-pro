@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import { Clock, Activity, TrendingUp, Calendar } from 'lucide-react';
+import { Activity, TrendingUp, Calendar } from 'lucide-react';
 
 interface ActivityTimelineChartProps {
   data: Array<{ date: string; conversations: number; projects: number; total: number }>;
@@ -43,18 +43,6 @@ const ActivityTimelineChart: React.FC<ActivityTimelineChartProps> = ({
     return `${trend} ${Math.abs(Number(percentChange))}% vs last week • ${avgDailyActivity} daily avg`;
   };
 
-  const formatLastUpdated = (timestamp?: string) => {
-    if (!timestamp) return "Just now";
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    
-    if (diffHours < 1) return "Just now";
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return date.toLocaleDateString();
-  };
-
   if (!data || data.length === 0) {
     return (
       <Card>
@@ -76,17 +64,11 @@ const ActivityTimelineChart: React.FC<ActivityTimelineChartProps> = ({
   return (
     <Card>
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <CardTitle className="text-lg">Activity Timeline</CardTitle>
-            <CardDescription className="text-sm">
-              {getActivityInsight()}
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Clock className="h-3 w-3" />
-            <span>{formatLastUpdated(lastUpdated)}</span>
-          </div>
+        <div className="space-y-1">
+          <CardTitle className="text-lg">Activity Timeline</CardTitle>
+          <CardDescription className="text-sm">
+            {getActivityInsight()}
+          </CardDescription>
         </div>
       </CardHeader>
       <CardContent>

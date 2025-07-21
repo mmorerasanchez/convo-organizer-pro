@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import { Clock, MessageCircle, TrendingUp } from 'lucide-react';
+import { MessageCircle, TrendingUp } from 'lucide-react';
 
 interface PlatformUsageChartProps {
   data: Record<string, number>;
@@ -27,7 +27,7 @@ const PlatformUsageChart: React.FC<PlatformUsageChartProps> = ({
   const chartConfig = {
     count: {
       label: "Conversations",
-      color: "hsl(var(--chart-1))",
+      color: "hsl(var(--chart-primary))",
     },
   };
 
@@ -35,18 +35,6 @@ const PlatformUsageChart: React.FC<PlatformUsageChartProps> = ({
     if (chartData.length === 0) return null;
     const topPlatform = chartData[0];
     return `${topPlatform.platform} leads with ${topPlatform.percentage}% of conversations`;
-  };
-
-  const formatLastUpdated = (timestamp?: string) => {
-    if (!timestamp) return "Just now";
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    
-    if (diffHours < 1) return "Just now";
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return date.toLocaleDateString();
   };
 
   if (totalConversations === 0) {
@@ -70,17 +58,11 @@ const PlatformUsageChart: React.FC<PlatformUsageChartProps> = ({
   return (
     <Card>
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <CardTitle className="text-lg">Platform Usage</CardTitle>
-            <CardDescription className="text-sm">
-              {getMostUsedPlatform() || 'Conversations by AI platform'} • {totalConversations} total
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Clock className="h-3 w-3" />
-            <span>{formatLastUpdated(lastUpdated)}</span>
-          </div>
+        <div className="space-y-1">
+          <CardTitle className="text-lg">Platform Usage</CardTitle>
+          <CardDescription className="text-sm">
+            {getMostUsedPlatform() || 'Conversations by AI platform'} • {totalConversations} total
+          </CardDescription>
         </div>
       </CardHeader>
       <CardContent>

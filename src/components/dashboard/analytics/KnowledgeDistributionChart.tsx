@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
-import { Clock, FileText, HardDrive } from 'lucide-react';
+import { FileText, HardDrive } from 'lucide-react';
 
 interface KnowledgeDistributionChartProps {
   data: Record<string, number>;
@@ -70,18 +70,6 @@ const KnowledgeDistributionChart: React.FC<KnowledgeDistributionChartProps> = ({
     return `${topType.fileType} (${topType.percentage}%)`;
   };
 
-  const formatLastUpdated = (timestamp?: string) => {
-    if (!timestamp) return "Just now";
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    
-    if (diffHours < 1) return "Just now";
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return date.toLocaleDateString();
-  };
-
   if (totalFiles === 0) {
     return (
       <Card>
@@ -103,17 +91,11 @@ const KnowledgeDistributionChart: React.FC<KnowledgeDistributionChartProps> = ({
   return (
     <Card>
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <CardTitle className="text-lg">Knowledge File Types</CardTitle>
-            <CardDescription className="text-sm">
-              {getMostCommonType() ? `Most common: ${getMostCommonType()}` : 'Distribution of uploaded file types'} • {totalFiles} files
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Clock className="h-3 w-3" />
-            <span>{formatLastUpdated(lastUpdated)}</span>
-          </div>
+        <div className="space-y-1">
+          <CardTitle className="text-lg">Knowledge File Types</CardTitle>
+          <CardDescription className="text-sm">
+            {getMostCommonType() ? `Most common: ${getMostCommonType()}` : 'Distribution of uploaded file types'} • {totalFiles} files
+          </CardDescription>
         </div>
       </CardHeader>
       <CardContent>
