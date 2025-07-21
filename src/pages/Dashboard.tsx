@@ -1,4 +1,3 @@
-
 import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import StatCard from '@/components/dashboard/StatCard';
@@ -12,6 +11,7 @@ import { fetchProjects, fetchConversations } from '@/lib/api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { fetchKnowledgeCount } from '@/lib/api/knowledge';
+import AnalyticsDashboard from '@/components/dashboard/analytics/AnalyticsDashboard';
 
 const Dashboard = () => {
   const { user, loading: authLoading } = useRequireAuth();
@@ -96,7 +96,7 @@ const Dashboard = () => {
                 <TabsTrigger value="overview" className="h-7 px-3 text-sm">
                   Overview
                 </TabsTrigger>
-                <TabsTrigger value="analytics" className="h-7 px-3 text-sm flex items-center gap-1.5 opacity-60 cursor-not-allowed" disabled>
+                <TabsTrigger value="analytics" className="h-7 px-3 text-sm flex items-center gap-1.5">
                   <BarChart size={14} />
                   Analytics
                 </TabsTrigger>
@@ -110,13 +110,7 @@ const Dashboard = () => {
               </TabsContent>
               
               <TabsContent value="analytics">
-                <div className="text-center py-12 rounded-lg border bg-muted/20">
-                  <BarChart className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                  <h3 className="text-lg font-medium mb-2">Analytics coming soon</h3>
-                  <p className="text-muted-foreground max-w-md mx-auto">
-                    Detailed insights and analytics for your projects and tools will be available in a future update.
-                  </p>
-                </div>
+                <AnalyticsDashboard />
               </TabsContent>
             </Tabs>
           </>
