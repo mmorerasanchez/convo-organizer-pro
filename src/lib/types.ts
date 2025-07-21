@@ -30,6 +30,7 @@ export interface Project {
   conversationCount: number;
   shareLink?: string;
   status: string;
+  last_learning_run?: string;
 }
 
 export interface Knowledge {
