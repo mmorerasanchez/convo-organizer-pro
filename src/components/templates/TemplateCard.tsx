@@ -36,7 +36,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
     }
   });
 
-  const useMutation = useMutation({
+  const recordUsageMutation = useMutation({
     mutationFn: recordTemplateUsage,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['templates'] });
@@ -48,7 +48,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
   });
 
   const handleUse = () => {
-    useMutation.mutate(template.id);
+    recordUsageMutation.mutate(template.id);
     onUse?.(template);
   };
 
@@ -157,7 +157,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
         <Button 
           onClick={handleUse}
           className="w-full gap-2"
-          disabled={useMutation.isPending}
+          disabled={recordUsageMutation.isPending}
         >
           <Zap className="h-4 w-4" />
           Use Template
