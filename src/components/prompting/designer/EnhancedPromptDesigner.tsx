@@ -1,8 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,11 +8,12 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, Settings, Eye, Play, Copy, BookOpen, Zap } from 'lucide-react';
+import { ChevronDown, Settings, Eye, Play, Copy, BookOpen, Zap, Bot } from 'lucide-react';
 import { useFrameworks, useFrameworkFields, useFrameworkExamples, Framework } from '@/hooks/use-frameworks';
 import { useModels } from '@/hooks/use-frameworks';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { PromptingHeader } from '../shared/PromptingHeader';
 
 interface FieldValues {
   [key: string]: string;
@@ -34,6 +33,7 @@ interface PromptDesignerState {
   aiResponse: string;
   isRunning: boolean;
   activeTab: 'preview' | 'response';
+  selectedProjectId?: string;
 }
 
 const MODEL_RECOMMENDATIONS = {
@@ -62,7 +62,6 @@ export const EnhancedPromptDesigner = () => {
   });
   
   const [showExamples, setShowExamples] = useState(false);
-  const [showAdvancedParams, setShowAdvancedParams] = useState(false);
 
   const { data: frameworks = [] } = useFrameworks();
   const { data: fields = [] } = useFrameworkFields(state.selectedFramework?.id || null);
@@ -124,6 +123,10 @@ export const EnhancedPromptDesigner = () => {
     setState(prev => ({ ...prev, compiledPrompt: compiled.trim() }));
   };
 
+  const handleProjectSelect = (projectId: string) => {
+    setState(prev => ({ ...prev, selectedProjectId: projectId }));
+  };
+
   const handleMethodChange = (method: MethodType) => {
     setState(prev => ({
       ...prev,
@@ -165,7 +168,6 @@ export const EnhancedPromptDesigner = () => {
     try {
       console.log('Running prompt with compiled text:', state.compiledPrompt);
       
-      // Use Supabase edge function instead of fetch API
       const { data, error } = await supabase.functions.invoke('improve-prompt', {
         body: {
           prompt: state.compiledPrompt,
@@ -226,10 +228,19 @@ export const EnhancedPromptDesigner = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header with Prompt Title */}
+      {/* Unified Header */}
+      <PromptingHeader
+        title="Enhanced Prompt Designer"
+        description="Create, test, and iterate on prompts using proven frameworks and system-level optimizations."
+        icon={<Bot className="h-5 w-5" />}
+        onProjectSelect={handleProjectSelect}
+        selectedProjectId={state.selectedProjectId}
+      />
+
+      {/* Prompt Configuration */}
       <Card>
         <CardHeader>
-          <CardTitle>Enhanced Prompt Designer</CardTitle>
+          <CardTitle>Prompt Configuration</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -292,9 +303,6 @@ export const EnhancedPromptDesigner = () => {
                     <SelectItem key={framework.id} value={framework.id}>
                       <div className="flex items-center gap-2">
                         <span>{framework.name}</span>
-                        <Badge variant="secondary">
-                          {framework.framework_type}
-                        </Badge>
                       </div>
                     </SelectItem>
                   ))}
@@ -359,67 +367,56 @@ export const EnhancedPromptDesigner = () => {
               </Card>
             )}
 
-            {/* Model Settings */}
+            {/* Model Settings - Expanded horizontally */}
             <Card className="h-fit">
               <CardHeader>
-                <Collapsible open={showAdvancedParams} onOpenChange={setShowAdvancedParams}>
-                  <CollapsibleTrigger asChild>
-                    <Button variant="ghost" className="w-full justify-between p-0">
-                      <CardTitle className="flex items-center gap-2">
-                        <Settings className="h-4 w-4" />
-                        Model Settings
-                      </CardTitle>
-                      <ChevronDown className={`h-4 w-4 transition-transform ${showAdvancedParams ? 'rotate-180' : ''}`} />
-                    </Button>
-                  </CollapsibleTrigger>
-                </Collapsible>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Model Settings
+                </CardTitle>
               </CardHeader>
-              <Collapsible open={showAdvancedParams} onOpenChange={setShowAdvancedParams}>
-                <CollapsibleContent>
-                  <CardContent className="space-y-4 min-h-[300px]">
-                    <div className="space-y-2">
-                      <Label>Model</Label>
-                      <Select value={state.modelId} onValueChange={(value) => setState(prev => ({ ...prev, modelId: value }))}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {models.map(model => (
-                            <SelectItem key={model.id} value={model.id}>
-                              {model.display_name || model.id}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+              <CardContent className="space-y-4 min-h-[300px]">
+                <div className="space-y-2">
+                  <Label>Model</Label>
+                  <Select value={state.modelId} onValueChange={(value) => setState(prev => ({ ...prev, modelId: value }))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {models.map(model => (
+                        <SelectItem key={model.id} value={model.id}>
+                          {model.display_name || model.id}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                    <div className="space-y-2">
-                      <Label>Temperature: {state.temperature}</Label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.1"
-                        value={state.temperature}
-                        onChange={(e) => setState(prev => ({ ...prev, temperature: parseFloat(e.target.value) }))}
-                        className="w-full"
-                      />
-                    </div>
+                <div className="space-y-2">
+                  <Label>Temperature: {state.temperature}</Label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={state.temperature}
+                    onChange={(e) => setState(prev => ({ ...prev, temperature: parseFloat(e.target.value) }))}
+                    className="w-full"
+                  />
+                </div>
 
-                    <div className="space-y-2">
-                      <Label>Max Tokens</Label>
-                      <Input
-                        type="number"
-                        value={state.maxTokens}
-                        onChange={(e) => setState(prev => ({ ...prev, maxTokens: parseInt(e.target.value) || 1000 }))}
-                        min={100}
-                        max={4000}
-                        step={100}
-                      />
-                    </div>
-                  </CardContent>
-                </CollapsibleContent>
-              </Collapsible>
+                <div className="space-y-2">
+                  <Label>Max Tokens</Label>
+                  <Input
+                    type="number"
+                    value={state.maxTokens}
+                    onChange={(e) => setState(prev => ({ ...prev, maxTokens: parseInt(e.target.value) || 1000 }))}
+                    min={100}
+                    max={4000}
+                    step={100}
+                  />
+                </div>
+              </CardContent>
             </Card>
           </div>
         </div>
