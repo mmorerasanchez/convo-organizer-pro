@@ -1,68 +1,167 @@
+
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Template } from '@/lib/types';
-import { formatDistanceToNow } from 'date-fns';
-import { FileCode, Users, TrendingUp } from 'lucide-react';
+import { Eye, Users, Lock, Zap, MoreHorizontal } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteTemplate, recordTemplateUsage } from '@/lib/api/templates';
+import { useFrameworks } from '@/hooks/use-frameworks';
 
 interface TemplateCardProps {
   template: Template;
+  onEdit?: (template: Template) => void;
+  onUse?: (template: Template) => void;
 }
 
-const TemplateCard: React.FC<TemplateCardProps> = ({ template }) => {
-  const getTagColor = (tag: string) => {
-    const colors = {
-      'Research': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-      'Content Creation': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-      'Analysis': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-      'Customer Support': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-      'Development': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-      'Custom': 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
-    };
-    return colors[tag as keyof typeof colors] || colors.Custom;
+export const TemplateCard: React.FC<TemplateCardProps> = ({
+  template,
+  onEdit,
+  onUse
+}) => {
+  const queryClient = useQueryClient();
+  const { data: frameworks = [] } = useFrameworks();
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteTemplate,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['templates'] });
+      toast.success('Template deleted successfully');
+    },
+    onError: () => {
+      toast.error('Failed to delete template');
+    }
+  });
+
+  const useMutation = useMutation({
+    mutationFn: recordTemplateUsage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['templates'] });
+      toast.success('Template usage recorded');
+    },
+    onError: () => {
+      toast.error('Failed to record template usage');
+    }
+  });
+
+  const handleUse = () => {
+    useMutation.mutate(template.id);
+    onUse?.(template);
   };
 
+  const handleDelete = () => {
+    if (confirm('Are you sure you want to delete this template?')) {
+      deleteMutation.mutate(template.id);
+    }
+  };
+
+  const getVisibilityIcon = () => {
+    switch (template.visibility) {
+      case 'public':
+        return <Eye className="h-3 w-3" />;
+      case 'shared':
+        return <Users className="h-3 w-3" />;
+      default:
+        return <Lock className="h-3 w-3" />;
+    }
+  };
+
+  const getTagColor = (tag: string) => {
+    const colors: Record<string, string> = {
+      'Research': 'bg-blue-100 text-blue-800',
+      'Content Creation': 'bg-green-100 text-green-800',
+      'Analysis': 'bg-purple-100 text-purple-800',
+      'Customer Support': 'bg-orange-100 text-orange-800',
+      'Development': 'bg-red-100 text-red-800',
+      'Custom': 'bg-gray-100 text-gray-800'
+    };
+    return colors[tag] || colors['Custom'];
+  };
+
+  const framework = frameworks.find(f => f.id === template.framework_id);
+
   return (
-    <Card className="h-full hover:shadow-md transition-all duration-200 border-muted/60 cursor-pointer">
-      <CardContent className="p-4">
-        <div className="flex items-start gap-3 mb-3">
-          <div className="bg-primary/10 rounded-md p-2 flex-shrink-0">
-            <FileCode className="h-5 w-5 text-primary" />
+    <Card className="hover:shadow-md transition-shadow">
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <CardTitle className="text-lg font-semibold line-clamp-1">
+              {template.name}
+            </CardTitle>
+            <CardDescription className="line-clamp-2 mt-1">
+              {template.description || 'No description provided'}
+            </CardDescription>
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-medium truncate text-sm">{template.name}</h3>
-              {template.visibility !== 'private' && (
-                <Users size={16} className="text-primary flex-shrink-0 ml-2" aria-label="Shared Template" />
-              )}
-            </div>
-            <Badge variant="secondary" className={`text-xs ${getTagColor(template.tag)}`}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onEdit?.(template)}>
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={handleDelete}
+                className="text-destructive"
+              >
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </CardHeader>
+
+      <CardContent className="pt-0">
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <Badge className={getTagColor(template.tag)}>
               {template.tag}
             </Badge>
-            {template.description && (
-              <p className="text-xs text-muted-foreground line-clamp-2 mt-2">
-                {template.description}
-              </p>
+            <Badge variant="outline" className="flex items-center gap-1">
+              {getVisibilityIcon()}
+              <span className="capitalize">{template.visibility}</span>
+            </Badge>
+            {framework && (
+              <Badge variant="secondary">
+                {framework.name}
+              </Badge>
             )}
+          </div>
+
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <span>Used {template.usage_count} times</span>
+            {template.effectiveness_score && (
+              <span>Score: {template.effectiveness_score}/5</span>
+            )}
+          </div>
+
+          {template.model_id && (
+            <div className="text-sm text-muted-foreground">
+              Model: {template.model_id}
+            </div>
+          )}
+
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <span>Temp: {template.temperature}</span>
+            <span>Tokens: {template.max_tokens}</span>
           </div>
         </div>
       </CardContent>
-      <CardFooter className="bg-muted/10 border-t px-4 py-2 flex items-center justify-between text-xs text-muted-foreground">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            <TrendingUp size={12} />
-            <span>Used {template.usage_count}</span>
-          </div>
-          {template.effectiveness_score && (
-            <span className="text-green-600 dark:text-green-400">
-              {Math.round(template.effectiveness_score * 100)}% effective
-            </span>
-          )}
-        </div>
-        <div>
-          Updated {formatDistanceToNow(new Date(template.updated_at), { addSuffix: true })}
-        </div>
+
+      <CardFooter className="pt-3">
+        <Button 
+          onClick={handleUse}
+          className="w-full gap-2"
+          disabled={useMutation.isPending}
+        >
+          <Zap className="h-4 w-4" />
+          Use Template
+        </Button>
       </CardFooter>
     </Card>
   );

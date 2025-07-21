@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Template } from '@/lib/types';
 
@@ -19,12 +20,16 @@ export const createTemplate = async (template: Omit<Template, 'id' | 'created_at
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('User not authenticated');
 
+  // Ensure framework_id is null if empty string
+  const templateData = {
+    ...template,
+    framework_id: template.framework_id || null,
+    created_by: user.id,
+  };
+
   const { data, error } = await supabase
     .from('templates')
-    .insert({
-      ...template,
-      created_by: user.id,
-    })
+    .insert(templateData)
     .select()
     .single();
 
@@ -37,9 +42,15 @@ export const createTemplate = async (template: Omit<Template, 'id' | 'created_at
 };
 
 export const updateTemplate = async (id: string, updates: Partial<Template>): Promise<Template> => {
+  // Ensure framework_id is null if empty string
+  const updateData = {
+    ...updates,
+    framework_id: updates.framework_id || null,
+  };
+
   const { data, error } = await supabase
     .from('templates')
-    .update(updates)
+    .update(updateData)
     .eq('id', id)
     .select()
     .single();

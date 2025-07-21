@@ -1,4 +1,3 @@
-
 export interface Tag {
   id: string;
   name: string;
@@ -106,7 +105,7 @@ export interface Template {
   name: string;
   description?: string;
   tag: 'Research' | 'Content Creation' | 'Analysis' | 'Customer Support' | 'Development' | 'Custom';
-  framework_id?: string;
+  framework_id?: string | null;
   framework_config: Record<string, any>;
   field_values: Record<string, any>;
   temperature: number;
