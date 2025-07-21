@@ -305,6 +305,69 @@ export type Database = {
         }
         Relationships: []
       }
+      guide_bookmarks: {
+        Row: {
+          chapter_id: string
+          created_at: string | null
+          id: string
+          notes: string | null
+          slide_id: string
+          user_id: string | null
+        }
+        Insert: {
+          chapter_id: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          slide_id: string
+          user_id?: string | null
+        }
+        Update: {
+          chapter_id?: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          slide_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      guide_progress: {
+        Row: {
+          chapter_id: string
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          slide_id: string
+          time_spent_seconds: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          chapter_id: string
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          slide_id: string
+          time_spent_seconds?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          chapter_id?: string
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          slide_id?: string
+          time_spent_seconds?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       knowledge: {
         Row: {
           created_at: string

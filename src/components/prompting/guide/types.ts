@@ -2,11 +2,13 @@
 import React from 'react';
 
 export interface Slide {
+  id: string;
   title: string;
   content: string;
 }
 
 export interface Chapter {
+  id: string;
   title: string;
   description: string;
   slides: Slide[];
