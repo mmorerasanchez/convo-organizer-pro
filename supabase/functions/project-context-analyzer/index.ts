@@ -144,11 +144,12 @@ serve(async (req) => {
       })
       .eq('id', job.id)
 
-    // Update project with learning run timestamp
+    // Update project with learning run timestamp and context quality score
+    const currentTimestamp = new Date().toISOString()
     await supabase
       .from('projects')
       .update({
-        last_learning_run: new Date().toISOString(),
+        last_learning_run: currentTimestamp,
         context_quality_score: calculateContextQualityScore(contextAnalysis)
       })
       .eq('id', projectId)

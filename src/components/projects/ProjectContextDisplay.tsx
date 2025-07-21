@@ -1,8 +1,8 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Brain, Clock, Sparkles, TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
+import { Brain, Clock, TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
 import { ProjectContext, LearningJob } from '@/lib/api/projectContext';
 import { formatDistanceToNow } from 'date-fns';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -12,7 +12,7 @@ interface ProjectContextDisplayProps {
   context: ProjectContext | null;
   lastLearningJob?: LearningJob;
   isLearning?: boolean;
-  onUpdateContext?: () => void;
+  onUpdateContext?: () => void; // Made optional since we're removing the button
 }
 
 export function ProjectContextDisplay({
@@ -31,12 +31,8 @@ export function ProjectContextDisplay({
           <Brain className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
           <CardTitle className="text-lg">AI Context Learning</CardTitle>
           <CardDescription>
-            This project hasn't been analyzed yet. Start learning from your conversations and documents.
+            This project hasn't been analyzed yet. Use the "Generate Context" button above to start learning from your conversations and documents.
           </CardDescription>
-          <Button onClick={onUpdateContext} className="mt-4">
-            <Sparkles className="h-4 w-4 mr-2" />
-            Generate Context
-          </Button>
         </CardHeader>
       </Card>
     );
@@ -81,24 +77,6 @@ export function ProjectContextDisplay({
                 {getContextQualityLabel(75)}
               </Badge>
             )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onUpdateContext}
-              disabled={isLearning}
-            >
-              {isLearning ? (
-                <>
-                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary mr-2" />
-                  Learning...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-3 w-3 mr-2" />
-                  Update
-                </>
-              )}
-            </Button>
           </div>
         </div>
       </CardHeader>
@@ -170,7 +148,7 @@ export function ProjectContextDisplay({
 
         {lastLearningJob?.status === 'failed' && (
           <div className="text-xs text-destructive bg-destructive/10 p-2 rounded">
-            Last context update failed. Try updating again.
+            Last context update failed. Try updating again using the "Generate Context" button.
           </div>
         )}
       </CardContent>

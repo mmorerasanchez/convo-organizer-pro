@@ -6,18 +6,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { 
   Sparkles, 
   Copy, 
   RefreshCw, 
-  Zap, 
   Settings,
-  MessageSquare
+  MessageSquare,
+  Brain,
+  Info
 } from 'lucide-react';
 import { useModels } from '@/hooks/use-frameworks';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { PromptingHeader } from '../shared/PromptingHeader';
+import { useProjectContext } from '@/hooks/use-project-context';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface ScannerState {
   originalPrompt: string;
@@ -48,6 +52,16 @@ export const EnhancedPromptScanner = () => {
   
   const requestLimit = 10; // Free tier limit
 
+  // Project context integration
+  const {
+    contextEnabled,
+    setContextEnabled,
+    contextData,
+    formatContextForAI,
+    hasContext,
+    isContextStale
+  } = useProjectContext(state.selectedProjectId, state.originalPrompt);
+
   const handleImprovePrompt = async (withFeedback = false) => {
     if (!state.originalPrompt.trim()) {
       toast.error("Please enter a prompt to improve.");
@@ -64,15 +78,22 @@ export const EnhancedPromptScanner = () => {
     try {
       console.log('Improving prompt:', state.originalPrompt);
       console.log('With feedback:', withFeedback ? state.feedback : 'none');
+      console.log('Context enabled:', contextEnabled);
       
+      // Format prompt with context if enabled and available
+      const promptToSend = contextEnabled && hasContext ? 
+        formatContextForAI(state.originalPrompt) : 
+        state.originalPrompt;
+
       const { data, error } = await supabase.functions.invoke('improve-prompt', {
         body: {
-          originalPrompt: state.originalPrompt,
+          originalPrompt: promptToSend,
           feedback: withFeedback ? state.feedback : '',
           frameworkType: 'scanner',
           useSystemPrompt: true,
           temperature: state.temperature,
-          maxTokens: state.maxTokens
+          maxTokens: state.maxTokens,
+          projectId: state.selectedProjectId // Pass project ID for context tracking
         }
       });
 
@@ -101,7 +122,10 @@ export const EnhancedPromptScanner = () => {
         feedback: withFeedback ? '' : prev.feedback
       }));
       
-      toast.success("Prompt improved successfully");
+      toast.success(contextEnabled && hasContext ? 
+        "Prompt improved with project context" : 
+        "Prompt improved successfully"
+      );
     } catch (error) {
       console.error('Error improving prompt:', error);
       toast.error(error instanceof Error ? error.message : "Failed to improve prompt");
@@ -157,7 +181,51 @@ export const EnhancedPromptScanner = () => {
         selectedProjectId={state.selectedProjectId}
       />
 
-      {/* Model Settings - Moved up and expanded horizontally */}
+      {/* Project Context Status */}
+      {state.selectedProjectId && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Brain className="h-4 w-4 text-primary" />
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Project Context</span>
+                    <Switch
+                      checked={contextEnabled}
+                      onCheckedChange={setContextEnabled}
+                      disabled={!hasContext}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {hasContext ? 
+                      (contextEnabled ? 'Context will be included in prompt improvement' : 'Context available but disabled') :
+                      'No context available for this project'
+                    }
+                  </p>
+                </div>
+              </div>
+              
+              {contextData && contextEnabled && (
+                <div className="text-xs text-muted-foreground">
+                  {contextData.relevantChunks.length} relevant items
+                </div>
+              )}
+            </div>
+
+            {isContextStale && hasContext && (
+              <Alert className="mt-3">
+                <Info className="h-4 w-4" />
+                <AlertDescription className="text-xs">
+                  Project context is older than 30 days. Consider updating it for better results.
+                </AlertDescription>
+              </Alert>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Model Settings */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

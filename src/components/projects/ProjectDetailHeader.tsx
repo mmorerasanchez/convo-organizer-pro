@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Edit, MoreHorizontal, Share, Trash, Users, ArrowLeft, Brain } from 'lucide-react';
+import { Edit, MoreHorizontal, Share, Trash, Users, ArrowLeft, Brain, Clock, AlertCircle, CheckCircle } from 'lucide-react';
 import { Project } from '@/lib/types';
 import ProjectShareDialog from './ProjectShareDialog';
 import EditProjectDialog from './EditProjectDialog';
@@ -13,6 +13,8 @@ import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { deleteProject } from '@/lib/api';
 import { getProjectContext, updateProjectContext, getProjectLearningJobs } from '@/lib/api/projectContext';
 import { toast } from 'sonner';
+import { formatDistanceToNow } from 'date-fns';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ProjectDetailHeaderProps {
   project: Project;
@@ -76,6 +78,25 @@ const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project, isSh
   const lastLearningJob = learningJobs[0];
   const isLearning = lastLearningJob?.status === 'processing' || updateContextMutation.isPending;
 
+  // Calculate context freshness
+  const getContextFreshness = () => {
+    if (!project.last_learning_run) return null;
+    
+    const lastUpdate = new Date(project.last_learning_run);
+    const now = new Date();
+    const daysSince = Math.floor((now.getTime() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24));
+    const isStale = daysSince > 30;
+    
+    return {
+      daysSince,
+      isStale,
+      lastUpdate,
+      label: formatDistanceToNow(lastUpdate, { addSuffix: true })
+    };
+  };
+
+  const contextFreshness = getContextFreshness();
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -93,6 +114,51 @@ const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project, isSh
         
         {!isShared && (
           <div className="flex items-center space-x-2">
+            {/* Context Freshness Indicator */}
+            {contextFreshness && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      {contextFreshness.isStale ? (
+                        <AlertCircle className="h-3 w-3 text-red-500" />
+                      ) : (
+                        <CheckCircle className="h-3 w-3 text-green-500" />
+                      )}
+                      <span>{contextFreshness.label}</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Context last updated {contextFreshness.label}</p>
+                    <p className="text-xs">
+                      {contextFreshness.isStale ? 'Context may be outdated' : 'Context is fresh'}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+
+            {/* Generate Context Button */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+              onClick={handleUpdateContext}
+              disabled={isLearning}
+            >
+              {isLearning ? (
+                <>
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary" />
+                  Learning...
+                </>
+              ) : (
+                <>
+                  <Brain className="h-4 w-4" />
+                  Generate Context
+                </>
+              )}
+            </Button>
+            
             <Button 
               variant="outline" 
               size="sm" 
@@ -131,13 +197,13 @@ const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project, isSh
       
       <p className="text-muted-foreground">{project.description}</p>
       
-      {/* AI Context Display */}
+      {/* AI Context Display - Remove the update button since it's now in the header */}
       <ProjectContextDisplay
         projectId={project.id}
         context={projectContext}
         lastLearningJob={lastLearningJob}
         isLearning={isLearning}
-        onUpdateContext={handleUpdateContext}
+        onUpdateContext={undefined} // Remove the button from here
       />
       
       {showShareDialog && (
