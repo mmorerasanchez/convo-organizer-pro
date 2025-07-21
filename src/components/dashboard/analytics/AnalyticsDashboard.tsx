@@ -13,6 +13,7 @@ import ProjectStatusChart from './ProjectStatusChart';
 import ActivityTimelineChart from './ActivityTimelineChart';
 import PlatformUsageChart from './PlatformUsageChart';
 import KnowledgeDistributionChart from './KnowledgeDistributionChart';
+import EmptyAnalyticsState from './EmptyAnalyticsState';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 
@@ -52,25 +53,32 @@ const AnalyticsDashboard: React.FC = () => {
   const isLoading = authLoading || projectsLoading || conversationsLoading || 
                    knowledgeLoading || activityLoading || toolsLoading;
 
+  const hasAnyData = projectAnalytics?.total > 0 || conversationAnalytics?.total > 0 || 
+                     knowledgeAnalytics?.total > 0 || toolsAnalytics?.total > 0;
+
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="space-y-4 md:space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
           {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-24" />
+            <Skeleton key={i} className="h-20 md:h-24" />
           ))}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-80" />
+            <Skeleton key={i} className="h-64 md:h-72 lg:h-80" />
           ))}
         </div>
       </div>
     );
   }
 
+  if (!hasAnyData) {
+    return <EmptyAnalyticsState />;
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* KPI Section */}
       <AnalyticsKPIs
         projectCount={projectAnalytics?.total || 0}
@@ -81,25 +89,41 @@ const AnalyticsDashboard: React.FC = () => {
       />
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         {/* Project Status Chart */}
         {projectAnalytics?.statusDistribution && (
-          <ProjectStatusChart data={projectAnalytics.statusDistribution} />
+          <ProjectStatusChart 
+            data={projectAnalytics.statusDistribution}
+            lastUpdated={new Date().toISOString()}
+            totalProjects={projectAnalytics.total}
+          />
         )}
 
         {/* Platform Usage Chart */}
         {conversationAnalytics?.platformDistribution && (
-          <PlatformUsageChart data={conversationAnalytics.platformDistribution} />
+          <PlatformUsageChart 
+            data={conversationAnalytics.platformDistribution}
+            lastUpdated={new Date().toISOString()}
+            totalConversations={conversationAnalytics.total}
+          />
         )}
 
         {/* Activity Timeline */}
         {activityAnalytics?.dailyActivity && (
-          <ActivityTimelineChart data={activityAnalytics.dailyActivity} />
+          <ActivityTimelineChart 
+            data={activityAnalytics.dailyActivity}
+            lastUpdated={new Date().toISOString()}
+          />
         )}
 
         {/* Knowledge Distribution */}
         {knowledgeAnalytics?.fileTypeDistribution && (
-          <KnowledgeDistributionChart data={knowledgeAnalytics.fileTypeDistribution} />
+          <KnowledgeDistributionChart 
+            data={knowledgeAnalytics.fileTypeDistribution}
+            lastUpdated={new Date().toISOString()}
+            totalFiles={knowledgeAnalytics.total}
+            totalSize={knowledgeAnalytics.totalSize}
+          />
         )}
       </div>
     </div>
