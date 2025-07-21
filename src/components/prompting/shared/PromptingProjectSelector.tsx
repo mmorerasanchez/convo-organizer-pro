@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Plus, FolderPlus } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { fetchProjects } from '@/lib/api/projects';
-import { NewProjectDialog } from '@/components/projects/NewProjectDialog';
+import NewProjectDialog from '@/components/projects/NewProjectDialog';
 
 interface PromptingProjectSelectorProps {
   onProjectSelect?: (projectId: string) => void;
@@ -19,21 +19,15 @@ export function PromptingProjectSelector({
   selectedProjectId
 }: PromptingProjectSelectorProps) {
   const { user } = useAuth();
-  const [newProjectDialogOpen, setNewProjectDialogOpen] = useState(false);
   
   const { data: projects = [] } = useQuery({
     queryKey: ['projects', user?.id],
-    queryFn: () => fetchProjects(user?.id || ''),
+    queryFn: fetchProjects,
     enabled: !!user
   });
 
   const handleProjectSelect = (projectId: string) => {
     onProjectSelect?.(projectId);
-  };
-
-  const handleNewProjectCreated = (newProject: any) => {
-    onProjectSelect?.(newProject.id);
-    setNewProjectDialogOpen(false);
   };
 
   if (!user) {
@@ -70,14 +64,17 @@ export function PromptingProjectSelector({
             </SelectContent>
           </Select>
           
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setNewProjectDialogOpen(true)}
-            className="shrink-0"
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
+          <NewProjectDialog 
+            trigger={
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            }
+          />
         </div>
       ) : (
         <div className="text-center py-4 border-2 border-dashed border-muted-foreground/25 rounded-lg">
@@ -85,22 +82,19 @@ export function PromptingProjectSelector({
           <p className="text-sm text-muted-foreground mb-3">
             Create a project to save and organize your prompts
           </p>
-          <Button
-            size="sm"
-            onClick={() => setNewProjectDialogOpen(true)}
-            className="gap-2"
-          >
-            <Plus className="h-3 w-3" />
-            Create Your First Project
-          </Button>
+          <NewProjectDialog 
+            trigger={
+              <Button
+                size="sm"
+                className="gap-2"
+              >
+                <Plus className="h-3 w-3" />
+                Create Your First Project
+              </Button>
+            }
+          />
         </div>
       )}
-      
-      <NewProjectDialog
-        open={newProjectDialogOpen}
-        onOpenChange={setNewProjectDialogOpen}
-        onProjectCreated={handleNewProjectCreated}
-      />
     </div>
   );
 }
