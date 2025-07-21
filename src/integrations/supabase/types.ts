@@ -960,6 +960,22 @@ export type Database = {
         Args: { "": string } | { "": unknown } | { "": unknown }
         Returns: string
       }
+      search_project_context: {
+        Args: {
+          project_id: string
+          query_embedding: string
+          content_types: string[]
+          similarity_threshold?: number
+          match_limit?: number
+        }
+        Returns: {
+          content_id: string
+          content_type: string
+          chunk_text: string
+          similarity: number
+          metadata: Json
+        }[]
+      }
       sparsevec_out: {
         Args: { "": unknown }
         Returns: unknown

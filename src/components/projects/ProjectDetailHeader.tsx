@@ -3,13 +3,15 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Edit, MoreHorizontal, Share, Trash, Users, ArrowLeft } from 'lucide-react';
+import { Edit, MoreHorizontal, Share, Trash, Users, ArrowLeft, Brain } from 'lucide-react';
 import { Project } from '@/lib/types';
 import ProjectShareDialog from './ProjectShareDialog';
 import EditProjectDialog from './EditProjectDialog';
 import DeleteDialog from '@/components/common/DeleteDialog';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ProjectContextDisplay } from './ProjectContextDisplay';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { deleteProject } from '@/lib/api';
+import { getProjectContext, updateProjectContext, getProjectLearningJobs } from '@/lib/api/projectContext';
 import { toast } from 'sonner';
 
 interface ProjectDetailHeaderProps {
@@ -25,6 +27,20 @@ const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project, isSh
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
+  // Fetch project context
+  const { data: projectContext, isLoading: isContextLoading } = useQuery({
+    queryKey: ['projectContext', project.id],
+    queryFn: () => getProjectContext(project.id),
+    enabled: !!project.id
+  });
+
+  // Fetch learning jobs
+  const { data: learningJobs = [] } = useQuery({
+    queryKey: ['learningJobs', project.id],
+    queryFn: () => getProjectLearningJobs(project.id),
+    enabled: !!project.id
+  });
+
   const deleteMutation = useMutation({
     mutationFn: () => deleteProject(project.id),
     onSuccess: () => {
@@ -36,13 +52,32 @@ const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project, isSh
       toast.error(`Error deleting project: ${error.message}`);
     }
   });
+
+  const updateContextMutation = useMutation({
+    mutationFn: () => updateProjectContext(project.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projectContext', project.id] });
+      queryClient.invalidateQueries({ queryKey: ['learningJobs', project.id] });
+      toast.success('Project context updated successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(`Error updating context: ${error.message}`);
+    }
+  });
   
   const handleDelete = () => {
     deleteMutation.mutate();
   };
 
+  const handleUpdateContext = () => {
+    updateContextMutation.mutate();
+  };
+
+  const lastLearningJob = learningJobs[0];
+  const isLearning = lastLearningJob?.status === 'processing' || updateContextMutation.isPending;
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" asChild>
@@ -95,6 +130,15 @@ const ProjectDetailHeader: React.FC<ProjectDetailHeaderProps> = ({ project, isSh
       </div>
       
       <p className="text-muted-foreground">{project.description}</p>
+      
+      {/* AI Context Display */}
+      <ProjectContextDisplay
+        projectId={project.id}
+        context={projectContext}
+        lastLearningJob={lastLearningJob}
+        isLearning={isLearning}
+        onUpdateContext={handleUpdateContext}
+      />
       
       {showShareDialog && (
         <ProjectShareDialog 
