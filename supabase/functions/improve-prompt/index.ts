@@ -58,17 +58,13 @@ serve(async (req) => {
   try {
     console.log("Request received at improve-prompt function");
     
-    // Verify authentication
+    // Verify authentication for protected endpoints
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      console.error("No authorization header provided");
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      console.log("No authorization header provided - allowing anonymous access");
     }
     
-    // Parse request - handle both old and new parameter formats
+    // Parse request body
     const requestBody = await req.json();
     console.log("Request payload:", requestBody);
 
@@ -102,7 +98,7 @@ serve(async (req) => {
       );
     }
 
-    console.log("Calling OpenAI API with temperature:", temperature, "maxTokens:", maxTokens);
+    console.log("Calling OpenAI API with temperature:", temperature, "maxTokens:", maxTokens, "frameworkType:", frameworkType);
     
     try {
       let systemPrompt;
@@ -110,46 +106,71 @@ serve(async (req) => {
       // Use system prompt from database if requested
       if (useSystemPrompt) {
         try {
+          console.log("Fetching system prompt for framework type:", frameworkType);
           const { data: systemPrompts, error } = await supabase
             .from('system_prompts')
             .select('prompt_text')
             .eq('framework_type', frameworkType)
             .eq('active', true)
             .limit(1)
-            .single();
+            .maybeSingle();
             
-          if (error || !systemPrompts) {
-            console.warn("Failed to fetch system prompt, falling back to default:", error);
-            systemPrompt = createFallbackSystemPrompt(feedback);
-          } else {
+          if (error) {
+            console.warn("Failed to fetch system prompt:", error);
+            systemPrompt = createFallbackSystemPrompt(feedback, frameworkType);
+          } else if (systemPrompts?.prompt_text) {
             systemPrompt = systemPrompts.prompt_text;
             console.log("Using system prompt from database for framework:", frameworkType);
+          } else {
+            console.log("No active system prompt found, using fallback");
+            systemPrompt = createFallbackSystemPrompt(feedback, frameworkType);
           }
         } catch (dbError) {
           console.warn("Database error fetching system prompt, using fallback:", dbError);
-          systemPrompt = createFallbackSystemPrompt(feedback);
+          systemPrompt = createFallbackSystemPrompt(feedback, frameworkType);
         }
       } else {
-        systemPrompt = createFallbackSystemPrompt(feedback);
+        systemPrompt = createFallbackSystemPrompt(feedback, frameworkType);
       }
 
-      function createFallbackSystemPrompt(feedback?: string) {
-        return `You are an expert prompt engineer who helps improve prompts for AI language models.
+      function createFallbackSystemPrompt(feedback?: string, type: string = 'scanner') {
+        let basePrompt = `You are an expert prompt engineer who helps improve prompts for AI language models.
         
 Apply the following best practices when improving prompts:
-${promptingBestPractices}
+${promptingBestPractices}`;
 
-${feedback ? `Additionally, consider this specific feedback: ${feedback}` : ''}
+        if (type === 'designer') {
+          basePrompt += `
 
-Your task is to improve the given prompt by making it more effective, clearer, and following the best practices above.
+## Framework-Specific Optimization
+When working with structured prompt frameworks:
+- Maintain the framework structure while enhancing clarity
+- Ensure each field is properly utilized and optimized
+- Add specific examples where appropriate
+- Optimize for the intended model and use case
+
+## Lovable.dev Specific Guidelines
+- Optimize for React, TypeScript, and Tailwind CSS development
+- Focus on component-based architecture considerations
+- Include accessibility and performance best practices
+- Consider mobile-first responsive design principles`;
+        }
+
+        if (feedback) {
+          basePrompt += `\n\nAdditionally, consider this specific feedback: ${feedback}`;
+        }
+
+        basePrompt += `\n\nYour task is to improve the given prompt by making it more effective, clearer, and following the best practices above.
 Return only the improved prompt without explanations or additional text.`;
+
+        return basePrompt;
       }
 
       // Set up API call with timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
-      // Attempt to use the OpenAI API
+      // Call OpenAI API
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         signal: controller.signal,

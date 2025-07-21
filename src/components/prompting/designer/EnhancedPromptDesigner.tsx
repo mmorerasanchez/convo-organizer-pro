@@ -13,6 +13,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ChevronDown, Settings, Eye, Play, Copy, BookOpen, Zap } from 'lucide-react';
 import { useFrameworks, useFrameworkFields, useFrameworkExamples, Framework } from '@/hooks/use-frameworks';
 import { useModels } from '@/hooks/use-frameworks';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface FieldValues {
@@ -162,37 +163,40 @@ export const EnhancedPromptDesigner = () => {
     setState(prev => ({ ...prev, isRunning: true, activeTab: 'response' }));
     
     try {
-      // Call the improve-prompt edge function with framework type
-      const response = await fetch('/api/improve-prompt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      console.log('Running prompt with compiled text:', state.compiledPrompt);
+      
+      // Use Supabase edge function instead of fetch API
+      const { data, error } = await supabase.functions.invoke('improve-prompt', {
+        body: {
           prompt: state.compiledPrompt,
           frameworkType: 'designer',
           useSystemPrompt: true,
           temperature: state.temperature,
           maxTokens: state.maxTokens
-        })
+        }
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to run prompt');
+      if (error) {
+        console.error('Edge function error:', error);
+        throw error;
       }
 
-      const data = await response.json();
+      if (!data) {
+        throw new Error('No data returned from edge function');
+      }
+
+      console.log('Edge function response:', data);
       
       setState(prev => ({ 
         ...prev, 
-        aiResponse: data.completion || data.improvedPrompt || 'No response received',
+        aiResponse: data.completion || data.improvedPrompt || data.generatedText || 'No response received',
         isRunning: false 
       }));
       
       toast.success("Prompt run successfully");
     } catch (error) {
       console.error('Error running prompt:', error);
-      toast.error("Failed to run prompt");
+      toast.error(error instanceof Error ? error.message : "Failed to run prompt");
       setState(prev => ({ ...prev, isRunning: false }));
     }
   };
