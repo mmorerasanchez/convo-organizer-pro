@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,8 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, Settings, Eye, Play, Copy, BookOpen } from 'lucide-react';
+import { ChevronDown, Settings, Eye, Play, Copy, BookOpen, Zap } from 'lucide-react';
 import { useFrameworks, useFrameworkFields, useFrameworkExamples, Framework } from '@/hooks/use-frameworks';
 import { useModels } from '@/hooks/use-frameworks';
 import { toast } from 'sonner';
@@ -17,16 +19,20 @@ interface FieldValues {
   [key: string]: string;
 }
 
+type MethodType = 'zero-shot' | 'few-shot';
+
 interface PromptDesignerState {
+  title: string;
+  selectedMethod: MethodType;
   selectedFramework: Framework | null;
   fieldValues: FieldValues;
-  title: string;
   modelId: string;
   temperature: number;
   maxTokens: number;
   compiledPrompt: string;
-  testResponse: string;
-  isTesting: boolean;
+  aiResponse: string;
+  isRunning: boolean;
+  activeTab: 'preview' | 'response';
 }
 
 const MODEL_RECOMMENDATIONS = {
@@ -41,15 +47,17 @@ const MODEL_RECOMMENDATIONS = {
 
 export const EnhancedPromptDesigner = () => {
   const [state, setState] = useState<PromptDesignerState>({
+    title: '',
+    selectedMethod: 'zero-shot',
     selectedFramework: null,
     fieldValues: {},
-    title: '',
     modelId: 'gpt-4o-mini',
     temperature: 0.7,
     maxTokens: 1000,
     compiledPrompt: '',
-    testResponse: '',
-    isTesting: false
+    aiResponse: '',
+    isRunning: false,
+    activeTab: 'preview'
   });
   
   const [showExamples, setShowExamples] = useState(false);
@@ -59,6 +67,11 @@ export const EnhancedPromptDesigner = () => {
   const { data: fields = [] } = useFrameworkFields(state.selectedFramework?.id || null);
   const { data: examples = [] } = useFrameworkExamples(state.selectedFramework?.id || null);
   const { data: models = [] } = useModels();
+
+  // Filter frameworks by selected method
+  const compatibleFrameworks = frameworks.filter(framework => 
+    framework.framework_type === state.selectedMethod
+  );
 
   // Auto-populate parameters when framework changes
   useEffect(() => {
@@ -110,8 +123,18 @@ export const EnhancedPromptDesigner = () => {
     setState(prev => ({ ...prev, compiledPrompt: compiled.trim() }));
   };
 
+  const handleMethodChange = (method: MethodType) => {
+    setState(prev => ({
+      ...prev,
+      selectedMethod: method,
+      selectedFramework: null,
+      fieldValues: {},
+      compiledPrompt: ''
+    }));
+  };
+
   const handleFrameworkChange = (frameworkId: string) => {
-    const framework = frameworks.find(f => f.id === frameworkId) || null;
+    const framework = compatibleFrameworks.find(f => f.id === frameworkId) || null;
     setState(prev => ({
       ...prev,
       selectedFramework: framework as Framework | null,
@@ -130,31 +153,47 @@ export const EnhancedPromptDesigner = () => {
     }));
   };
 
-  const handleTestPrompt = async () => {
+  const handleRunPrompt = async () => {
     if (!state.compiledPrompt.trim()) {
-      toast.error("No compiled prompt to test");
+      toast.error("No compiled prompt to run");
       return;
     }
 
-    setState(prev => ({ ...prev, isTesting: true }));
+    setState(prev => ({ ...prev, isRunning: true, activeTab: 'response' }));
     
     try {
-      // Simulate API call for testing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const mockResponse = `This is a test response for the ${state.selectedFramework?.name} framework. The prompt has been successfully compiled and would be sent to ${state.modelId} with temperature ${state.temperature} and max tokens ${state.maxTokens}.`;
+      // Call the improve-prompt edge function with framework type
+      const response = await fetch('/api/improve-prompt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: state.compiledPrompt,
+          frameworkType: 'designer',
+          useSystemPrompt: true,
+          temperature: state.temperature,
+          maxTokens: state.maxTokens
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to run prompt');
+      }
+
+      const data = await response.json();
       
       setState(prev => ({ 
         ...prev, 
-        testResponse: mockResponse,
-        isTesting: false 
+        aiResponse: data.completion || data.improvedPrompt || 'No response received',
+        isRunning: false 
       }));
       
-      toast.success("Prompt tested successfully");
+      toast.success("Prompt run successfully");
     } catch (error) {
-      console.error('Error testing prompt:', error);
-      toast.error("Failed to test prompt");
-      setState(prev => ({ ...prev, isTesting: false }));
+      console.error('Error running prompt:', error);
+      toast.error("Failed to run prompt");
+      setState(prev => ({ ...prev, isRunning: false }));
     }
   };
 
@@ -183,25 +222,73 @@ export const EnhancedPromptDesigner = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header with Prompt Title */}
       <Card>
         <CardHeader>
-          <CardTitle>Advanced Prompt Designer</CardTitle>
+          <CardTitle>Enhanced Prompt Designer</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Framework</Label>
-              <Select value={state.selectedFramework?.id || ''} onValueChange={handleFrameworkChange}>
+          <div className="space-y-2">
+            <Label>Prompt Title</Label>
+            <Input
+              placeholder="Enter a title for your prompt"
+              value={state.title}
+              onChange={(e) => setState(prev => ({ ...prev, title: e.target.value }))}
+            />
+          </div>
+
+          {/* Two Column Method and Framework Selection */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Left Column: Method Selection */}
+            <div className="space-y-4">
+              <Label className="text-base font-medium">Method</Label>
+              <RadioGroup 
+                value={state.selectedMethod} 
+                onValueChange={handleMethodChange}
+                className="space-y-3"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="zero-shot" id="zero-shot" />
+                  <Label htmlFor="zero-shot" className="cursor-pointer">
+                    <div>
+                      <span className="font-medium">Zero-shot</span>
+                      <p className="text-sm text-muted-foreground">Direct instruction-based prompting</p>
+                    </div>
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="few-shot" id="few-shot" />
+                  <Label htmlFor="few-shot" className="cursor-pointer">
+                    <div>
+                      <span className="font-medium">Few-shot</span>
+                      <p className="text-sm text-muted-foreground">Example-based prompting with demonstrations</p>
+                    </div>
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {/* Right Column: Framework Selection */}
+            <div className="space-y-4">
+              <Label className="text-base font-medium">Framework</Label>
+              <Select 
+                value={state.selectedFramework?.id || ''} 
+                onValueChange={handleFrameworkChange}
+                disabled={compatibleFrameworks.length === 0}
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder="Choose a prompting framework" />
+                  <SelectValue placeholder={
+                    compatibleFrameworks.length === 0 
+                      ? `No ${state.selectedMethod} frameworks available`
+                      : "Choose a compatible framework"
+                  } />
                 </SelectTrigger>
                 <SelectContent>
-                  {frameworks.map(framework => (
+                  {compatibleFrameworks.map(framework => (
                     <SelectItem key={framework.id} value={framework.id}>
                       <div className="flex items-center gap-2">
                         <span>{framework.name}</span>
-                        <Badge variant={framework.framework_type === 'zero-shot' ? 'default' : 'secondary'}>
+                        <Badge variant="secondary">
                           {framework.framework_type}
                         </Badge>
                       </div>
@@ -209,42 +296,31 @@ export const EnhancedPromptDesigner = () => {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Prompt Title</Label>
-              <Input
-                placeholder="Enter a title for your prompt"
-                value={state.title}
-                onChange={(e) => setState(prev => ({ ...prev, title: e.target.value }))}
-              />
+              
+              {state.selectedFramework && (
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-sm">{state.selectedFramework.description}</p>
+                </div>
+              )}
             </div>
           </div>
-
-          {state.selectedFramework && (
-            <div className="p-3 bg-muted rounded-lg">
-              <p className="text-sm">{state.selectedFramework.description}</p>
-            </div>
-          )}
         </CardContent>
       </Card>
 
-      {/* Framework Fields and Examples */}
+      {/* Framework Fields and Model Settings - Equal Height */}
       {state.selectedFramework && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Framework Fields */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Framework Fields</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {fields.map(renderFieldInput)}
-              </CardContent>
-            </Card>
-          </div>
+          <Card className="h-fit">
+            <CardHeader>
+              <CardTitle>Framework Fields</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 min-h-[400px]">
+              {fields.map(renderFieldInput)}
+            </CardContent>
+          </Card>
 
-          {/* Examples and Settings */}
+          {/* Model Settings and Examples */}
           <div className="space-y-6">
             {/* Examples (for few-shot frameworks) */}
             {state.selectedFramework.framework_type === 'few-shot' && examples.length > 0 && (
@@ -264,7 +340,7 @@ export const EnhancedPromptDesigner = () => {
                 </CardHeader>
                 <Collapsible open={showExamples} onOpenChange={setShowExamples}>
                   <CollapsibleContent>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-4 max-h-32 overflow-y-auto">
                       {examples.map((example, index) => (
                         <div key={example.id} className="space-y-2">
                           <h5 className="text-sm font-medium">{example.title}</h5>
@@ -280,7 +356,7 @@ export const EnhancedPromptDesigner = () => {
             )}
 
             {/* Model Settings */}
-            <Card>
+            <Card className="h-fit">
               <CardHeader>
                 <Collapsible open={showAdvancedParams} onOpenChange={setShowAdvancedParams}>
                   <CollapsibleTrigger asChild>
@@ -296,7 +372,7 @@ export const EnhancedPromptDesigner = () => {
               </CardHeader>
               <Collapsible open={showAdvancedParams} onOpenChange={setShowAdvancedParams}>
                 <CollapsibleContent>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-4 min-h-[300px]">
                     <div className="space-y-2">
                       <Label>Model</Label>
                       <Select value={state.modelId} onValueChange={(value) => setState(prev => ({ ...prev, modelId: value }))}>
@@ -345,7 +421,7 @@ export const EnhancedPromptDesigner = () => {
         </div>
       )}
 
-      {/* Compiled Prompt Preview */}
+      {/* Enhanced Compiled Prompt Preview with Dual Tabs */}
       {state.compiledPrompt && (
         <Card>
           <CardHeader>
@@ -355,10 +431,12 @@ export const EnhancedPromptDesigner = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="preview" className="w-full">
+            <Tabs value={state.activeTab} onValueChange={(value) => setState(prev => ({ ...prev, activeTab: value as 'preview' | 'response' }))}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="preview">Preview</TabsTrigger>
-                <TabsTrigger value="response">Test Response</TabsTrigger>
+                <TabsTrigger value="response" disabled={!state.aiResponse && !state.isRunning}>
+                  AI Response {state.isRunning && <Zap className="h-3 w-3 ml-1 animate-pulse" />}
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="preview" className="space-y-4">
@@ -366,9 +444,9 @@ export const EnhancedPromptDesigner = () => {
                   <pre className="whitespace-pre-wrap text-sm">{state.compiledPrompt}</pre>
                 </div>
                 <div className="flex gap-2">
-                  <Button onClick={handleTestPrompt} disabled={state.isTesting}>
+                  <Button onClick={handleRunPrompt} disabled={state.isRunning}>
                     <Play className="h-4 w-4 mr-2" />
-                    {state.isTesting ? 'Testing...' : 'Test Prompt'}
+                    {state.isRunning ? 'Running...' : 'Run Prompt'}
                   </Button>
                   <Button variant="outline" onClick={handleCopyPrompt}>
                     <Copy className="h-4 w-4 mr-2" />
@@ -378,13 +456,18 @@ export const EnhancedPromptDesigner = () => {
               </TabsContent>
               
               <TabsContent value="response" className="space-y-4">
-                {state.testResponse ? (
+                {state.isRunning ? (
+                  <div className="text-center py-8">
+                    <Zap className="h-8 w-8 animate-pulse mx-auto mb-2" />
+                    <p className="text-muted-foreground">Running prompt with AI system prompts...</p>
+                  </div>
+                ) : state.aiResponse ? (
                   <div className="bg-muted p-4 rounded-lg max-h-96 overflow-y-auto">
-                    <pre className="whitespace-pre-wrap text-sm">{state.testResponse}</pre>
+                    <pre className="whitespace-pre-wrap text-sm">{state.aiResponse}</pre>
                   </div>
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
-                    No test response yet. Test your prompt to see the results here.
+                    No AI response yet. Run your prompt to see the enhanced results here.
                   </div>
                 )}
               </TabsContent>
