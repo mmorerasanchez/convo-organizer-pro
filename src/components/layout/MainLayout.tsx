@@ -25,8 +25,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             {/* Desktop header */}
             <DesktopHeader />
             
-            <main className="flex-1 px-4 py-6 sm:px-6">
-              <div className="mx-auto max-w-5xl">{children}</div>
+            <main className="flex-1 px-container py-section sm:px-section">
+              <div className="mx-auto max-w-7xl">{children}</div>
             </main>
             
             {/* Centered footer with logo */}

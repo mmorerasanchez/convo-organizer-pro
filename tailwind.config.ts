@@ -105,6 +105,22 @@ export default {
 				8: '8',
 				9: '9',
 				10: '10',
+			},
+			spacing: {
+				'header': '4.5rem',
+				'container': '1.5rem',
+				'section': '2rem',
+				'card': '1.25rem',
+				'grid': '1.5rem'
+			},
+			typography: {
+				'heading-xl': ['1.875rem', { lineHeight: '2.25rem', fontWeight: '700' }],
+				'heading-lg': ['1.5rem', { lineHeight: '2rem', fontWeight: '600' }],
+				'heading-md': ['1.25rem', { lineHeight: '1.75rem', fontWeight: '600' }],
+				'heading-sm': ['1.125rem', { lineHeight: '1.5rem', fontWeight: '600' }],
+				'body-lg': ['1rem', { lineHeight: '1.5rem', fontWeight: '400' }],
+				'body-md': ['0.875rem', { lineHeight: '1.25rem', fontWeight: '400' }],
+				'body-sm': ['0.75rem', { lineHeight: '1rem', fontWeight: '400' }],
 			}
 		}
 	},

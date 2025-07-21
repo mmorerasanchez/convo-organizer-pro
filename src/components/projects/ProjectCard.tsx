@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Project } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
 import { Folder, MessageCircle, Users } from 'lucide-react';
-import ProjectStatusBadge from './ProjectStatusBadge';
+import StatusIndicator from '@/components/common/StatusIndicator';
 
 interface ProjectCardProps {
   project: Project;
@@ -32,16 +32,16 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, isShared = false }) 
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-1">
-                <h3 className="font-medium truncate text-sm">{displayName}</h3>
+                <h3 className="font-semibold truncate leading-tight">{displayName}</h3>
                 {isShared && (
                   <Users size={16} className="text-primary flex-shrink-0 ml-2" aria-label="Shared Project" />
                 )}
               </div>
               <div className="flex items-center">
-                <ProjectStatusBadge status={project.status} />
+                <StatusIndicator status={project.status} />
               </div>
               {project.description && (
-                <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
                   {project.description || "No description provided"}
                 </p>
               )}

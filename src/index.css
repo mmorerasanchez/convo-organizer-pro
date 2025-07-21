@@ -36,6 +36,31 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.75rem;
+    
+    /* Design Tokens - Spacing */
+    --spacing-header: 4.5rem;
+    --spacing-container: 1.5rem;
+    --spacing-section: 2rem;
+    --spacing-card: 1.25rem;
+    --spacing-grid: 1.5rem;
+    
+    /* Design Tokens - Typography Scale */
+    --text-heading-xl: 1.875rem;
+    --text-heading-lg: 1.5rem;
+    --text-heading-md: 1.25rem;
+    --text-heading-sm: 1.125rem;
+    --text-body-lg: 1rem;
+    --text-body-md: 0.875rem;
+    --text-body-sm: 0.75rem;
+    
+    /* Design Tokens - Line Heights */
+    --leading-heading-xl: 2.25rem;
+    --leading-heading-lg: 2rem;
+    --leading-heading-md: 1.75rem;
+    --leading-heading-sm: 1.5rem;
+    --leading-body-lg: 1.5rem;
+    --leading-body-md: 1.25rem;
+    --leading-body-sm: 1rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;

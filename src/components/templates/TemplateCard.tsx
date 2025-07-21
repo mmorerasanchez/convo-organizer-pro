@@ -69,16 +69,16 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
     }
   };
 
-  const getTagColor = (tag: string) => {
-    const colors: Record<string, string> = {
-      'Research': 'bg-blue-100 text-blue-800',
-      'Content Creation': 'bg-green-100 text-green-800',
-      'Analysis': 'bg-purple-100 text-purple-800',
-      'Customer Support': 'bg-orange-100 text-orange-800',
-      'Development': 'bg-red-100 text-red-800',
-      'Custom': 'bg-gray-100 text-gray-800'
+  const getTagVariant = (tag: string): 'info' | 'success' | 'secondary' | 'warning' | 'destructive' | 'muted' => {
+    const variants: Record<string, 'info' | 'success' | 'secondary' | 'warning' | 'destructive' | 'muted'> = {
+      'Research': 'info',
+      'Content Creation': 'success',
+      'Analysis': 'secondary',
+      'Customer Support': 'warning',
+      'Development': 'destructive',
+      'Custom': 'muted'
     };
-    return colors[tag] || colors['Custom'];
+    return variants[tag] || 'muted';
   };
 
   const framework = frameworks.find(f => f.id === template.framework_id);
@@ -119,7 +119,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
       <CardContent className="pt-0">
         <div className="space-y-3">
           <div className="flex flex-wrap gap-2">
-            <Badge className={getTagColor(template.tag)}>
+            <Badge variant={getTagVariant(template.tag)}>
               {template.tag}
             </Badge>
             <Badge variant="outline" className="flex items-center gap-1">

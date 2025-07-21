@@ -8,21 +8,21 @@ interface ProjectStatusBadgeProps {
 }
 
 const ProjectStatusBadge: React.FC<ProjectStatusBadgeProps> = ({ status, className }) => {
-  const getStatusColor = () => {
+  const getStatusVariant = () => {
     switch (status) {
       case 'not started':
-        return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+        return 'muted';
       case 'in progress':
-        return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
+        return 'info';
       case 'active':
-        return 'bg-green-100 text-green-800 hover:bg-green-200';
+        return 'success';
       default:
-        return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+        return 'muted';
     }
   };
 
   return (
-    <Badge variant="outline" className={`px-2.5 py-0.5 text-xs font-medium ${getStatusColor()} ${className || ''}`}>
+    <Badge variant={getStatusVariant()} className={className}>
       {status}
     </Badge>
   );

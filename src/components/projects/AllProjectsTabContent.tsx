@@ -27,7 +27,7 @@ const AllProjectsTabContent: React.FC<AllProjectsTabContentProps> = ({
   const [viewMode, setViewMode] = useState<'grid' | 'status' | 'table'>('grid');
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-section">
       <div className="flex justify-between items-center flex-wrap gap-2">
         <ProjectFilters
           searchTerm={searchTerm}

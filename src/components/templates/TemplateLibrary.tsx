@@ -62,7 +62,7 @@ const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ onCreateTemplate }) =
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-10 w-32" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-section">
           {[...Array(6)].map((_, i) => (
             <Skeleton key={i} className="h-48 w-full" />
           ))}
@@ -80,7 +80,7 @@ const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ onCreateTemplate }) =
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-section">
       {/* Header with filters */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-4 flex-1">
@@ -168,7 +168,7 @@ const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ onCreateTemplate }) =
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-section">
           {filteredTemplates.map((template) => (
             <TemplateCard key={template.id} template={template} />
           ))}

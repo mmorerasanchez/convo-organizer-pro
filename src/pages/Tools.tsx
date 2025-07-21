@@ -31,7 +31,7 @@ const Tools = () => {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-section">
         <ToolsHeader 
           activeTab={activeTab}
           setActiveTab={setActiveTab}

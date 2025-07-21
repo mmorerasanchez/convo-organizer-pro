@@ -76,7 +76,7 @@ const NewProjectDialog: React.FC<NewProjectDialogProps> = ({
       }
       isProcessing={isProcessing}
     >
-      <div className="py-4 new-project-form">
+      <div className="space-y-4">
         <NewProjectForm
           projectName={projectName}
           projectDescription={projectDescription}

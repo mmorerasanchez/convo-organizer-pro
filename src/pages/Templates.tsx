@@ -15,7 +15,7 @@ const Templates = () => {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-section">
         <PageHeader 
           title="Templates"
           description="Save and reuse prompt configurations for consistent, efficient workflows"

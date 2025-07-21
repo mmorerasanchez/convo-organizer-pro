@@ -69,23 +69,14 @@ const Dashboard = () => {
         />
         
         {isLoading ? (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Skeleton className="h-64 w-full" />
             <Skeleton className="h-64 w-full" />
           </div>
         ) : (
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="mb-5 bg-muted/50 h-9 p-1">
-              <TabsTrigger value="overview" className="h-7 px-3 text-sm font-mono">
-                Overview
-              </TabsTrigger>
-              <TabsTrigger value="analytics" className="h-7 px-3 text-sm flex items-center gap-1.5 font-mono">
-                <BarChart size={14} />
-                Analytics
-              </TabsTrigger>
-            </TabsList>
-            
             <TabsContent value="overview" className="space-y-0">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <RecentActivity conversations={sortedConversations} />
                 <ProjectList projects={sortedProjects} />
               </div>

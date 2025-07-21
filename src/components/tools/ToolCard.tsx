@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Tool } from '@/lib/types';
 import { Edit, Trash } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -33,11 +34,11 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
     }
   };
 
-  // Calculate the style for the score badge
-  const getScoreColor = () => {
-    if (tool.score >= 8) return 'bg-green-100 text-green-800';
-    if (tool.score >= 6) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-red-100 text-red-800';
+  // Calculate the score badge variant
+  const getScoreVariant = () => {
+    if (tool.score >= 8) return 'success';
+    if (tool.score >= 6) return 'warning';
+    return 'destructive';
   };
 
   return (
@@ -46,18 +47,18 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
         <div className="flex justify-between items-start">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-medium">{tool.name}</h3>
-              <div className={`px-1.5 py-0.5 rounded-full text-xs font-medium ${getScoreColor()}`}>
+              <h3 className="font-semibold leading-tight">{tool.name}</h3>
+              <Badge variant={getScoreVariant()} className="text-xs">
                 {tool.score}
-              </div>
+              </Badge>
             </div>
             <p className="text-xs text-muted-foreground">{tool.model}</p>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="px-4 pt-0 pb-4 flex-grow">
+        <CardContent className="flex-grow">
         {tool.description && (
-          <p className="text-xs text-muted-foreground line-clamp-3">
+          <p className="text-sm text-muted-foreground line-clamp-2">
             {tool.description}
           </p>
         )}
