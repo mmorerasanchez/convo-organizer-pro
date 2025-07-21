@@ -834,6 +834,160 @@ export type Database = {
           },
         ]
       }
+      template_usage: {
+        Row: {
+          execution_time_ms: number | null
+          id: string
+          project_id: string | null
+          success_rating: number | null
+          template_id: string
+          usage_context: Json | null
+          used_at: string | null
+          used_by: string
+        }
+        Insert: {
+          execution_time_ms?: number | null
+          id?: string
+          project_id?: string | null
+          success_rating?: number | null
+          template_id: string
+          usage_context?: Json | null
+          used_at?: string | null
+          used_by: string
+        }
+        Update: {
+          execution_time_ms?: number | null
+          id?: string
+          project_id?: string | null
+          success_rating?: number | null
+          template_id?: string
+          usage_context?: Json | null
+          used_at?: string | null
+          used_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_usage_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_usage_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_versions: {
+        Row: {
+          change_description: string | null
+          configuration_snapshot: Json
+          created_at: string | null
+          created_by: string
+          id: string
+          template_id: string
+          version_number: number
+        }
+        Insert: {
+          change_description?: string | null
+          configuration_snapshot: Json
+          created_at?: string | null
+          created_by: string
+          id?: string
+          template_id: string
+          version_number: number
+        }
+        Update: {
+          change_description?: string | null
+          configuration_snapshot?: Json
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          template_id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_versions_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      templates: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          description: string | null
+          effectiveness_score: number | null
+          field_values: Json
+          framework_config: Json
+          framework_id: string | null
+          id: string
+          max_tokens: number | null
+          model_id: string | null
+          name: string
+          tag: string
+          temperature: number | null
+          updated_at: string | null
+          usage_count: number | null
+          variables: Json
+          visibility: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          effectiveness_score?: number | null
+          field_values?: Json
+          framework_config?: Json
+          framework_id?: string | null
+          id?: string
+          max_tokens?: number | null
+          model_id?: string | null
+          name: string
+          tag: string
+          temperature?: number | null
+          updated_at?: string | null
+          usage_count?: number | null
+          variables?: Json
+          visibility?: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          effectiveness_score?: number | null
+          field_values?: Json
+          framework_config?: Json
+          framework_id?: string | null
+          id?: string
+          max_tokens?: number | null
+          model_id?: string | null
+          name?: string
+          tag?: string
+          temperature?: number | null
+          updated_at?: string | null
+          usage_count?: number | null
+          variables?: Json
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "templates_framework_id_fkey"
+            columns: ["framework_id"]
+            isOneToOne: false
+            referencedRelation: "frameworks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tools: {
         Row: {
           created_at: string

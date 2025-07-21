@@ -12,6 +12,7 @@ import SharedProjectDetail from "./pages/SharedProjectDetail";
 import ConversationDetail from "./pages/ConversationDetail";
 import Conversations from "./pages/Conversations";
 import Prompting from "./pages/Prompting";
+import Templates from "./pages/Templates";
 import Tools from "./pages/Tools";
 import Auth from "./pages/Auth";
 import Login from "./pages/Login";
@@ -60,6 +61,7 @@ const App = () => (
               <Route path="/conversations" element={<ProtectedRoute><Conversations /></ProtectedRoute>} />
               <Route path="/conversations/:id" element={<ProtectedRoute><ConversationDetail /></ProtectedRoute>} />
               <Route path="/prompting" element={<ProtectedRoute><Prompting /></ProtectedRoute>} />
+              <Route path="/templates" element={<ProtectedRoute><Templates /></ProtectedRoute>} />
               <Route path="/tools" element={<ProtectedRoute><Tools /></ProtectedRoute>} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/login" element={<Login />} />

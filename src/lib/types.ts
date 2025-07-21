@@ -100,3 +100,23 @@ export interface LLMModel {
   strengths?: string[];
   bestFor?: string[];
 }
+
+export interface Template {
+  id: string;
+  name: string;
+  description?: string;
+  tag: 'Research' | 'Content Creation' | 'Analysis' | 'Customer Support' | 'Development' | 'Custom';
+  framework_id?: string;
+  framework_config: Record<string, any>;
+  field_values: Record<string, any>;
+  temperature: number;
+  max_tokens: number;
+  model_id?: string;
+  variables: Record<string, any>;
+  visibility: 'private' | 'shared' | 'public';
+  created_by: string;
+  usage_count: number;
+  effectiveness_score?: number;
+  created_at: string;
+  updated_at: string;
+}
