@@ -93,9 +93,11 @@ const CreateTemplateDialog: React.FC<CreateTemplateDialogProps> = ({
   };
 
   const handleFrameworkChange = (value: string) => {
+    // Convert "none" to null for the database
+    const frameworkId = value === 'none' ? null : value;
     setFormData(prev => ({ 
       ...prev, 
-      framework_id: value || null,
+      framework_id: frameworkId,
       framework_config: {},
       field_values: {}
     }));
@@ -213,14 +215,14 @@ const CreateTemplateDialog: React.FC<CreateTemplateDialogProps> = ({
           <div className="space-y-2">
             <Label htmlFor="framework">Framework (Optional)</Label>
             <Select 
-              value={formData.framework_id || ''} 
+              value={formData.framework_id || 'none'} 
               onValueChange={handleFrameworkChange}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select a framework" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No framework</SelectItem>
+                <SelectItem value="none">No framework</SelectItem>
                 {filteredFrameworks.map((framework) => (
                   <SelectItem key={framework.id} value={framework.id}>
                     {framework.name}
