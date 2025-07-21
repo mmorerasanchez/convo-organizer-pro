@@ -30,9 +30,9 @@ export const PromptOutputCard = ({
   };
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="bg-muted/50 pb-4">
-        <CardTitle className="text-md">Improved Prompt</CardTitle>
+    <Card className="h-full flex flex-col hover:shadow-md transition-all duration-200">
+      <CardHeader className="bg-muted/50">
+        <CardTitle>Improved Prompt</CardTitle>
         <CardDescription>
           AI-generated improvement based on prompt engineering best practices
         </CardDescription>
@@ -40,7 +40,7 @@ export const PromptOutputCard = ({
       
       <CardContent className="flex-grow">
         {improvedPrompt ? (
-          <div className="whitespace-pre-wrap font-mono text-sm">
+          <div className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
             {improvedPrompt}
           </div>
         ) : (
@@ -55,13 +55,12 @@ export const PromptOutputCard = ({
       </CardContent>
       
       {improvedPrompt && (
-        <CardFooter className="flex flex-wrap justify-between gap-2 border-t pt-4">
+        <CardFooter className="flex flex-wrap justify-between gap-3 border-t">
           <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={onTryAgain}
-              className="h-8"
               disabled={isProcessing || !originalPrompt}
             >
               Try Again
@@ -72,10 +71,10 @@ export const PromptOutputCard = ({
                 variant="ghost"
                 size="sm"
                 onClick={onRevert}
-                className="h-8 gap-1"
                 disabled={isProcessing}
+                className="gap-2"
               >
-                <ArrowLeft className="h-3.5 w-3.5" />
+                <ArrowLeft className="h-4 w-4" />
                 Revert
               </Button>
             )}
@@ -86,10 +85,10 @@ export const PromptOutputCard = ({
               variant="outline"
               size="sm"
               onClick={handleCopy}
-              className="h-8 gap-1.5"
               disabled={isProcessing}
+              className="gap-2"
             >
-              <Copy className="h-3.5 w-3.5" />
+              <Copy className="h-4 w-4" />
               Copy
             </Button>
             
@@ -97,17 +96,16 @@ export const PromptOutputCard = ({
               variant="secondary"
               size="sm"
               onClick={onSave}
-              className="h-8 gap-1.5"
               disabled={isProcessing || !improvedPrompt}
+              className="gap-2"
             >
-              <Save className="h-3.5 w-3.5" />
+              <Save className="h-4 w-4" />
               Save
             </Button>
             
             <Button
               onClick={onAccept}
               size="sm"
-              className="h-8"
               disabled={isProcessing || !improvedPrompt}
             >
               Accept

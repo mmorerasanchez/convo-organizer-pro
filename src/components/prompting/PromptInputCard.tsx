@@ -39,14 +39,14 @@ export function PromptInputCard({
   onToggleAdvancedParams,
 }: PromptInputCardProps) {
   return (
-    <Card className="overflow-hidden border">
-      <CardHeader className="pb-0">
-        <CardTitle className="text-base font-medium">Your Original Prompt</CardTitle>
-        <CardDescription className="text-xs text-muted-foreground">
+    <Card className="overflow-hidden border hover:shadow-md transition-all duration-200">
+      <CardHeader>
+        <CardTitle>Your Original Prompt</CardTitle>
+        <CardDescription>
           Enter your informal prompt to get AI-powered improvement suggestions
         </CardDescription>
       </CardHeader>
-      <CardContent className="pt-4 space-y-4">
+      <CardContent className="space-y-4">
         <EnhancedModelSelector
           value={selectedModelId}
           onChange={onModelChange}
@@ -64,26 +64,27 @@ export function PromptInputCard({
         
         <Textarea 
           placeholder="Enter your prompt here... (e.g., 'Tell me about climate change')"
-          className="min-h-[180px] bg-background border text-sm font-mono prompt-area"
+          className="min-h-[180px] bg-background border text-sm font-mono prompt-area resize-none focus-visible:ring-2 focus-visible:ring-primary/20"
           value={promptInput}
           onChange={(e) => onChange(e.target.value)}
         />
       </CardContent>
-      <CardFooter className="flex justify-between bg-muted/10 px-5 py-3 border-t">
+      <CardFooter className="justify-between bg-muted/10 border-t">
         <Button 
           variant="ghost" 
+          size="sm"
           onClick={onClear} 
-          className="text-sm h-8 px-3"
         >
-          <XCircle className="h-4 w-4 mr-1" />
+          <XCircle className="h-4 w-4 mr-2" />
           Clear
         </Button>
         <Button 
           onClick={onScan} 
           disabled={!promptInput.trim() || isProcessing}
-          className="gap-1.5 bg-primary hover:bg-primary/90 text-sm h-8 px-3"
+          size="sm"
+          className="gap-2"
         >
-          {isProcessing ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Brain className="h-3.5 w-3.5" />}
+          {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Brain className="h-4 w-4" />}
           {isProcessing ? 'Processing...' : 'Scan & Improve'}
         </Button>
       </CardFooter>

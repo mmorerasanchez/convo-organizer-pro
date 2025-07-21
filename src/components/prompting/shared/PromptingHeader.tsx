@@ -25,21 +25,23 @@ export function PromptingHeader({
   selectedProjectId
 }: PromptingHeaderProps) {
   return (
-    <Card>
+    <Card className="border">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {icon}
-            <CardTitle>{title}</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="text-primary">
+              {icon}
+            </div>
+            <CardTitle className="text-xl">{title}</CardTitle>
           </div>
-          <Badge variant="outline" className="flex items-center gap-1">
+          <Badge variant="outline" className="flex items-center gap-2">
             <TrendingUp className="h-3 w-3" />
-            {currentUsage}/{limit} requests
+            <span>{currentUsage}/{limit} requests</span>
           </Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-muted-foreground">{description}</p>
+        <p className="text-muted-foreground leading-relaxed">{description}</p>
         <PromptingProjectSelector 
           onProjectSelect={onProjectSelect}
           selectedProjectId={selectedProjectId}

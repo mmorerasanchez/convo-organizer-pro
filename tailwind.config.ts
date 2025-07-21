@@ -24,6 +24,10 @@ export default {
 				mono: ['Inconsolata', 'monospace'],
 				heading: ['Lexend Deca', 'sans-serif'],
 			},
+			spacing: {
+				'18': '4.5rem',
+				'88': '22rem',
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -95,6 +99,12 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
+			},
+			lineClamp: {
+				7: '7',
+				8: '8',
+				9: '9',
+				10: '10',
 			}
 		}
 	},
