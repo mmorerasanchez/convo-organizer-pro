@@ -46,14 +46,14 @@ const AllProjectsTabContent: React.FC<AllProjectsTabContentProps> = ({
         <ProjectGrid 
           projects={projects}
           isLoading={isLoading}
-          showNewButton={true}
+          showNewButton={false}
           searchTerm={searchTerm}
         />
       ) : viewMode === 'status' ? (
         <ProjectsByStatus 
           projects={projects}
           isLoading={isLoading}
-          showNewButton={true}
+          showNewButton={false}
         />
       ) : (
         <ProjectsTableView
