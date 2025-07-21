@@ -6,7 +6,9 @@ import { Tabs, TabsContent } from '@/components/ui/tabs';
 import PromptingGuide from '@/components/prompting/PromptingGuide';
 import PromptScanner from '@/components/prompting/PromptScanner';
 import PromptDesigner from '@/components/prompting/PromptDesigner';
-import { BookOpen, Bot, Wand2 } from 'lucide-react';
+import { EnhancedPromptScanner } from '@/components/prompting/scanner/EnhancedPromptScanner';
+import { EnhancedPromptDesigner } from '@/components/prompting/designer/EnhancedPromptDesigner';
+import { BookOpen, Bot, Wand2, Sparkles, Zap } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 import { PromptingProvider } from '@/components/prompting/context/PromptingContext';
 import { PromptScannerProvider } from '@/components/prompting/context/usePromptScanner';
@@ -16,20 +18,22 @@ const Prompting = () => {
   const navigate = useNavigate();
   const tabFromUrl = searchParams.get('tab');
   const [activeTab, setActiveTab] = React.useState(() => {
-    // Initialize tab from URL parameter or default to 'designer'
-    return tabFromUrl === 'scanner' || tabFromUrl === 'guide' ? tabFromUrl : 'designer';
+    // Initialize tab from URL parameter or default to 'enhanced-scanner'
+    const validTabs = ['enhanced-scanner', 'enhanced-designer', 'scanner', 'designer', 'guide'];
+    return validTabs.includes(tabFromUrl || '') ? tabFromUrl : 'enhanced-scanner';
   });
 
   // Update active tab when URL parameter changes
   useEffect(() => {
-    if (tabFromUrl === 'scanner' || tabFromUrl === 'guide' || tabFromUrl === 'designer') {
+    const validTabs = ['enhanced-scanner', 'enhanced-designer', 'scanner', 'designer', 'guide'];
+    if (validTabs.includes(tabFromUrl || '')) {
       setActiveTab(tabFromUrl);
     }
   }, [tabFromUrl]);
 
   // Sync URL with active tab
   useEffect(() => {
-    if (activeTab && activeTab !== 'designer') {
+    if (activeTab && activeTab !== 'enhanced-scanner') {
       setSearchParams({ tab: activeTab });
     } else {
       // Remove tab parameter for default tab
@@ -41,14 +45,24 @@ const Prompting = () => {
 
   const tabs = [
     {
-      value: 'designer',
-      label: 'Prompt Designer',
-      icon: <Bot className="h-4 w-4" />
+      value: 'enhanced-scanner',
+      label: 'Enhanced Scanner',
+      icon: <Sparkles className="h-4 w-4" />
+    },
+    {
+      value: 'enhanced-designer',
+      label: 'Enhanced Designer',
+      icon: <Zap className="h-4 w-4" />
     },
     {
       value: 'scanner',
-      label: 'Prompt Scanner',
+      label: 'Legacy Scanner',
       icon: <Wand2 className="h-4 w-4" />
+    },
+    {
+      value: 'designer',
+      label: 'Legacy Designer',
+      icon: <Bot className="h-4 w-4" />
     },
     {
       value: 'guide',
@@ -70,14 +84,22 @@ const Prompting = () => {
           />
           
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsContent value="designer" className="space-y-6 mt-0">
-              <PromptDesigner />
+            <TabsContent value="enhanced-scanner" className="space-y-6 mt-0">
+              <EnhancedPromptScanner />
+            </TabsContent>
+            
+            <TabsContent value="enhanced-designer" className="space-y-6 mt-0">
+              <EnhancedPromptDesigner />
             </TabsContent>
             
             <TabsContent value="scanner" className="space-y-6 mt-0">
               <PromptScannerProvider>
                 <PromptScanner />
               </PromptScannerProvider>
+            </TabsContent>
+            
+            <TabsContent value="designer" className="space-y-6 mt-0">
+              <PromptDesigner />
             </TabsContent>
             
             <TabsContent value="guide" className="space-y-6 mt-0">

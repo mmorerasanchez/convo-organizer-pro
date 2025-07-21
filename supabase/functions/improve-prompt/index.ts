@@ -1,8 +1,14 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+
+// Initialize Supabase client
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -71,7 +77,9 @@ serve(async (req) => {
       originalPrompt: altOriginalPrompt,
       feedback,
       temperature = 0.7,
-      maxTokens = 1000
+      maxTokens = 1000,
+      useSystemPrompt = false,
+      frameworkType = 'scanner'
     } = requestBody;
 
     // Use either prompt or originalPrompt parameter
@@ -97,9 +105,37 @@ serve(async (req) => {
     console.log("Calling OpenAI API with temperature:", temperature, "maxTokens:", maxTokens);
     
     try {
-      // Create a system prompt that incorporates both expert guidance and our best practices
-      const systemPrompt = `You are an expert prompt engineer who helps improve prompts for AI language models.
+      let systemPrompt;
       
+      // Use system prompt from database if requested
+      if (useSystemPrompt) {
+        try {
+          const { data: systemPrompts, error } = await supabase
+            .from('system_prompts')
+            .select('prompt_text')
+            .eq('framework_type', frameworkType)
+            .eq('active', true)
+            .limit(1)
+            .single();
+            
+          if (error || !systemPrompts) {
+            console.warn("Failed to fetch system prompt, falling back to default:", error);
+            systemPrompt = createFallbackSystemPrompt(feedback);
+          } else {
+            systemPrompt = systemPrompts.prompt_text;
+            console.log("Using system prompt from database for framework:", frameworkType);
+          }
+        } catch (dbError) {
+          console.warn("Database error fetching system prompt, using fallback:", dbError);
+          systemPrompt = createFallbackSystemPrompt(feedback);
+        }
+      } else {
+        systemPrompt = createFallbackSystemPrompt(feedback);
+      }
+
+      function createFallbackSystemPrompt(feedback?: string) {
+        return `You are an expert prompt engineer who helps improve prompts for AI language models.
+        
 Apply the following best practices when improving prompts:
 ${promptingBestPractices}
 
@@ -107,6 +143,7 @@ ${feedback ? `Additionally, consider this specific feedback: ${feedback}` : ''}
 
 Your task is to improve the given prompt by making it more effective, clearer, and following the best practices above.
 Return only the improved prompt without explanations or additional text.`;
+      }
 
       // Set up API call with timeout
       const controller = new AbortController();
