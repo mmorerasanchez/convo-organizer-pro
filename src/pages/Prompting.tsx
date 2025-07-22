@@ -1,17 +1,16 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import PromptingGuide from '@/components/prompting/PromptingGuide';
-import PromptScanner from '@/components/prompting/PromptScanner';
-import PromptDesigner from '@/components/prompting/PromptDesigner';
 import { EnhancedPromptScanner } from '@/components/prompting/scanner/EnhancedPromptScanner';
 import { EnhancedPromptDesigner } from '@/components/prompting/designer/EnhancedPromptDesigner';
-import { BookOpen, Bot, Wand2, Sparkles, Zap } from 'lucide-react';
+import TemplateLibrary from '@/components/templates/TemplateLibrary';
+import CreateTemplateDialog from '@/components/templates/CreateTemplateDialog';
+import { BookOpen, Sparkles, Zap, FileCode } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 import { PromptingProvider } from '@/components/prompting/context/PromptingContext';
-import { PromptScannerProvider } from '@/components/prompting/context/usePromptScanner';
 
 const Prompting = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,13 +18,17 @@ const Prompting = () => {
   const tabFromUrl = searchParams.get('tab');
   const [activeTab, setActiveTab] = React.useState(() => {
     // Initialize tab from URL parameter or default to 'enhanced-scanner'
-    const validTabs = ['enhanced-scanner', 'enhanced-designer', 'scanner', 'designer', 'guide'];
+    const validTabs = ['enhanced-scanner', 'enhanced-designer', 'templates', 'guide'];
     return validTabs.includes(tabFromUrl || '') ? tabFromUrl : 'enhanced-scanner';
   });
 
+  // Templates-specific state
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Update active tab when URL parameter changes
   useEffect(() => {
-    const validTabs = ['enhanced-scanner', 'enhanced-designer', 'scanner', 'designer', 'guide'];
+    const validTabs = ['enhanced-scanner', 'enhanced-designer', 'templates', 'guide'];
     if (validTabs.includes(tabFromUrl || '')) {
       setActiveTab(tabFromUrl);
     }
@@ -43,6 +46,10 @@ const Prompting = () => {
     }
   }, [activeTab, setSearchParams, tabFromUrl]);
 
+  const handleCreateTemplate = () => {
+    setShowCreateDialog(true);
+  };
+
   const tabs = [
     {
       value: 'enhanced-scanner',
@@ -55,14 +62,9 @@ const Prompting = () => {
       icon: <Zap className="h-4 w-4" />
     },
     {
-      value: 'scanner',
-      label: 'Legacy Scanner',
-      icon: <Wand2 className="h-4 w-4" />
-    },
-    {
-      value: 'designer',
-      label: 'Legacy Designer',
-      icon: <Bot className="h-4 w-4" />
+      value: 'templates',
+      label: 'Templates',
+      icon: <FileCode className="h-4 w-4" />
     },
     {
       value: 'guide',
@@ -77,10 +79,14 @@ const Prompting = () => {
         <div className="space-y-8">
           <PageHeader 
             title="Prompting Tools"
-            description="Learn best practices, improve your prompts, and design structured prompts with proven frameworks"
+            description="Learn best practices, improve your prompts, design structured prompts, and manage templates"
             tabs={tabs}
             activeTab={activeTab}
             onTabChange={setActiveTab}
+            showSearch={activeTab === 'templates'}
+            searchPlaceholder="Search templates..."
+            searchValue={searchTerm}
+            onSearchChange={setSearchTerm}
           />
           
           <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -92,20 +98,22 @@ const Prompting = () => {
               <EnhancedPromptDesigner />
             </TabsContent>
             
-            <TabsContent value="scanner" className="space-y-6 mt-0">
-              <PromptScannerProvider>
-                <PromptScanner />
-              </PromptScannerProvider>
-            </TabsContent>
-            
-            <TabsContent value="designer" className="space-y-6 mt-0">
-              <PromptDesigner />
+            <TabsContent value="templates" className="space-y-6 mt-0">
+              <TemplateLibrary 
+                onCreateTemplate={handleCreateTemplate}
+                searchTerm={searchTerm}
+              />
             </TabsContent>
             
             <TabsContent value="guide" className="space-y-6 mt-0">
               <PromptingGuide />
             </TabsContent>
           </Tabs>
+          
+          <CreateTemplateDialog 
+            open={showCreateDialog}
+            onOpenChange={setShowCreateDialog}
+          />
         </div>
       </PromptingProvider>
     </MainLayout>

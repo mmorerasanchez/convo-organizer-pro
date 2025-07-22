@@ -9,7 +9,6 @@ import {
   MessageSquare,
   BarChart,
   LineChart,
-  FileCode,
   UsersRound,
   ArrowUpRight
 } from 'lucide-react';
@@ -26,7 +25,6 @@ import {
 export const activeModules = [
   { icon: Home, label: 'Dashboard', path: '/' },
   { icon: BookOpen, label: 'Projects', path: '/projects' },
-  { icon: FileCode, label: 'Templates', path: '/templates' },
   { icon: Bot, label: 'Prompting', path: '/prompting' },
   { icon: CodeSquare, label: 'Tools', path: '/tools' },
   { 
