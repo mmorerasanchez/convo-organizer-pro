@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -26,17 +27,17 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({
     if (statusLower.includes('active') || statusLower.includes('running') || statusLower.includes('live')) {
       return 'success';
     }
-    if (statusLower.includes('inactive') || statusLower.includes('stopped') || statusLower.includes('not started')) {
-      return 'info';
+    if (statusLower.includes('not started') || statusLower.includes('inactive') || statusLower.includes('stopped')) {
+      return 'muted';
     }
-    if (statusLower.includes('pending') || statusLower.includes('progress') || statusLower.includes('processing')) {
+    if (statusLower.includes('in progress') || statusLower.includes('pending') || statusLower.includes('progress') || statusLower.includes('processing')) {
       return 'warning';
     }
-    if (statusLower.includes('error') || statusLower.includes('failed') || statusLower.includes('failed')) {
+    if (statusLower.includes('error') || statusLower.includes('failed')) {
       return 'error';
     }
     
-    return 'inactive';
+    return 'muted';
   };
 
   const getVariant = (statusType: StatusType) => {
@@ -45,8 +46,8 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({
       case 'success':
         return 'success';
       case 'inactive':
-      case 'info':
-        return 'info';
+      case 'muted':
+        return 'muted';
       case 'pending':
       case 'warning':
         return 'warning';
@@ -72,10 +73,9 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({
         <div className={cn(
           "w-1.5 h-1.5 rounded-full",
           statusType === 'success' && "bg-green-500",
-          statusType === 'info' && "bg-blue-500", 
+          statusType === 'muted' && "bg-muted-foreground",
           statusType === 'warning' && "bg-yellow-500",
-          statusType === 'error' && "bg-red-500",
-          !['success', 'info', 'warning', 'error'].includes(statusType) && "bg-muted-foreground"
+          statusType === 'error' && "bg-red-500"
         )} />
       )}
       <span className="capitalize">{status}</span>
