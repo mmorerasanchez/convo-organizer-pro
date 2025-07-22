@@ -1,10 +1,9 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { LLMModel } from '@/lib/types';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, CheckCircle, Zap, Monitor, Building, Clock, Play } from 'lucide-react';
 
 // Model data organized by provider
 const models: LLMModel[] = [
@@ -135,10 +134,20 @@ interface ModelCardProps {
 }
 
 const ModelCard: React.FC<ModelCardProps> = ({ model }) => {
+  const [isHovering, setIsHovering] = useState(false);
   const isAvailable = model.status === 'available';
   
+  const getPricingLabel = () => {
+    if (!model.pricing) return 'Standard';
+    return model.pricing.charAt(0).toUpperCase() + model.pricing.slice(1);
+  };
+
   return (
-    <Card className="overflow-hidden border border-border h-full flex flex-col">
+    <Card 
+      className="overflow-hidden border border-border h-full flex flex-col hover:shadow-md transition-all duration-200 relative"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-2">
@@ -146,15 +155,16 @@ const ModelCard: React.FC<ModelCardProps> = ({ model }) => {
             <CardTitle className="text-lg">{model.name}</CardTitle>
           </div>
           <Badge 
-            variant={isAvailable ? 'default' : 'secondary'} 
+            variant={isAvailable ? 'available' : 'secondary'} 
             className="capitalize"
           >
             {isAvailable ? 'Available' : 'Coming Soon'}
           </Badge>
         </div>
+        <p className="text-sm text-muted-foreground mt-1">{model.description}</p>
       </CardHeader>
+      
       <CardContent className="pb-4 flex-grow">
-        <p className="text-sm text-muted-foreground mb-4">{model.description}</p>
         <div className="flex flex-wrap gap-1">
           {model.capabilities.map((capability, index) => (
             <Badge key={index} variant="outline" className="text-xs">
@@ -162,22 +172,46 @@ const ModelCard: React.FC<ModelCardProps> = ({ model }) => {
             </Badge>
           ))}
         </div>
-        <div className="mt-4 text-xs text-muted-foreground">
-          Context: {model.contextWindow.toLocaleString()} tokens
-        </div>
       </CardContent>
-      <CardFooter className="border-t bg-muted/50 py-2 px-6">
-        <div className="flex justify-end w-full">
+      
+      <CardFooter className="border-t bg-muted/10 py-3 px-5 flex flex-col items-start gap-1 text-xs text-muted-foreground">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1">
+            <CheckCircle className="h-3 w-3" />
+            <span>{isAvailable ? 'Available' : 'Coming Soon'}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Zap className="h-3 w-3" />
+            <span>{getPricingLabel()} cost</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1">
+          <Monitor className="h-3 w-3" />
+          <span>Context: {model.contextWindow.toLocaleString()} tokens</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <Building className="h-3 w-3" />
+          <span>Provider: {model.provider}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <Clock className="h-3 w-3" />
+          <span>Last used: {model.lastUsed || 'Never'}</span>
+        </div>
+      </CardFooter>
+
+      {/* Hover Actions Overlay */}
+      {isHovering && isAvailable && (
+        <div className="absolute top-2 right-2 bg-background/90 backdrop-blur-sm rounded-md p-1 shadow-sm border">
           <Button 
             variant="ghost" 
-            size="sm" 
-            disabled={!isAvailable}
-            className={!isAvailable ? "opacity-50" : ""}
+            size="sm"
+            className="h-7 px-2 gap-1"
           >
+            <Play className="h-3.5 w-3.5" />
             Use
           </Button>
         </div>
-      </CardFooter>
+      )}
     </Card>
   );
 };
