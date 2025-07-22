@@ -80,51 +80,196 @@ const EnhancedSlideContent = ({
   const chapterProgressPercentage = (chapterProgress.completed / chapterProgress.total) * 100;
   const totalProgressPercentage = (totalProgress.completed / totalProgress.total) * 100;
 
-  // Function to render markdown-like content
+  // Enhanced function to render rich markdown-like content
   const renderContent = (text: string) => {
     const lines = text.trim().split('\n');
-    
-    return (
-      <div className="space-y-4">
-        {lines.map((line, index) => {
-          const trimmedLine = line.trim();
-          
-          if (trimmedLine.startsWith('## ')) {
-            return (
-              <h3 key={index} className="text-lg font-semibold mt-6 first:mt-0 text-foreground">
-                {trimmedLine.substring(3)}
-              </h3>
-            );
-          }
-          
-          if (trimmedLine.startsWith('- ')) {
-            return (
-              <div key={index} className="flex space-x-2 ml-4">
-                <span className="text-muted-foreground mt-1">•</span>
-                <span className="text-muted-foreground">{trimmedLine.substring(2)}</span>
-              </div>
-            );
-          }
-          
-          if (trimmedLine.includes('**')) {
-            const parts = trimmedLine.split(/\*\*(.*?)\*\*/g);
-            return (
-              <p key={index} className={`text-muted-foreground ${trimmedLine === '' ? 'my-2' : ''}`}>
-                {parts.map((part, i) => (
-                  i % 2 === 0 ? part : <strong key={i} className="text-foreground font-medium">{part}</strong>
-                ))}
+    const elements: React.ReactNode[] = [];
+    let i = 0;
+
+    while (i < lines.length) {
+      const line = lines[i].trim();
+      
+      // Handle code blocks (```)
+      if (line.startsWith('```')) {
+        const language = line.substring(3).trim();
+        const codeLines: string[] = [];
+        i++; // Move past opening ```
+        
+        while (i < lines.length && !lines[i].trim().startsWith('```')) {
+          codeLines.push(lines[i]);
+          i++;
+        }
+        
+        elements.push(
+          <div key={`code-${elements.length}`} className="my-6">
+            <div className="bg-muted/50 border rounded-lg overflow-hidden">
+              {language && (
+                <div className="px-4 py-2 bg-muted/80 border-b text-xs font-mono text-muted-foreground">
+                  {language}
+                </div>
+              )}
+              <pre className="p-4 overflow-x-auto">
+                <code className="font-mono text-sm leading-relaxed text-foreground">
+                  {codeLines.join('\n')}
+                </code>
+              </pre>
+            </div>
+          </div>
+        );
+        i++; // Move past closing ```
+        continue;
+      }
+      
+      // Handle blockquotes (>)
+      if (line.startsWith('> ')) {
+        const quoteLines: string[] = [];
+        while (i < lines.length && lines[i].trim().startsWith('> ')) {
+          quoteLines.push(lines[i].trim().substring(2));
+          i++;
+        }
+        
+        elements.push(
+          <blockquote key={`quote-${elements.length}`} className="border-l-4 border-primary/30 pl-4 my-4 italic text-muted-foreground bg-muted/20 py-2 rounded-r">
+            {quoteLines.map((quoteLine, idx) => (
+              <p key={idx} className="leading-relaxed">
+                {renderInlineFormatting(quoteLine)}
               </p>
-            );
+            ))}
+          </blockquote>
+        );
+        continue;
+      }
+      
+      // Handle headers (##, ###)
+      if (line.startsWith('### ')) {
+        elements.push(
+          <h4 key={`h4-${elements.length}`} className="text-lg font-semibold mt-8 mb-4 first:mt-0 text-foreground">
+            {renderInlineFormatting(line.substring(4))}
+          </h4>
+        );
+      } else if (line.startsWith('## ')) {
+        elements.push(
+          <h3 key={`h3-${elements.length}`} className="text-xl font-semibold mt-8 mb-4 first:mt-0 text-foreground">
+            {renderInlineFormatting(line.substring(3))}
+          </h3>
+        );
+      }
+      // Handle list items (-, *, +)
+      else if (line.match(/^[\-\*\+]\s/)) {
+        const listItems: string[] = [];
+        while (i < lines.length && lines[i].trim().match(/^[\-\*\+]\s/)) {
+          listItems.push(lines[i].trim().substring(2));
+          i++;
+        }
+        
+        elements.push(
+          <ul key={`list-${elements.length}`} className="space-y-2 my-4 ml-4">
+            {listItems.map((item, idx) => (
+              <li key={idx} className="flex items-start space-x-3">
+                <span className="text-primary mt-1.5 shrink-0">•</span>
+                <span className="text-muted-foreground leading-relaxed text-justify">
+                  {renderInlineFormatting(item)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        );
+        continue;
+      }
+      // Handle numbered lists (1., 2., etc.)
+      else if (line.match(/^\d+\.\s/)) {
+        const listItems: string[] = [];
+        let counter = 1;
+        while (i < lines.length && lines[i].trim().match(/^\d+\.\s/)) {
+          listItems.push(lines[i].trim().replace(/^\d+\.\s/, ''));
+          i++;
+        }
+        
+        elements.push(
+          <ol key={`ordered-list-${elements.length}`} className="space-y-2 my-4 ml-4">
+            {listItems.map((item, idx) => (
+              <li key={idx} className="flex items-start space-x-3">
+                <span className="text-primary mt-0.5 shrink-0 font-medium text-sm">
+                  {idx + 1}.
+                </span>
+                <span className="text-muted-foreground leading-relaxed text-justify">
+                  {renderInlineFormatting(item)}
+                </span>
+              </li>
+            ))}
+          </ol>
+        );
+        continue;
+      }
+      // Handle regular paragraphs
+      else if (line !== '') {
+        elements.push(
+          <p key={`p-${elements.length}`} className="text-muted-foreground leading-relaxed text-justify mb-4">
+            {renderInlineFormatting(line)}
+          </p>
+        );
+      }
+      // Handle empty lines
+      else {
+        elements.push(<div key={`space-${elements.length}`} className="h-4"></div>);
+      }
+      
+      i++;
+    }
+
+    return <div className="space-y-2">{elements}</div>;
+  };
+
+  // Function to handle inline formatting (bold, italic, code, links)
+  const renderInlineFormatting = (text: string): React.ReactNode => {
+    if (!text) return text;
+
+    // Split by multiple patterns and process each part
+    const patterns = [
+      { regex: /\*\*(.+?)\*\*/g, component: (match: string) => <strong className="text-foreground font-semibold">{match}</strong> },
+      { regex: /\*(.+?)\*/g, component: (match: string) => <em className="italic">{match}</em> },
+      { regex: /`(.+?)`/g, component: (match: string) => <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground border">{match}</code> },
+      { regex: /\[(.+?)\]\((.+?)\)/g, component: (match: string, text: string, url: string) => <a href={url} className="text-primary hover:underline font-medium" target="_blank" rel="noopener noreferrer">{text}</a> }
+    ];
+
+    let result: React.ReactNode[] = [text];
+
+    patterns.forEach(({ regex, component }) => {
+      result = result.flatMap((item, index) => {
+        if (typeof item !== 'string') return item;
+        
+        const parts = item.split(regex);
+        const newResult: React.ReactNode[] = [];
+        
+        for (let i = 0; i < parts.length; i++) {
+          if (i % 2 === 0) {
+            if (parts[i]) newResult.push(parts[i]);
+          } else {
+            // Handle link pattern specially (has 2 capture groups)
+            if (regex.source.includes(']\\(')) {
+              const text = parts[i];
+              const url = parts[i + 1];
+              if (text && url) {
+                newResult.push(React.createElement('a', {
+                  key: `link-${index}-${i}`,
+                  href: url,
+                  className: 'text-primary hover:underline font-medium',
+                  target: '_blank',
+                  rel: 'noopener noreferrer'
+                }, text));
+                i++; // Skip next part as it's the URL
+              }
+            } else {
+              newResult.push(React.cloneElement(component(parts[i]) as React.ReactElement, { key: `format-${index}-${i}` }));
+            }
           }
-          
-          if (trimmedLine !== '') {
-            return <p key={index} className="text-muted-foreground leading-relaxed">{trimmedLine}</p>;
-          }
-          
-          return <div key={index} className="h-2"></div>;
-        })}
-      </div>
-    );
+        }
+        
+        return newResult.length > 0 ? newResult : [item];
+      });
+    });
+
+    return result;
   };
 
   return (
@@ -176,7 +321,7 @@ const EnhancedSlideContent = ({
         </CardHeader>
 
         <CardContent className="space-y-6">
-          <div className="prose max-w-none">
+          <div className="prose prose-slate max-w-none dark:prose-invert">
             {renderContent(content)}
           </div>
 
