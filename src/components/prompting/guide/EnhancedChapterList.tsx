@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -36,7 +37,7 @@ const EnhancedChapterList = ({
         return (
           <Card 
             key={index}
-            className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+            className={`cursor-pointer learning-card transition-all duration-200 hover:shadow-md ${
               isActive 
                 ? 'ring-2 ring-primary shadow-md' 
                 : 'hover:ring-1 hover:ring-primary/50'
@@ -57,7 +58,7 @@ const EnhancedChapterList = ({
                       <Circle className="h-4 w-4 text-muted-foreground" />
                     )}
                   </div>
-                  <CardTitle className="text-lg leading-tight">
+                  <CardTitle className="text-xl font-semibold leading-tight">
                     {chapter.title}
                   </CardTitle>
                 </div>
@@ -74,7 +75,7 @@ const EnhancedChapterList = ({
                   <span>Progress</span>
                   <span>{chapterProgress.completed}/{chapterProgress.total} slides</span>
                 </div>
-                <Progress value={progressPercentage} className="h-1.5" />
+                <Progress value={progressPercentage} className="h-2" />
               </div>
 
               <div className="flex items-center justify-between text-xs text-muted-foreground">

@@ -17,13 +17,29 @@ const badgeVariants = cva(
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
         success:
-          "border-transparent bg-green-500 text-white hover:bg-green-600",
+          "border-transparent bg-success text-success-foreground hover:bg-success/80",
         warning:
-          "border-transparent bg-yellow-500 text-white hover:bg-yellow-600",
+          "border-transparent bg-warning text-warning-foreground hover:bg-warning/80",
         info:
           "border-transparent bg-blue-500 text-white hover:bg-blue-600",
         muted:
           "border-transparent bg-muted text-muted-foreground hover:bg-muted/80",
+        "not-started":
+          "border-transparent bg-muted text-muted-foreground hover:bg-muted/80",
+        "in-progress":
+          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+        active:
+          "border-transparent bg-success text-success-foreground hover:bg-success/80",
+        "on-hold":
+          "border-transparent bg-warning text-warning-foreground hover:bg-warning/80",
+        completed:
+          "border-transparent bg-success text-success-foreground hover:bg-success/80",
+        available:
+          "border-transparent bg-primary text-white hover:bg-primary/80",
+        private:
+          "border border-border bg-transparent text-foreground hover:bg-muted/50",
+        capability:
+          "border border-border bg-transparent text-muted-foreground text-xs px-2 py-1 hover:bg-muted/50",
       },
     },
     defaultVariants: {

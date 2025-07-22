@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tool } from '@/lib/types';
-import { Edit, Trash } from 'lucide-react';
+import { Edit, Trash, MessageSquare } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteTool } from '@/lib/api';
 import { toast } from 'sonner';
@@ -42,28 +42,33 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
   };
 
   return (
-    <Card className="h-full flex flex-col border-muted/60 hover:shadow-sm transition-all">
-      <CardHeader className="p-4 pb-2">
-        <div className="flex justify-between items-start">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold leading-tight">{tool.name}</h3>
-              <Badge variant={getScoreVariant()} className="text-xs">
-                {tool.score}
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground">{tool.model}</p>
+    <Card className="h-full tools-card flex flex-col border-muted/60 hover:shadow-md transition-all duration-200">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <MessageSquare className="w-5 h-5" />
+            <CardTitle className="text-xl font-semibold">{tool.name}</CardTitle>
           </div>
+          <Badge variant="available">Available</Badge>
         </div>
+        <CardDescription className="text-sm">
+          {tool.description || 'No description provided'}
+        </CardDescription>
       </CardHeader>
-        <CardContent className="flex-grow">
-        {tool.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {tool.description}
-          </p>
-        )}
+      <CardContent className="flex-grow space-y-4">
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="capability">text generation</Badge>
+          <Badge variant="capability">reasoning</Badge>
+          {tool.model && (
+            <Badge variant="secondary">{tool.model}</Badge>
+          )}
+        </div>
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <span>Score: {tool.score}/10</span>
+          <span>Model: {tool.model}</span>
+        </div>
       </CardContent>
-      <CardFooter className="border-t p-2 bg-muted/10 flex items-center justify-between">
+      <CardFooter className="border-t pt-4 bg-muted/10 flex items-center justify-between">
         <EditToolDialog tool={tool} />
         <Button 
           variant="ghost" 
