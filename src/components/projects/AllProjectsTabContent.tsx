@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Project } from '@/lib/types';
-import ProjectFilters from './ProjectFilters';
 import ProjectGrid from './ProjectGrid';
 import ProjectsByStatus from './ProjectsByStatus';
 import ProjectsTableView from './ProjectsTableView';
@@ -29,14 +28,6 @@ const AllProjectsTabContent: React.FC<AllProjectsTabContentProps> = ({
   return (
     <div className="space-y-section">
       <div className="flex justify-between items-center flex-wrap gap-2">
-        <ProjectFilters
-          searchTerm={searchTerm}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          resetFilters={resetFilters}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-        />
         <div className="flex items-center space-x-2">
           <NewProjectDialog />
         </div>

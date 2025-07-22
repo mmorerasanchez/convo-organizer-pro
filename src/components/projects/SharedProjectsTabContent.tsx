@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Project } from '@/lib/types';
-import ProjectFilters from './ProjectFilters';
 import ProjectGrid from './ProjectGrid';
 import ProjectsByStatus from './ProjectsByStatus';
 import ProjectsTableView from './ProjectsTableView';
@@ -32,17 +31,6 @@ const SharedProjectsTabContent: React.FC<SharedProjectsTabContentProps> = ({
   
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <ProjectFilters
-          searchTerm={searchTerm}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          resetFilters={resetFilters}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-        />
-      </div>
-      
       {viewMode === 'grid' ? (
         <ProjectGrid 
           projects={projects}

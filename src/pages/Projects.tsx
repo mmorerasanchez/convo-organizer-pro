@@ -4,18 +4,20 @@ import MainLayout from '@/components/layout/MainLayout';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProjects, getSharedProjects } from '@/lib/api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
-import { BookOpen, Users } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Grid3X3, List, BarChart3 } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
-import AllProjectsTabContent from '@/components/projects/AllProjectsTabContent';
-import SharedProjectsTabContent from '@/components/projects/SharedProjectsTabContent';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import ProjectsControlBar from '@/components/projects/ProjectsControlBar';
+import ProjectGrid from '@/components/projects/ProjectGrid';
+import ProjectsByStatus from '@/components/projects/ProjectsByStatus';
+import ProjectsTableView from '@/components/projects/ProjectsTableView';
 
 const Projects = () => {
   useRequireAuth();
-  const [activeTab, setActiveTab] = useState('all-projects');
+  const [activeViewTab, setActiveViewTab] = useState('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'updated' | 'name'>('updated');
+  const [filterBy, setFilterBy] = useState('all');
   
   const { data: projects = [], isLoading, error } = useQuery({
     queryKey: ['projects'],
@@ -27,102 +29,98 @@ const Projects = () => {
     queryFn: getSharedProjects
   });
 
-  // Define a custom tab renderer for the disabled shared projects tab
-  const sharedProjectsTab = {
-    value: 'shared-projects',
-    label: 'Shared Projects',
-    icon: <Users className="h-4 w-4" />,
-    disabled: true,
-    custom: (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="h-7 px-3 text-sm flex items-center gap-1.5 font-mono opacity-60 cursor-not-allowed filter blur-[0.3px]">
-              <Users className="h-4 w-4" />
-              Shared Projects
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>This feature is currently unavailable</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    )
-  };
-
-  const tabs = [
+  // View mode tabs configuration
+  const viewTabs = [
     {
-      value: 'all-projects',
-      label: 'My Projects',
-      icon: <BookOpen className="h-4 w-4" />
+      value: 'grid',
+      label: 'Grid View',
+      icon: <Grid3X3 className="h-4 w-4" />
     },
-    sharedProjectsTab
+    {
+      value: 'status',
+      label: 'By Status',
+      icon: <BarChart3 className="h-4 w-4" />
+    },
+    {
+      value: 'table',
+      label: 'Table View',
+      icon: <List className="h-4 w-4" />
+    }
   ];
 
-  // Filter and sort projects based on search term and sort option
-  const filteredProjects = projects.filter(project => 
-    project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    project.description.toLowerCase().includes(searchTerm.toLowerCase())
-  ).sort((a, b) => {
-    if (sortBy === 'updated') {
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-    } else {
-      return a.name.localeCompare(b.name);
-    }
-  });
-
-  // Filter and sort shared projects
-  const filteredSharedProjects = sharedProjects.filter(project => 
-    project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    project.description.toLowerCase().includes(searchTerm.toLowerCase())
-  ).sort((a, b) => {
-    if (sortBy === 'updated') {
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-    } else {
-      return a.name.localeCompare(b.name);
-    }
-  });
+  // Filter and sort projects based on search term, sort option, and filter
+  const filteredProjects = projects
+    .filter(project => {
+      // Search filter
+      const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.description.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // Status filter
+      if (filterBy === 'all') return matchesSearch;
+      return matchesSearch && project.status === filterBy;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'updated') {
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      } else {
+        return a.name.localeCompare(b.name);
+      }
+    });
 
   const resetFilters = () => {
     setSearchTerm('');
     setSortBy('updated');
+    setFilterBy('all');
   };
 
   return (
     <MainLayout>
       <div className="space-y-6">
+        {/* Standardized Header - matches Dashboard exactly */}
         <PageHeader 
           title="Projects"
           description="Create and manage your projects or collaborate on shared projects"
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          showSearch={true}
-          searchPlaceholder="Search projects..."
-          searchValue={searchTerm}
-          onSearchChange={setSearchTerm}
+          tabs={viewTabs}
+          activeTab={activeViewTab}
+          onTabChange={setActiveViewTab}
         />
         
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsContent value="all-projects" className="mt-0 space-y-6">
-            <AllProjectsTabContent 
+        {/* Control Bar with sort, filter, search, and actions */}
+        <ProjectsControlBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          filterBy={filterBy}
+          setFilterBy={setFilterBy}
+          resetFilters={resetFilters}
+        />
+        
+        {/* View Mode Content */}
+        <Tabs value={activeViewTab} onValueChange={setActiveViewTab}>
+          <TabsContent value="grid" className="mt-0 space-y-6">
+            <ProjectGrid 
               projects={filteredProjects}
-              isLoading={isLoading} 
+              isLoading={isLoading}
+              showNewButton={false}
               searchTerm={searchTerm}
-              sortBy={sortBy}
-              setSortBy={setSortBy}
-              resetFilters={resetFilters}
             />
           </TabsContent>
           
-          <TabsContent value="shared-projects" className="mt-0 space-y-6">
-            <SharedProjectsTabContent 
-              projects={filteredSharedProjects}
-              isLoading={isLoadingShared} 
-              searchTerm={searchTerm}
+          <TabsContent value="status" className="mt-0 space-y-6">
+            <ProjectsByStatus 
+              projects={filteredProjects}
+              isLoading={isLoading}
+              showNewButton={false}
+            />
+          </TabsContent>
+          
+          <TabsContent value="table" className="mt-0 space-y-6">
+            <ProjectsTableView
+              projects={filteredProjects}
+              isLoading={isLoading}
               sortBy={sortBy}
               setSortBy={setSortBy}
-              resetFilters={resetFilters}
             />
           </TabsContent>
         </Tabs>
