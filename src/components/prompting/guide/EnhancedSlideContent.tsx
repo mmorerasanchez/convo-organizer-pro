@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -229,12 +230,12 @@ const EnhancedSlideContent = ({
     const patterns = [
       { regex: /\*\*(.+?)\*\*/g, component: (match: string) => <strong className="text-foreground font-semibold">{match}</strong> },
       { regex: /\*(.+?)\*/g, component: (match: string) => <em className="italic">{match}</em> },
-      { regex: /`(.+?)`/g, component: (match: string) => <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground border">{match}</code> },
-      { regex: /\[(.+?)\]\((.+?)\)/g, component: (text: string, url: string) => <a href={url} className="text-primary hover:underline font-medium" target="_blank" rel="noopener noreferrer">{text}</a> }
+      { regex: /`(.+?)`/g, component: (match: string) => <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground border">{match}</code> }
     ];
 
     let result: React.ReactNode[] = [text];
 
+    // Handle non-link patterns first
     patterns.forEach(({ regex, component }) => {
       result = result.flatMap((item, index) => {
         if (typeof item !== 'string') return item;
@@ -246,32 +247,43 @@ const EnhancedSlideContent = ({
           if (i % 2 === 0) {
             if (parts[i]) newResult.push(parts[i]);
           } else {
-            // Handle link pattern specially (has 2 capture groups)
-            if (regex.source.includes(']\\(')) {
-              const text = parts[i];
-              const url = parts[i + 1];
-              if (text && url) {
-                newResult.push(
-                  <a 
-                    key={`link-${index}-${i}`}
-                    href={url}
-                    className="text-primary hover:underline font-medium"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {text}
-                  </a>
-                );
-                i++; // Skip next part as it's the URL
-              }
-            } else {
-              newResult.push(React.cloneElement(component(parts[i]) as React.ReactElement, { key: `format-${index}-${i}` }));
-            }
+            newResult.push(React.cloneElement(component(parts[i]) as React.ReactElement, { key: `format-${index}-${i}` }));
           }
         }
         
         return newResult.length > 0 ? newResult : [item];
       });
+    });
+
+    // Handle link pattern separately
+    result = result.flatMap((item, index) => {
+      if (typeof item !== 'string') return item;
+      
+      const linkRegex = /\[(.+?)\]\((.+?)\)/g;
+      const parts = item.split(linkRegex);
+      const newResult: React.ReactNode[] = [];
+      
+      for (let i = 0; i < parts.length; i += 3) {
+        // Add regular text
+        if (parts[i]) newResult.push(parts[i]);
+        
+        // Add link if we have both text and URL
+        if (parts[i + 1] && parts[i + 2]) {
+          newResult.push(
+            <a 
+              key={`link-${index}-${i}`}
+              href={parts[i + 2]}
+              className="text-primary hover:underline font-medium"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {parts[i + 1]}
+            </a>
+          );
+        }
+      }
+      
+      return newResult.length > 0 ? newResult : [item];
     });
 
     return result;
@@ -397,3 +409,4 @@ const EnhancedSlideContent = ({
 };
 
 export default EnhancedSlideContent;
+
