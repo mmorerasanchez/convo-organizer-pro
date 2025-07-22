@@ -3,9 +3,8 @@ import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Plus, Loader2 } from 'lucide-react';
-import { fetchTemplates, deleteTemplate } from '@/lib/api/templates';
+import { fetchTemplates } from '@/lib/api/templates';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
 import TemplateCard from './TemplateCard';
 
 interface TemplateLibraryProps {
@@ -18,7 +17,6 @@ const TemplateLibrary: React.FC<TemplateLibraryProps> = ({
   searchTerm = '' 
 }) => {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
 
   const { data: templates = [], isLoading } = useQuery({
     queryKey: ['templates'],
@@ -26,28 +24,12 @@ const TemplateLibrary: React.FC<TemplateLibraryProps> = ({
     enabled: !!user
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: deleteTemplate,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['templates'] });
-      toast.success('Template deleted successfully');
-    },
-    onError: (error) => {
-      console.error('Error deleting template:', error);
-      toast.error('Failed to delete template');
-    }
-  });
-
   // Filter templates based on search term
   const filteredTemplates = templates.filter(template => 
     searchTerm === '' || 
     template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    template.description.toLowerCase().includes(searchTerm.toLowerCase())
+    template.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const handleDelete = (templateId: string) => {
-    deleteMutation.mutate(templateId);
-  };
 
   if (!user) {
     return (
@@ -88,8 +70,6 @@ const TemplateLibrary: React.FC<TemplateLibraryProps> = ({
             <TemplateCard
               key={template.id}
               template={template}
-              onDelete={handleDelete}
-              isDeleting={deleteMutation.isPending}
             />
           ))}
         </div>

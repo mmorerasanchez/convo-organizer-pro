@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react';
 import { Tool } from '@/lib/types';
 
 const useToolsFilter = (tools: Tool[], searchTerm: string = '') => {
-  const [sortBy, setSortBy] = useState<'name' | 'model' | 'score' | 'updated'>('updated');
+  const [sortBy, setSortBy] = useState<'name' | 'score'>('name');
 
   const filteredTools = useMemo(() => {
     let filtered = tools;
@@ -12,7 +12,7 @@ const useToolsFilter = (tools: Tool[], searchTerm: string = '') => {
     if (searchTerm) {
       filtered = filtered.filter(tool =>
         tool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tool.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tool.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         tool.model.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -22,19 +22,16 @@ const useToolsFilter = (tools: Tool[], searchTerm: string = '') => {
       switch (sortBy) {
         case 'name':
           return a.name.localeCompare(b.name);
-        case 'model':
-          return a.model.localeCompare(b.model);
         case 'score':
           return b.score - a.score;
-        case 'updated':
         default:
-          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+          return a.name.localeCompare(b.name);
       }
     });
   }, [tools, searchTerm, sortBy]);
 
   const resetFilters = () => {
-    setSortBy('updated');
+    setSortBy('name');
   };
 
   return {
