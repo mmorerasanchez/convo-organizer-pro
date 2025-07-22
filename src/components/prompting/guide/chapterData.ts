@@ -1,4 +1,3 @@
-
 import { type Chapter } from './types';
 
 export const chapters: Chapter[] = [
@@ -1307,6 +1306,924 @@ const ExpensiveComponent = React.memo(({ data, onUpdate }) => {
 \`\`\`
 
 Small optimizations add up to significant performance improvements!`
+      }
+    ]
+  },
+  {
+    id: 'chapter-7',
+    title: 'Debugging & Troubleshooting',
+    description: 'Master essential debugging strategies and troubleshooting techniques for efficient problem-solving in AI-assisted development.',
+    slides: [
+      {
+        id: 'slide-7-1',
+        title: 'Understanding Common Issues',
+        content: `## Debugging is Normal
+
+**Errors are an expected part** of AI-assisted development. Even the most advanced AI tools encounter issues, and recognizing this helps maintain a productive mindset.
+
+## Why Issues Occur
+
+**AI Complexity:**
+- AI makes assumptions based on incomplete context
+- Different interpretations of requirements
+- Edge cases not immediately apparent
+- Integration complexity between services
+
+**Development Reality:**
+- Complex systems have many moving parts
+- External dependencies can change
+- Browser and environment differences
+- User interaction patterns vary
+
+## Common Issue Categories
+
+**Syntax & Logic Errors:**
+- Missing imports or incorrect paths
+- Type mismatches in TypeScript
+- Logic errors in component state
+- Event handling problems
+
+**Integration Issues:**
+- API key configuration problems
+- Authentication flow errors
+- Database connection issues
+- External service limitations
+
+**UI & UX Problems:**
+- Responsive design issues
+- Component rendering problems
+- Style conflicts and specificity
+- Accessibility concerns
+
+## The Right Mindset
+
+- **Embrace iteration** as part of the process
+- **View errors as learning opportunities**
+- **Stay systematic** in your approach
+- **Ask for help** when needed
+
+Remember: Every expert developer has faced these same challenges!`
+      },
+      {
+        id: 'slide-7-2',
+        title: 'The "Try to Fix" Button',
+        content: `## Automated Quick Fixes
+
+Lovable's **"Try to Fix" button** provides immediate assistance for common issues, analyzing errors and attempting automatic resolution.
+
+## How It Works
+
+**Automatic Error Detection:**
+- Scans console errors and build failures
+- Identifies common patterns and solutions
+- Applies tested fixes for known issues
+- Updates code with minimal changes
+
+**Best Use Cases:**
+- Simple syntax errors and typos
+- Missing imports or dependencies
+- Basic configuration issues
+- Common React/TypeScript errors
+
+## When to Use "Try to Fix"
+
+**Ideal Scenarios:**
+- Clear error messages in console
+- Build failures with obvious causes
+- Missing dependencies or imports
+- Simple logic or syntax errors
+
+**When to Try 2-3 Times:**
+- First attempt doesn't resolve the issue
+- Error message changes after fix attempt
+- Partial resolution but new errors appear
+
+## When to Switch to Chat Mode
+
+**After 2-3 attempts, consider Chat mode if:**
+- The same error keeps recurring
+- New errors appear after each fix
+- The issue seems more complex
+- You need to understand the root cause
+
+## Console Error Checking
+
+**Always check your browser console:**
+- Press F12 to open Developer Tools
+- Look for red error messages
+- Note specific error locations and messages
+- Share these details when asking for help
+
+The "Try to Fix" button is your first line of defense, but Chat mode is your powerful debugging partner!`
+      },
+      {
+        id: 'slide-7-3',
+        title: 'Errors Are Learning Opportunities',
+        content: `## Reframing Your Perspective
+
+**"AI did something weird"** moments are not failures—they're natural parts of the iterative development process that help you become a better developer.
+
+## Common "Weird AI" Moments
+
+**Unexpected Implementations:**
+- AI interprets requirements differently than expected
+- Code structure doesn't match your mental model
+- Feature works but uses unfamiliar patterns
+- Styling choices that seem unusual
+
+**Integration Surprises:**
+- API calls structured differently than anticipated
+- Database schema decisions you didn't expect
+- Component organization that feels foreign
+- State management approaches you haven't seen
+
+## Learning from These Moments
+
+**Ask "Why Did the AI Choose This?"**
+- Understand the reasoning behind decisions
+- Learn new patterns and approaches
+- Discover alternative solutions to problems
+- Expand your development knowledge
+
+**Use It as Teaching Moments:**
+- Request explanations for unfamiliar code
+- Ask for alternative implementations
+- Learn about best practices you might not know
+- Understand trade-offs in different approaches
+
+## Building Resilience
+
+**Develop a Growth Mindset:**
+- View challenges as opportunities to improve
+- Embrace the learning curve of AI collaboration
+- Build confidence through successful iterations
+- Share knowledge with other developers
+
+**Practical Strategies:**
+- Keep notes of successful prompt patterns
+- Document solutions to recurring issues
+- Build a personal troubleshooting playbook
+- Celebrate small wins and progress
+
+## Example Reframe
+
+**Instead of:** "The AI messed up my button component"
+**Try:** "The AI chose a different button pattern—let me understand why and see if I can learn something new"
+
+This shift in perspective transforms frustration into curiosity and growth!`
+      },
+      {
+        id: 'slide-7-4',
+        title: 'Chat Mode as Your Debug Co-Pilot',
+        content: `## Beyond Automatic Fixes
+
+When issues become complex, **Chat mode transforms into your intelligent debugging partner**, offering collaborative problem-solving capabilities that go far beyond automated fixes.
+
+## Why Chat Mode for Complex Issues
+
+**Interactive Problem Solving:**
+- Back-and-forth discussion of symptoms and causes
+- Ability to explore multiple solution approaches
+- Real-time refinement of understanding
+- Collaborative root cause analysis
+
+**Planning and Strategy:**
+- Discuss implementation approaches before coding
+- Break down complex problems into manageable steps
+- Explore trade-offs between different solutions
+- Validate assumptions before implementation
+
+## Switching to Chat Mode
+
+**Indicators it's time to switch:**
+- "Try to Fix" hasn't resolved the issue after 2-3 attempts
+- You need to understand why something is happening
+- The problem involves multiple components or systems
+- You want to explore different approaches
+
+**How to Make the Switch:**
+- Simply start typing in the chat instead of using "Try to Fix"
+- Explain what you've already tried
+- Describe the specific behavior you're seeing
+- Ask for analysis before requesting code changes
+
+## Chat Mode Superpowers
+
+**Investigation Without Changes:**
+- "Analyze this error but don't write code yet"
+- "Help me understand why this might be happening"
+- "What are three possible causes of this issue?"
+- "Walk me through how this feature should work"
+
+**Collaborative Planning:**
+- "Let's plan the implementation step by step"
+- "What's the best approach for this integration?"
+- "Help me think through the edge cases"
+- "What could go wrong with this approach?"
+
+## Building Debugging Partnerships
+
+**Treat the AI as a knowledgeable colleague:**
+- Explain your thought process and concerns
+- Ask for explanations of suggested solutions
+- Request alternative approaches when needed
+- Build on the AI's suggestions with your own ideas
+
+Chat mode turns debugging from a frustrating solo activity into a collaborative problem-solving session!`
+      },
+      {
+        id: 'slide-7-5',
+        title: 'Effective Debugging Prompts',
+        content: `## Crafting Powerful Debug Queries
+
+**Precise prompting is crucial** for effective debugging. The quality of your questions directly impacts the usefulness of the AI's diagnostic assistance.
+
+## Investigation Prompts
+
+**Before Making Changes:**
+- "Suggest 3 ways to implement X without writing code yet"
+- "Investigate but don't write code—what could be causing this?"
+- "Help me understand why this component might not be rendering"
+- "What are the most likely causes of this API error?"
+
+**Root Cause Analysis:**
+- "Why might the login function return undefined?"
+- "What could cause this component to re-render infinitely?"
+- "Why would this API call work in development but fail in production?"
+- "What security issues could cause this authentication error?"
+
+## Specific Problem Queries
+
+**Error-Focused Questions:**
+- "This error says 'Cannot read property X of undefined'—what's the likely cause?"
+- "I'm getting a CORS error when calling this API—what should I check?"
+- "The component loads but the data doesn't appear—where should I look?"
+- "My form submits but doesn't update the database—what could be wrong?"
+
+**Behavior Analysis:**
+- "The button click works sometimes but not others—what could cause this?"
+- "Data loads on desktop but not mobile—what might be different?"
+- "The component looks right but doesn't respond to clicks—what should I check?"
+
+## Evidence-Based Prompting
+
+**Provide Specific Details:**
+- Include exact error messages and stack traces
+- Describe specific steps that reproduce the issue
+- Mention what was working before the problem appeared
+- Share relevant console logs and network errors
+
+**Context is Key:**
+- "I'm building a user authentication flow and..."
+- "This happens only when users try to upload large files..."
+- "The issue started after I added the payment integration..."
+- "On mobile Safari, the form validation..."
+
+## Progressive Problem Solving
+
+**Start Broad, Then Narrow:**
+1. "What could cause authentication to fail?"
+2. "The token seems valid—what else should I check?"
+3. "The API returns 401—is this a server or client issue?"
+4. "Let me check the request headers—what should I look for?"
+
+Remember: Good debugging prompts lead to faster solutions and deeper understanding!`
+      },
+      {
+        id: 'slide-7-6',
+        title: 'Providing Specific Evidence',
+        content: `## The Power of Detailed Information
+
+**Comprehensive evidence is the foundation** of effective debugging. The more specific and relevant information you provide, the more accurately the AI can diagnose and resolve issues.
+
+## Essential Evidence Types
+
+**Error Messages & Stack Traces:**
+- Copy exact error text, including line numbers
+- Include the full stack trace when available
+- Note which file and function the error occurs in
+- Mention if the error is consistent or intermittent
+
+**Console Logs:**
+- Browser console errors (press F12 → Console)
+- Network tab information for API failures
+- Any custom console.log outputs you've added
+- Performance warnings or deprecation notices
+
+**Screenshots & Visual Evidence:**
+- What the user sees when the error occurs
+- Browser developer tools screenshots
+- Network request/response details
+- Before and after comparisons
+
+## Contextual Information
+
+**Reproduction Steps:**
+- Exact sequence of actions that trigger the issue
+- User input that causes problems
+- Browser and device information
+- Time-sensitive factors (happens only at certain times)
+
+**Environment Details:**
+- Development vs. production behavior differences
+- Browser-specific issues (works in Chrome, fails in Safari)
+- Device-specific problems (desktop vs. mobile)
+- Network conditions that might affect the issue
+
+## Code Context
+
+**Recent Changes:**
+- What was added or modified before the issue appeared
+- New integrations or dependencies introduced
+- Configuration changes made
+- Database schema updates
+
+**Related Components:**
+- Which components or features are affected
+- How the broken feature connects to other parts
+- Dependencies between different parts of the code
+- External services involved
+
+## Example: High-Quality Bug Report
+
+**Instead of:** "Login doesn't work"
+
+**Try:** "When users click the 'Sign In' button after entering valid credentials, they get redirected back to the login page instead of the dashboard. The browser console shows 'TypeError: Cannot read property 'user' of undefined' in UserContext.tsx line 45. This started happening after I added the Clerk integration yesterday. The error occurs in both Chrome and Firefox, but only on the production build—development works fine."
+
+## Information Gathering Checklist
+
+**Before asking for help:**
+- [ ] Check browser console for errors
+- [ ] Try reproducing the issue consistently  
+- [ ] Note what changed recently
+- [ ] Gather relevant error messages
+- [ ] Test in different browsers/devices
+- [ ] Check network requests in dev tools
+
+Quality evidence leads to faster, more accurate solutions!`
+      },
+      {
+        id: 'slide-7-7',
+        title: 'Root Cause Analysis: Ask "Why?"',
+        content: `## Beyond Surface-Level Fixes
+
+**True debugging goes deeper than symptoms**—it uncovers the fundamental reasons why problems occur, preventing future issues and building more robust applications.
+
+## The "Why?" Method
+
+**Don't Just Fix—Understand:**
+- Surface symptoms are often not the real problem
+- Quick fixes may mask deeper architectural issues
+- Understanding root causes prevents recurring problems
+- Knowledge gained helps with future debugging
+
+**The Five Whys Technique:**
+1. **Why did this error occur?** "The API call failed"
+2. **Why did the API call fail?** "Authentication token was missing"
+3. **Why was the token missing?** "User session expired"
+4. **Why did the session expire?** "Token refresh logic isn't working"
+5. **Why isn't refresh logic working?** "Missing error handling for refresh failures"
+
+## Common Root Causes
+
+**Authentication & Authorization:**
+- Session management issues
+- Token expiration handling
+- Permission scope problems
+- Redirect logic failures
+
+**Data Flow Problems:**
+- State management inconsistencies
+- Prop drilling issues
+- Async operation timing
+- Component lifecycle mismatches
+
+**Integration Issues:**
+- API versioning conflicts
+- Configuration environment differences
+- Service dependency failures
+- Rate limiting and throttling
+
+## Systematic Investigation
+
+**Look for Patterns:**
+- Does this happen with specific user actions?
+- Are certain data types or values problematic?
+- Does the issue occur at particular times?
+- Is it related to specific user roles or permissions?
+
+**Examine Dependencies:**
+- What external services are involved?
+- Which internal components interact with this feature?
+- How does data flow through the system?
+- Where are the potential failure points?
+
+## Building Robust Solutions
+
+**Address the Real Problem:**
+- Fix the underlying cause, not just the symptom
+- Implement proper error handling
+- Add validation at appropriate points
+- Design for failure scenarios
+
+**Prevent Future Issues:**
+- Add logging for debugging future problems
+- Implement health checks and monitoring
+- Document the solution and the reasoning
+- Consider similar issues that might exist elsewhere
+
+## Example Analysis
+
+**Symptom:** User profile image doesn't display
+**Surface Fix:** Add a default image
+**Root Cause Analysis:**
+- Why no image? → Upload failed silently
+- Why did upload fail? → File size too large
+- Why no size validation? → Frontend validation missing
+- Why missing validation? → Requirements not specified
+**Better Solution:** Add file size validation, error handling, and user feedback
+
+Asking "Why?" transforms debugging from fixing problems to preventing them!`
+      },
+      {
+        id: 'slide-7-8',
+        title: 'Codebase Audit Approach',
+        content: `## Systematic Code Review
+
+**For persistent or recurring issues**, a comprehensive codebase audit can uncover architectural flaws and inconsistent patterns that contribute to bugs and maintenance challenges.
+
+## When to Conduct an Audit
+
+**Indicators You Need an Audit:**
+- Same types of errors keep appearing
+- New features consistently break existing functionality
+- Performance degrades with each new addition
+- Team members struggle to understand the codebase
+- Technical debt is accumulating rapidly
+
+**Audit Triggers:**
+- Before major feature additions
+- After multiple "quick fixes" accumulate
+- When onboarding new team members becomes difficult
+- Before production launches or major releases
+
+## Structural Review Areas
+
+**Component Organization:**
+- Are components properly separated by responsibility?
+- Is there clear distinction between UI and business logic?
+- Are components reusable without tight coupling?
+- Do folder structures reflect actual relationships?
+
+**State Management:**
+- Is application state managed consistently?
+- Are there unnecessary state duplications?
+- Is data flow predictable and documented?
+- Are side effects properly contained?
+
+**Code Patterns:**
+- Are naming conventions consistent across the codebase?
+- Do similar features use similar implementation patterns?
+- Are error handling approaches standardized?
+- Is there consistent styling and formatting?
+
+## Architecture Assessment
+
+**Separation of Concerns:**
+- Business logic separated from presentation
+- API calls isolated in dedicated services
+- Database queries abstracted appropriately
+- Authentication logic centralized
+
+**Dependencies & Imports:**
+- Are circular dependencies present?
+- Are external dependencies up to date and necessary?
+- Is the dependency tree clean and minimal?
+- Are imports organized and consistent?
+
+**Performance Considerations:**
+- Are there unnecessary re-renders or calculations?
+- Is code splitting implemented effectively?
+- Are assets optimized and cached properly?
+- Are database queries efficient?
+
+## Security & Best Practices
+
+**Security Review:**
+- Are API keys and secrets properly managed?
+- Is user input validated and sanitized?
+- Are authentication flows secure and complete?
+- Is data encryption implemented where needed?
+
+**Best Practices Compliance:**
+- Are React patterns followed consistently?
+- Is TypeScript used effectively for type safety?
+- Are accessibility guidelines followed?
+- Is testing coverage adequate?
+
+## Documentation & Maintainability
+
+**Code Documentation:**
+- Are complex functions and components documented?
+- Is the overall architecture explained?
+- Are setup and deployment procedures clear?
+- Is troubleshooting information available?
+
+**Future Maintenance:**
+- How easy is it to add new features?
+- Can team members understand and modify code quickly?
+- Are there clear patterns for common tasks?
+- Is the codebase resistant to breaking changes?
+
+## Audit Action Plan
+
+**Prioritize Findings:**
+1. **Critical Issues:** Security vulnerabilities, major bugs
+2. **High Impact:** Performance issues, architectural problems
+3. **Medium Impact:** Code organization, documentation gaps
+4. **Low Impact:** Styling inconsistencies, minor optimizations
+
+**Implementation Strategy:**
+- Address critical issues immediately
+- Plan refactoring sprints for architectural changes
+- Establish coding standards and review processes
+- Create documentation and onboarding materials
+
+A systematic audit transforms chaotic codebases into maintainable, scalable applications!`
+      },
+      {
+        id: 'slide-7-9',
+        title: 'Prompt Lifecycle & Versioning',
+        content: `## Managing Prompts as Code Assets
+
+**Treat your prompts as critical code components** that require the same disciplined lifecycle management as any other software asset. Poor prompt management leads to inconsistent results and difficult debugging.
+
+## Prompt Lifecycle Stages
+
+**1. Design Phase:**
+- **Define Clear Goals:** What specific outcome do you want?
+- **Identify Target Audience:** Who will interact with this AI response?
+- **Set Success Metrics:** How will you measure effectiveness?
+- **Document Requirements:** What constraints and requirements exist?
+
+**2. Draft Phase:**
+- **Choose Framework:** Select appropriate prompt structure (RACE, RTF, etc.)
+- **Set Parameters:** Configure temperature, max tokens, and model settings
+- **Write First Version:** Create initial prompt following best practices
+- **Include Examples:** Add few-shot examples when helpful
+
+**3. Test Phase:**
+- **Unit Testing:** Test prompt with various inputs and edge cases
+- **Red Team Testing:** Try to break the prompt with adversarial inputs
+- **Edge Case Analysis:** Test boundary conditions and unusual scenarios
+- **Performance Validation:** Ensure prompt meets success metrics
+
+## Deployment Strategy
+
+**4. Canary Deployment:**
+- **Feature Flags:** Deploy behind toggles for controlled rollout
+- **Small User Groups:** Test with limited audience first
+- **A/B Testing Setup:** Compare new prompt against existing version
+- **Monitoring Dashboard:** Track performance metrics in real-time
+
+**5. Production Monitoring:**
+- **Input/Output Logging:** Record all prompt interactions
+- **Quality Metrics:** Track response quality and user satisfaction
+- **Performance Monitoring:** Monitor response times and error rates
+- **User Feedback:** Collect votes and ratings on AI responses
+
+**6. Iteration & Improvement:**
+- **A/B Testing:** Compare different prompt versions
+- **Performance Analysis:** Identify areas for improvement
+- **Rollback Capability:** Quick revert to previous versions if needed
+- **Continuous Optimization:** Regular refinement based on data
+
+## Version Control Best Practices
+
+**Semantic Versioning:**
+- **Major (1.0.0):** Breaking changes to prompt behavior
+- **Minor (1.1.0):** New features or significant improvements
+- **Patch (1.1.1):** Bug fixes and minor adjustments
+
+**Metadata Management:**
+- **Owner Information:** Who is responsible for this prompt
+- **Model Used:** Which AI model and version
+- **Creation Date:** When the prompt was created
+- **Last Modified:** Recent change timestamps
+- **Performance Metrics:** Success rates and quality scores
+
+## Essential Tracking Information
+
+**Prompt Metadata:**
+\`\`\`json
+{
+  "promptId": "user-auth-assistant-v2.1.0",
+  "owner": "auth-team@company.com",
+  "model": "gpt-4o-mini",
+  "created": "2024-01-15",
+  "lastModified": "2024-01-22",
+  "successRate": 94.2,
+  "averageRating": 4.3,
+  "usageCount": 1547
+}
+\`\`\`
+
+**Historical Tracking:**
+- Previous prompt versions and their performance
+- Rollback triggers and reasons
+- A/B test results and winning variants
+- User feedback trends over time
+
+## Rollback Strategy
+
+**When to Roll Back:**
+- Performance metrics drop significantly
+- User complaints increase
+- Error rates spike
+- Unintended behavior emerges
+
+**Quick Rollback Process:**
+- Maintain previous stable version readily available
+- Automated rollback triggers based on metrics
+- Clear communication about changes to stakeholders
+- Post-rollback analysis to prevent future issues
+
+Treating prompts with the same rigor as code ensures reliable, maintainable AI interactions!`
+      },
+      {
+        id: 'slide-7-10',
+        title: 'Version Control & Recovery Strategies',
+        content: `## Building Safety Nets
+
+**Robust version control strategies** protect your work and enable seamless recovery from errors, ensuring you can always return to a working state when experiments go wrong.
+
+## Pinning Stable Versions
+
+**Creating Reliable Checkpoints:**
+- Mark stable milestones as you reach them
+- Pin versions before major feature additions
+- Create restore points before risky changes
+- Document why each version was pinned
+
+**Strategic Pinning Times:**
+- **Feature Completion:** After successfully implementing new functionality
+- **Before Experiments:** Prior to trying new approaches or technologies
+- **Production Deployments:** Before pushing to live environments
+- **Integration Points:** After successfully connecting external services
+
+**Version Documentation:**
+- **What Works:** Clear description of functioning features
+- **Known Issues:** Any minor problems that exist
+- **Next Steps:** Planned improvements or additions
+- **Dependencies:** External services and configurations required
+
+## Smart Rollback Strategy
+
+**When to Roll Back:**
+- New changes introduce more problems than they solve
+- "Try to Fix" attempts make issues worse
+- Complex features become unstable
+- Multiple systems start failing simultaneously
+
+**Clean Rollback Process:**
+1. **Stop Making Changes:** Don't try to fix forward when stuck
+2. **Assess the Situation:** Identify what was working before
+3. **Choose Restore Point:** Select appropriate stable version
+4. **Communicate the Rollback:** Inform the AI about the revert
+5. **Start Fresh:** Begin again with lessons learned
+
+**Avoiding Tangled Code:**
+- Don't stack quick fixes on top of broken implementations
+- Revert to clean state rather than patching problems
+- Start with working foundation and rebuild incrementally
+- Document what didn't work to avoid repeating mistakes
+
+## Database Considerations
+
+**Supabase Schema Changes:**
+- Database migrations don't automatically revert with code
+- Plan schema changes carefully before implementation
+- Test database changes in development first
+- Consider backward compatibility when possible
+
+**Handling Schema Rollbacks:**
+- Document database state at each pinned version
+- Plan migration reversal strategies
+- Test rollback procedures in development
+- Coordinate schema changes with code deployments
+
+## GitHub Integration Best Practices
+
+**Branch Strategy:**
+- Use feature branches for experimental changes
+- Keep main branch stable and deployable
+- Test changes thoroughly before merging
+- Don't delete branches until features are confirmed stable
+
+**Collaboration Workflow:**
+- Communicate major changes to team members
+- Use pull requests for code review
+- Maintain clear commit messages
+- Tag important releases and milestones
+
+**Sync Management:**
+- Understand Lovable's automatic sync behavior
+- Be cautious with force pushes that might break sync
+- Use GitHub issues to track problems and solutions
+- Maintain backup branches for critical development states
+
+## Recovery Planning
+
+**Disaster Recovery:**
+- Regular backups of both code and database
+- Documentation of critical configurations
+- Contact information for external service support
+- Step-by-step recovery procedures
+
+**Prevention Strategies:**
+- Regular testing of rollback procedures
+- Monitoring for early warning signs of problems
+- Team training on version control best practices
+- Clear escalation procedures for major issues
+
+## Example Recovery Workflow
+
+**Problem:** New authentication system breaks existing user login
+**Recovery Steps:**
+1. **Immediate:** Roll back to last stable version
+2. **Analysis:** Identify what went wrong with new implementation
+3. **Planning:** Design better approach based on lessons learned
+4. **Implementation:** Rebuild feature incrementally with testing
+5. **Validation:** Thoroughly test before deploying again
+
+Smart version control transforms development from risky experimentation to confident iteration!`
+      },
+      {
+        id: 'slide-7-11',
+        title: 'Troubleshooting Quick Reference',
+        content: `## Instant Problem-Solving Guide
+
+**Quick reference for common symptoms**, their likely causes, and proven fixes. Keep this handy for rapid issue resolution during development.
+
+## Response Quality Issues
+
+| **Symptom** | **Likely Cause** | **Fix** |
+|-------------|------------------|---------|
+| **Vague or off-topic responses** | Missing context or unclear requirements | Fill PTCF gaps (Persona, Task, Context, Format). Provide more detailed background information and specific examples. |
+| **AI hallucination or false information** | No authoritative source provided | Provide explicit citations, use ReAct pattern, or integrate search tools to ground responses in factual data. |
+| **Responses too verbose** | No length constraints specified | Add explicit word or section limits (e.g., "Summarize in under 120 words" or "Limit to 3 paragraphs"). |
+| **Ignores tool calls or functions** | Tool schema absent or incorrect | Ensure tool schema is correctly defined and show explicit examples of Action: lines in your prompt. |
+| **Inconsistent results over time** | No version control for prompts | Commit prompts to version control, monitor performance actively, and maintain rollback capability. |
+
+## Technical Implementation Issues
+
+| **Symptom** | **Likely Cause** | **Fix** |
+|-------------|------------------|---------|
+| **Component not rendering** | Import errors or JSX syntax issues | Check import paths, ensure proper JSX syntax, verify component exports and file extensions. |
+| **API calls failing** | Authentication or CORS issues | Verify API keys in Supabase secrets, check CORS settings, validate request headers and endpoints. |
+| **Database operations not working** | RLS policies or authentication problems | Ensure user is authenticated, check Row Level Security policies, verify table permissions. |
+| **Styling not applying** | CSS specificity or Tailwind conflicts | Check class order, verify Tailwind compilation, inspect browser dev tools for style conflicts. |
+| **Build errors** | TypeScript type errors or missing dependencies | Fix type mismatches, install missing packages, check import statements and file paths. |
+
+## Integration & Service Issues
+
+| **Symptom** | **Likely Cause** | **Fix** |
+|-------------|------------------|---------|
+| **External API not responding** | Rate limits or authentication failures | Check API key validity, verify rate limit status, implement proper error handling and retries. |
+| **File uploads failing** | Size limits or storage configuration | Check file size limits, verify storage bucket permissions, validate file types and formats. |
+| **Authentication redirect loops** | Callback URL or session issues | Verify callback URLs match service configuration, check session storage and cookie settings. |
+| **Payment processing errors** | Stripe configuration or webhook issues | Validate Stripe keys, check webhook endpoints, ensure proper error handling for payment flows. |
+| **Real-time features not updating** | WebSocket connection or subscription issues | Check connection status, verify subscription setup, implement reconnection logic. |
+
+## Performance & UX Issues
+
+| **Symptom** | **Likely Cause** | **Fix** |
+|-------------|------------------|---------|
+| **Slow page loading** | Large bundle size or unoptimized assets | Implement code splitting, optimize images, remove unused dependencies, enable compression. |
+| **UI not responsive** | Missing responsive classes or viewport issues | Add responsive Tailwind classes, check viewport meta tag, test on actual devices. |
+| **Memory leaks or crashes** | Infinite loops or improper cleanup | Check useEffect dependencies, implement proper cleanup, avoid infinite re-renders. |
+| **Mobile-specific issues** | Touch events or viewport problems | Test touch interactions, check mobile viewport settings, verify responsive design. |
+| **Accessibility problems** | Missing ARIA labels or keyboard navigation | Add proper semantic HTML, implement keyboard navigation, include ARIA attributes. |
+
+## Emergency Debugging Steps
+
+**When everything breaks:**
+1. **Check browser console** for immediate error messages
+2. **Revert to last working version** if available
+3. **Test in incognito mode** to rule out cache issues
+4. **Verify external service status** (check service status pages)
+5. **Switch to Chat mode** for collaborative debugging
+
+**Before asking for help:**
+- [ ] Copy exact error messages
+- [ ] Document steps to reproduce
+- [ ] Check if issue occurs in different browsers
+- [ ] Note what changed since it last worked
+- [ ] Gather relevant screenshots or logs
+
+Keep this reference accessible during development for faster problem resolution!`
+      },
+      {
+        id: 'slide-7-12',
+        title: 'Building Your Debugging Toolkit',
+        content: `## Mastering the Debug Process
+
+**Effective debugging is a skill** that improves with practice and the right tools. Build your personal toolkit for faster, more confident problem-solving.
+
+## Essential Debug Tools
+
+**Browser Developer Tools:**
+- **Console Tab:** Error messages, logs, and interactive JavaScript
+- **Network Tab:** API requests, response codes, and timing
+- **Elements Tab:** DOM inspection and live CSS editing
+- **Application Tab:** Local storage, session data, and service workers
+- **Performance Tab:** Rendering bottlenecks and memory usage
+
+**Lovable-Specific Tools:**
+- **"Try to Fix" Button:** First line of defense for quick issues
+- **Chat Mode:** Interactive debugging partner for complex problems
+- **Version History:** Roll back to working states
+- **Dev Mode:** Access to raw code and build information
+
+**External Debugging Resources:**
+- **Service Status Pages:** Check if external APIs are operational
+- **Browser Compatibility Tables:** Verify feature support across browsers
+- **Stack Overflow:** Community solutions for common problems
+- **Official Documentation:** Authoritative answers for integrations
+
+## Personal Debugging Playbook
+
+**Create Your Own Reference:**
+- **Common Error Patterns:** Document recurring issues and solutions
+- **Successful Prompt Templates:** Save effective debugging prompts
+- **Integration Checklists:** Step-by-step verification for external services
+- **Performance Optimization Notes:** Techniques that worked for your projects
+
+**Learning from Each Issue:**
+- **Document the Journey:** What led to the problem and how it was solved
+- **Note Patterns:** Similar issues that might occur in the future
+- **Share Knowledge:** Help others by documenting solutions
+- **Reflect on Process:** How could the issue have been prevented?
+
+## Building Debugging Confidence
+
+**Systematic Approach:**
+1. **Reproduce Consistently:** Ensure you can trigger the issue reliably
+2. **Isolate Variables:** Change one thing at a time
+3. **Form Hypotheses:** Make educated guesses about causes
+4. **Test Systematically:** Verify or disprove each hypothesis
+5. **Document Results:** Keep track of what works and what doesn't
+
+**Collaborative Debugging:**
+- **Rubber Duck Method:** Explain the problem aloud (even to an inanimate object)
+- **AI Partnership:** Use Chat mode as an intelligent debugging partner
+- **Peer Review:** Share complex issues with other developers
+- **Community Support:** Engage with development communities for help
+
+## Prevention Strategies
+
+**Proactive Measures:**
+- **Regular Code Reviews:** Catch issues before they become problems
+- **Comprehensive Testing:** Test edge cases and error scenarios
+- **Monitoring Implementation:** Set up alerts for production issues
+- **Documentation Habits:** Keep implementation details accessible
+
+**Building Resilient Code:**
+- **Error Boundaries:** Gracefully handle component failures
+- **Input Validation:** Prevent bad data from causing issues
+- **Fallback Mechanisms:** Provide alternatives when primary features fail
+- **Progressive Enhancement:** Ensure core functionality works everywhere
+
+## Debugging Mindset
+
+**Embrace the Process:**
+- **Curiosity Over Frustration:** View problems as puzzles to solve
+- **Systematic Over Random:** Follow logical steps rather than random attempts
+- **Learning Over Quick Fixes:** Understand root causes, not just symptoms
+- **Patience Over Pressure:** Give yourself time to think through problems
+
+**Continuous Improvement:**
+- **Reflect on Successes:** What debugging strategies worked well?
+- **Learn from Failures:** What approaches led you astray?
+- **Expand Your Toolkit:** Try new debugging techniques and tools
+- **Share Your Knowledge:** Teach others what you've learned
+
+## The Expert Debugging Loop
+
+**1. Observe:** What exactly is happening versus what should happen?
+**2. Hypothesize:** What are the most likely causes?
+**3. Test:** How can you verify or disprove your hypotheses?
+**4. Adjust:** Based on results, what should you try next?
+**5. Implement:** Apply the solution and verify it works
+**6. Document:** Record the solution for future reference
+
+## Remember
+
+**Every expert was once a beginner.** The developers you admire faced the same frustrating bugs and confusing error messages. The difference is they built systematic approaches, learned from each challenge, and developed the confidence to tackle increasingly complex problems.
+
+**Debugging is not about being perfect—it's about being persistent, systematic, and curious.**
+
+Your debugging skills will become one of your most valuable assets as a developer!`
       }
     ]
   }
