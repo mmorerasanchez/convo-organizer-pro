@@ -7,6 +7,7 @@ import PromptingGuide from '@/components/prompting/PromptingGuide';
 import { EnhancedPromptScanner } from '@/components/prompting/scanner/EnhancedPromptScanner';
 import { EnhancedPromptDesigner } from '@/components/prompting/designer/EnhancedPromptDesigner';
 import TemplateLibrary from '@/components/templates/TemplateLibrary';
+import TemplatesControlBar from '@/components/templates/TemplatesControlBar';
 import CreateTemplateDialog from '@/components/templates/CreateTemplateDialog';
 import { BookOpen, Sparkles, Zap, FileCode } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
@@ -25,6 +26,8 @@ const Prompting = () => {
   // Templates-specific state
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState<'name' | 'created' | 'updated'>('name');
+  const [filterBy, setFilterBy] = useState('all');
 
   // Update active tab when URL parameter changes
   useEffect(() => {
@@ -48,6 +51,12 @@ const Prompting = () => {
 
   const handleCreateTemplate = () => {
     setShowCreateDialog(true);
+  };
+
+  const resetFilters = () => {
+    setSearchTerm('');
+    setSortBy('name');
+    setFilterBy('all');
   };
 
   const tabs = [
@@ -83,10 +92,6 @@ const Prompting = () => {
             tabs={tabs}
             activeTab={activeTab}
             onTabChange={setActiveTab}
-            showSearch={activeTab === 'templates'}
-            searchPlaceholder="Search templates..."
-            searchValue={searchTerm}
-            onSearchChange={setSearchTerm}
           />
           
           <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -99,9 +104,21 @@ const Prompting = () => {
             </TabsContent>
             
             <TabsContent value="templates" className="space-y-6 mt-0">
+              <TemplatesControlBar
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+                filterBy={filterBy}
+                setFilterBy={setFilterBy}
+                resetFilters={resetFilters}
+                onCreateTemplate={handleCreateTemplate}
+              />
               <TemplateLibrary 
                 onCreateTemplate={handleCreateTemplate}
                 searchTerm={searchTerm}
+                sortBy={sortBy}
+                filterBy={filterBy}
               />
             </TabsContent>
             

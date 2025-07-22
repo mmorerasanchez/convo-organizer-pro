@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react';
 import { Tool } from '@/lib/types';
 
 const useToolsFilter = (tools: Tool[], searchTerm: string = '') => {
-  const [sortBy, setSortBy] = useState<'name' | 'score'>('name');
+  const [sortBy, setSortBy] = useState<'name' | 'score' | 'created'>('name');
 
   const filteredTools = useMemo(() => {
     let filtered = tools;
@@ -24,6 +24,8 @@ const useToolsFilter = (tools: Tool[], searchTerm: string = '') => {
           return a.name.localeCompare(b.name);
         case 'score':
           return b.score - a.score;
+        case 'created':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         default:
           return a.name.localeCompare(b.name);
       }

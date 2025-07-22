@@ -4,7 +4,7 @@ import { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription }
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tool } from '@/lib/types';
-import { Edit, Trash, MessageSquare, Star, Cpu, Clock, Calendar } from 'lucide-react';
+import { Edit, Trash, Star, Cpu, Clock, Calendar } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteTool } from '@/lib/api';
 import { toast } from 'sonner';
@@ -44,10 +44,7 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
     >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <MessageSquare className="w-5 h-5" />
-            <CardTitle className="text-xl font-semibold">{tool.name}</CardTitle>
-          </div>
+          <CardTitle className="text-xl font-semibold">{tool.name}</CardTitle>
           <Badge variant="available">Available</Badge>
         </div>
         <CardDescription className="text-sm">
@@ -64,9 +61,6 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool }) => {
           <div className="flex items-center gap-1">
             <Star className="h-3 w-3" />
             <span>Score: {tool.score}/10</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Badge variant="available" className="text-xs">Available</Badge>
           </div>
         </div>
         <div className="flex items-center gap-1">

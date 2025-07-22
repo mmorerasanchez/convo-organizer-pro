@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Plus, Loader2 } from 'lucide-react';
 import { fetchTemplates } from '@/lib/api/templates';
@@ -10,11 +10,15 @@ import TemplateCard from './TemplateCard';
 interface TemplateLibraryProps {
   onCreateTemplate: () => void;
   searchTerm?: string;
+  sortBy?: 'name' | 'created' | 'updated';
+  filterBy?: string;
 }
 
 const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ 
   onCreateTemplate, 
-  searchTerm = '' 
+  searchTerm = '',
+  sortBy = 'name',
+  filterBy = 'all'
 }) => {
   const { user } = useAuth();
 
@@ -24,12 +28,33 @@ const TemplateLibrary: React.FC<TemplateLibraryProps> = ({
     enabled: !!user
   });
 
-  // Filter templates based on search term
-  const filteredTemplates = templates.filter(template => 
-    searchTerm === '' || 
-    template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    template.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter and sort templates
+  const filteredTemplates = templates
+    .filter(template => {
+      // Search filter
+      const matchesSearch = searchTerm === '' || 
+        template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        template.description?.toLowerCase().includes(searchTerm.toLowerCase());
+
+      // Visibility filter
+      if (filterBy === 'all') return matchesSearch;
+      if (filterBy === 'my') return matchesSearch && template.visibility === 'private';
+      if (filterBy === 'public') return matchesSearch && template.visibility === 'public';
+      
+      return matchesSearch;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'created':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case 'updated':
+          return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+        default:
+          return a.name.localeCompare(b.name);
+      }
+    });
 
   if (!user) {
     return (
@@ -52,17 +77,6 @@ const TemplateLibrary: React.FC<TemplateLibraryProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Control Bar */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          {/* Additional filters could go here */}
-        </div>
-        <Button onClick={onCreateTemplate}>
-          <Plus className="h-4 w-4 mr-2" />
-          Create Template
-        </Button>
-      </div>
-
       {/* Templates Grid */}
       {filteredTemplates.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -83,16 +97,10 @@ const TemplateLibrary: React.FC<TemplateLibraryProps> = ({
               ? "Try adjusting your search criteria"
               : "Create your first template to get started"}
           </p>
-          {searchTerm ? (
-            <Button variant="outline" onClick={() => window.location.reload()}>
-              Clear Search
-            </Button>
-          ) : (
-            <Button onClick={onCreateTemplate}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Template
-            </Button>
-          )}
+          <Button onClick={onCreateTemplate}>
+            <Plus className="h-4 w-4 mr-2" />
+            Create Template
+          </Button>
         </div>
       )}
     </div>

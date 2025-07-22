@@ -8,26 +8,17 @@ import MainLayout from '@/components/layout/MainLayout';
 import MyToolsTab from '@/components/tools/MyToolsTab';
 import ToolFinderTab from '@/components/tools/ToolFinderTab';
 import ModelSectionsTab from '@/components/tools/ModelSectionsTab';
-import useToolsFilter from '@/hooks/useToolsFilter';
 import PageHeader from '@/components/common/PageHeader';
 import { Search, CodeSquare, Cpu } from 'lucide-react';
 
 const Tools = () => {
   useRequireAuth();
   const [activeTab, setActiveTab] = useState('my-tools');
-  const [searchTerm, setSearchTerm] = useState('');
   
   const { data: tools = [], isLoading, error } = useQuery({
     queryKey: ['tools'],
     queryFn: fetchTools
   });
-
-  const {
-    sortBy,
-    setSortBy,
-    filteredTools,
-    resetFilters
-  } = useToolsFilter(tools, searchTerm);
 
   const tabs = [
     {
@@ -57,10 +48,6 @@ const Tools = () => {
           tabs={tabs}
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          showSearch={activeTab === 'my-tools'}
-          searchPlaceholder="Search tools by name, description or model..."
-          searchValue={searchTerm}
-          onSearchChange={setSearchTerm}
         />
         
         <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -69,11 +56,6 @@ const Tools = () => {
               tools={tools}
               isLoading={isLoading}
               error={error}
-              searchTerm={searchTerm}
-              sortBy={sortBy}
-              setSortBy={setSortBy}
-              filteredTools={filteredTools}
-              resetFilters={resetFilters}
             />
           </TabsContent>
           
