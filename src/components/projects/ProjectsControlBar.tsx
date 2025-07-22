@@ -116,7 +116,7 @@ const ProjectsControlBar: React.FC<ProjectsControlBarProps> = ({
         </Popover>
 
         {/* Search Bar */}
-        <div className="relative w-96">
+        <div className="relative w-[28rem]">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search projects..."
