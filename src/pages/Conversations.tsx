@@ -3,14 +3,15 @@ import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import ConversationCard from '@/components/conversations/ConversationCard';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Plus, Search, X } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Tag } from '@/lib/types';
 import NewConversationDialog from '@/components/conversations/NewConversationDialog';
+import ConversationsControlBar from '@/components/conversations/ConversationsControlBar';
 import { useQuery } from '@tanstack/react-query';
 import { fetchConversations, fetchTags } from '@/lib/api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Skeleton } from '@/components/ui/skeleton';
+import PageHeader from '@/components/common/PageHeader';
 
 const Conversations = () => {
   useRequireAuth();
@@ -71,10 +72,7 @@ const Conversations = () => {
     return (
       <MainLayout>
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-10 w-40" />
-            <Skeleton className="h-10 w-32" />
-          </div>
+          <Skeleton className="h-24 w-full" />
           <Skeleton className="h-12 w-full" />
           <div className="flex flex-wrap gap-2">
             {[...Array(5)].map((_, i) => (
@@ -108,51 +106,24 @@ const Conversations = () => {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Conversations</h1>
-          <div className="hidden md:block">
-            <NewConversationDialog />
-          </div>
-        </div>
+        {/* Standardized Header */}
+        <PageHeader 
+          title="Conversations"
+          description="Organize and manage your AI conversations with projects and tags"
+          showSearch={true}
+          searchPlaceholder="Search conversations..."
+          searchValue={searchTerm}
+          onSearchChange={setSearchTerm}
+        />
         
-        {/* Search and filters */}
-        <div className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search conversations..." 
-              className="pl-8"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
-          <div className="flex flex-wrap gap-2">
-            {tags.map((tag) => (
-              <button
-                key={tag.id}
-                onClick={() => handleTagSelect(tag)}
-                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                  selectedTags.some(t => t.id === tag.id)
-                    ? tag.color + ' ring-2 ring-primary/30'
-                    : 'bg-secondary hover:bg-secondary/80'
-                }`}
-              >
-                {tag.name}
-              </button>
-            ))}
-            
-            {(searchTerm || selectedTags.length > 0) && (
-              <button
-                onClick={clearFilters}
-                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-secondary hover:bg-secondary/80"
-              >
-                <X size={12} className="mr-1" />
-                Clear filters
-              </button>
-            )}
-          </div>
-        </div>
+        {/* Control Bar with filters and actions */}
+        <ConversationsControlBar
+          tags={tags}
+          selectedTags={selectedTags}
+          onTagSelect={handleTagSelect}
+          clearFilters={clearFilters}
+          searchTerm={searchTerm}
+        />
         
         {/* Conversations grid */}
         {filteredConversations.length > 0 ? (

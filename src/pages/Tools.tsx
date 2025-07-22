@@ -5,15 +5,17 @@ import { fetchTools } from '@/lib/api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import MainLayout from '@/components/layout/MainLayout';
-import ToolsHeader from '@/components/tools/ToolsHeader';
 import MyToolsTab from '@/components/tools/MyToolsTab';
 import ToolFinderTab from '@/components/tools/ToolFinderTab';
 import ModelSectionsTab from '@/components/tools/ModelSectionsTab';
 import useToolsFilter from '@/hooks/useToolsFilter';
+import PageHeader from '@/components/common/PageHeader';
+import { Search, CodeSquare, Cpu } from 'lucide-react';
 
 const Tools = () => {
   useRequireAuth();
   const [activeTab, setActiveTab] = useState('my-tools');
+  const [searchTerm, setSearchTerm] = useState('');
   
   const { data: tools = [], isLoading, error } = useQuery({
     queryKey: ['tools'],
@@ -21,22 +23,44 @@ const Tools = () => {
   });
 
   const {
-    searchTerm, 
-    setSearchTerm,
     sortBy,
     setSortBy,
     filteredTools,
     resetFilters
-  } = useToolsFilter(tools);
+  } = useToolsFilter(tools, searchTerm);
+
+  const tabs = [
+    {
+      value: 'my-tools',
+      label: 'My Tools',
+      icon: <CodeSquare className="h-4 w-4" />
+    },
+    {
+      value: 'llm-models',
+      label: 'LLM Models',
+      icon: <Cpu className="h-4 w-4" />
+    },
+    {
+      value: 'tool-finder',
+      label: 'Tool Finder',
+      icon: <Search className="h-4 w-4" />,
+      disabled: true
+    }
+  ];
 
   return (
     <MainLayout>
-      <div className="space-y-section">
-        <ToolsHeader 
+      <div className="space-y-6">
+        <PageHeader 
+          title="AI Tools"
+          description="Discover and use AI-powered tools and language models to enhance your workflow"
+          tabs={tabs}
           activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
+          onTabChange={setActiveTab}
+          showSearch={activeTab === 'my-tools'}
+          searchPlaceholder="Search tools by name, description or model..."
+          searchValue={searchTerm}
+          onSearchChange={setSearchTerm}
         />
         
         <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -57,7 +81,7 @@ const Tools = () => {
             <ModelSectionsTab />
           </TabsContent>
           
-          <TabsContent value="tool-finder">
+          <TabsContent value="tool-finder" className="mt-0">
             <ToolFinderTab />
           </TabsContent>
         </Tabs>
