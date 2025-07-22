@@ -32,13 +32,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </div>
         </div>
         
-        {/* Fixed footer with proper alignment using CSS custom properties */}
-        <footer 
-          className="fixed bottom-0 left-0 right-0 z-20 border-t bg-white md:left-[--sidebar-width] data-[state=collapsed]:md:left-[--sidebar-width-icon]"
-          style={{
-            left: 'var(--sidebar-width-icon)',
-          }}
-        >
+        {/* Fixed footer aligned with main content area */}
+        <footer className="fixed bottom-0 left-0 right-0 z-20 border-t bg-white md:left-64 group-data-[state=collapsed]/sidebar-wrapper:md:left-12">
           <div className="flex h-16 items-center justify-center px-4">
             <SidebarLogoFooter />
           </div>
