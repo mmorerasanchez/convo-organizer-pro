@@ -34,7 +34,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, isShared = false }) 
             </p>
           )}
         </CardHeader>
-        <CardFooter className="bg-muted/10 border-t px-5 py-3 flex items-center justify-between text-xs text-muted-foreground">
+        <CardFooter className="bg-muted/10 border-t px-5 py-3 flex flex-col items-start gap-1 text-xs text-muted-foreground">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1">
               <MessageCircle size={12} />
