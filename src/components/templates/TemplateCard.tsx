@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Template } from '@/lib/types';
+import { Eye, Users, Lock, FileText, Thermometer, Hash } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import StatusIndicator from '@/components/common/StatusIndicator';
 import { useFrameworks } from '@/hooks/use-frameworks';
@@ -19,6 +20,17 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
   onUse
 }) => {
   const { data: frameworks = [] } = useFrameworks();
+
+  const getVisibilityIcon = () => {
+    switch (template.visibility) {
+      case 'public':
+        return <Eye size={12} />;
+      case 'shared':
+        return <Users size={12} />;
+      default:
+        return <Lock size={12} />;
+    }
+  };
 
   const getVisibilityLabel = () => {
     return template.visibility.charAt(0).toUpperCase() + template.visibility.slice(1);
@@ -45,14 +57,19 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
       </CardHeader>
 
       <CardFooter className="bg-muted/10 border-t px-5 py-3 flex flex-col items-start gap-1 text-xs text-muted-foreground">
-        <div>
-          {template.usage_count} uses, {getVisibilityLabel()}
+        <div className="flex items-center gap-1">
+          <FileText size={12} />
+          <span>{template.usage_count} uses, </span>
+          {getVisibilityIcon()}
+          <span>{getVisibilityLabel()}</span>
         </div>
-        <div>
-          {framework?.name || 'Unknown Framework'}
+        <div className="flex items-center gap-1">
+          <Hash size={12} />
+          <span>{framework?.name || 'Unknown Framework'}</span>
         </div>
-        <div>
-          Temp: {template.temperature}, Tokens: {template.max_tokens}
+        <div className="flex items-center gap-1">
+          <Thermometer size={12} />
+          <span>Temp: {template.temperature}, Tokens: {template.max_tokens}</span>
         </div>
         <div>
           Updated {formatDistanceToNow(new Date(template.updated_at), { addSuffix: true })}
