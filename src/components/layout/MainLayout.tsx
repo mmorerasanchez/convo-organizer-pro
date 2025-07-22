@@ -25,17 +25,19 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             {/* Desktop header - now sticky */}
             <DesktopHeader />
             
-            {/* Main content with adjusted padding for fixed header */}
-            <main className="flex-1 px-container py-section sm:px-section">
+            {/* Main content with adjusted padding for fixed header and footer */}
+            <main className="flex-1 px-container py-section sm:px-section pb-20">
               <div className="mx-auto max-w-7xl">{children}</div>
             </main>
-            
-            {/* Centered footer with logo */}
-            <footer className="border-t p-4 text-center">
-              <SidebarLogoFooter />
-            </footer>
           </div>
         </div>
+        
+        {/* Fixed footer aligned with main content area */}
+        <footer className="fixed bottom-0 left-0 right-0 z-20 border-t bg-white md:left-64 group-data-[state=collapsed]/sidebar-wrapper:md:left-12">
+          <div className="flex h-16 items-center justify-center px-4">
+            <SidebarLogoFooter />
+          </div>
+        </footer>
       </div>
     </SidebarProvider>
   );
