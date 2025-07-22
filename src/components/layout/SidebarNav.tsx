@@ -34,7 +34,7 @@ const SidebarNav: React.FC = () => {
         {/* Removed the JoinProjectDialog component from here */}
       </SidebarContent>
 
-      <SidebarFooter className="border-t p-2">
+      <SidebarFooter className="border-t h-16 flex items-center justify-center px-4">
         <Button 
           variant="ghost" 
           className="w-full justify-start gap-2" 
