@@ -409,68 +409,512 @@ export const chapters: Chapter[] = [
     },
     {
       id: "chapter-3",
-      title: "Prompting Techniques",
-      description: "Various methods to improve the effectiveness of your prompts",
+      title: "Mastering Prompt Engineering",
+      description: "Learn the art and science of communicating effectively with AI models to unlock their full potential",
       slides: [
         {
           id: "slide-3-1",
-          title: "Zero-Shot Prompting",
+          title: "Mastering Prompt Engineering",
           content: `
-            Zero-shot prompting involves asking the model to perform a task without providing any examples. 
-            The instruction is all that's given, relying on the model's pre-existing knowledge.
-            
-            ## When to Use
-            
-            For straightforward tasks where the model's training data already covers the topic.
-            
-            ## Benefits
-            
-            Simplicity and speed of implementation.
+            Prompt engineering is the art and science of communicating effectively with AI models. In this chapter, we'll delve into the nuances of crafting prompts that yield precise and desirable outcomes within Lovable. Understanding how AI interprets instructions and managing its context are crucial skills for unlocking the full potential of your AI co-pilot.
+
+            We'll cover core principles, various prompting frameworks, the anatomy of high-signal prompts, and advanced patterns for complex tasks. This knowledge will transform how you interact with Lovable's AI, enabling you to achieve better results with greater consistency and efficiency.
+
+            ## What You'll Learn
+
+            - **AI Communication Fundamentals**: How AI models interpret and process your instructions
+            - **Core Principles**: Essential guidelines for effective prompt engineering across all platforms
+            - **Framework Library**: Structured templates for organizing your prompts
+            - **Advanced Techniques**: Sophisticated patterns for complex reasoning and tool interaction
+            - **Hallucination Management**: Strategies to ensure reliable and accurate AI outputs
+            - **Parameter Tuning**: Understanding the knobs and dials that control AI behavior
+
+            ## The Foundation of Success
+
+            Effective prompt engineering is the foundation of successful AI-powered development. Master these techniques, and you'll unlock capabilities that seemed impossible just a few years ago.
           `
         },
         {
           id: "slide-3-2",
-          title: "Few-Shot Prompting",
+          title: "Understanding AI Communication",
           content: `
-            Few-shot prompting includes a handful of examples within the prompt. These examples illustrate 
-            the desired behavior, helping the model to generalize from them.
-            
-            ## How It Works
-            
-            You supply one or more input–output pairs before the actual task, which guides the model 
-            toward the correct output format.
-            
-            ## Benefits
-            
-            Improved accuracy for more complex tasks and when the expected output format is specific.
+            AI models, while incredibly powerful, operate on literal interpretations of your instructions. They lack the common sense and contextual understanding that humans often take for granted. This fundamental difference necessitates a deliberate and precise approach to prompt crafting.
+
+            Understanding these limitations isn't about working around deficiencies—it's about leveraging the AI's strengths while providing the structure and clarity it needs to deliver exceptional results.
+
+            ## Literal Interpretation
+
+            AI models meticulously follow the instructions you provide. Any ambiguity in your prompts can lead to unintended or suboptimal results. For factual queries, it's always best practice to provide reference text, as the AI's "knowledge" is limited to its training data and the context you provide.
+
+            ## Key Characteristics
+
+            - **No Common Sense**: AI doesn't possess intuitive understanding beyond what you explicitly provide
+            - **Absolute Literalism**: Every word in your prompt matters and will be interpreted precisely
+            - **Context Dependency**: The AI can only work with information you've given it
+            - **Confident Responses**: AI will always sound confident, even when making educated guesses
+
+            ## The Clarity Imperative
+
+            Since AI lacks the ability to read between the lines or make intuitive leaps, clarity and specificity are paramount. Every important detail must be explicitly stated, and ambiguous language must be avoided to ensure reliable results.
           `
         },
         {
           id: "slide-3-3",
-          title: "Chain-of-Thought (CoT) Prompting",
+          title: "Context Management & Core Principles",
           content: `
-            Chain-of-thought prompting encourages the model to think through a problem step by step before 
-            arriving at a final answer.
-            
-            ## Application
-            
-            Particularly effective in reasoning and arithmetic problems.
-            
-            ## Example
-            
-            "Let's think step by step" may be prefixed to the prompt to trigger intermediate reasoning steps.
+            AI models operate within fixed "context windows," which dictate how much information they can process and remember at any given time. Lengthy or overly complex prompts can cause the AI to "forget" earlier details, leading to incomplete or inaccurate outputs.
+
+            ## Context Window Limitations
+
+            - **Fixed Memory**: AI can only hold a limited amount of information at once
+            - **Information Loss**: Long prompts may cause important details to be forgotten
+            - **Refresh Strategy**: Sometimes you need to restate critical information
+            - **Prioritization**: Most important information should be placed strategically
+
+            ## Core Principles Overview
+
+            Effective prompt engineering adheres to several cross-vendor principles that ensure clarity, guide the AI's thinking, and improve output quality. These foundational guidelines work across all large language models and form the backbone of successful AI interaction.
+
+            ## Universal Guidelines
+
+            - **Clarity & Scope**: Always define role, task, context, and format
+            - **Structured Framing**: Use frameworks like PTCF (Persona, Task, Context, Format)
+            - **Guided Thinking**: Encourage step-by-step reasoning for complex problems
+            - **Positive Instructions**: Tell the AI what to do, not what to avoid
+            - **Version Control**: Treat prompts like code with proper versioning
+
+            These principles form the foundation for all advanced prompting techniques we'll explore in the following slides.
           `
         },
         {
           id: "slide-3-4",
-          title: "Role and Context-Based Prompting",
+          title: "Core Principles: Clarity, PTCF & Guided Thinking",
           content: `
-            Defining the role or persona of the AI can help steer its responses. For example, setting the role 
-            as "a technical expert" versus "a friendly advisor" can significantly change the tone and depth of the response.
-            
-            ## Example
-            
-            "You are a professional customer service agent. Answer the following question clearly and concisely."
+            The first set of core principles focuses on establishing clear communication, structured framing, and encouraging proper reasoning. These techniques ensure your AI interactions are precise, comprehensive, and logical.
+
+            ## Clarity & Scope
+
+            Always state what you want the AI to do, who it should act as (its persona/role), why the task is important, how long the output should be, and what format it should take. Use explicit delimiters like triple quotes or XML tags to clearly separate instructions from contextual information.
+
+            **Example Structure:**
+            \`\`\`
+            Role: You are an expert React developer
+            Task: Create a login component
+            Context: For a SaaS application with Supabase auth
+            Format: Return clean TypeScript React code
+            \`\`\`
+
+            ## PTCF/RTF Framing
+
+            To prevent the model from guessing, frame your prompts using either:
+            - **PTCF**: Persona/Role • Task • Context • Format
+            - **RTF**: Role • Task • Format (simplified version)
+
+            This structured approach ensures all necessary information for the AI to understand and execute your request is present.
+
+            ## Guided Thinking (Chain-of-Thought)
+
+            For complex problems, explicitly ask the model to "think step-by-step" (Chain-of-Thought). This encourages the AI to break down the problem and reason through it before providing a final answer, leading to more accurate and reliable results.
+
+            **Trigger Phrases:**
+            - "Think step-by-step..."
+            - "Let's approach this systematically..."
+            - "First, analyze the requirements, then..."
+          `
+        },
+        {
+          id: "slide-3-5",
+          title: "Core Principles: ReAct, Few-Shot & Positive Instructions",
+          content: `
+            The second set of core principles covers advanced reasoning patterns, learning from examples, and effective instruction framing. These techniques enhance the AI's performance on complex tasks and ensure consistent, high-quality outputs.
+
+            ## Reason + Act (ReAct)
+
+            When the AI needs to interact with external tools or perform actions, alternate **Thought:** and **Action:** lines. This pattern helps significantly reduce hallucination by making the AI explicitly state its reasoning before performing an action.
+
+            **ReAct Structure:**
+            \`\`\`
+            Thought: I need to check the user's authentication status
+            Action: [Check Supabase auth]
+            Observation: User is authenticated with ID 12345
+            Thought: Now I can proceed with the dashboard data
+            Action: [Fetch dashboard data]
+            \`\`\`
+
+            ## Show, Don't Just Tell (Few-Shot)
+
+            Provide 1-3 high-quality examples of the desired input-output pairs before asking the AI for its main output. This demonstrates the exact format, style, and content you expect, guiding the model more effectively than textual instructions alone.
+
+            ## Positive Instructions
+
+            Always state what you want the AI to do, rather than forbidding what it should not do. Positive instructions are more effective because they give the AI a clear direction, reducing ambiguity and the chance of misinterpretation.
+
+            **Instead of:** "Don't make the button too big"
+            **Use:** "Make the button medium-sized with 16px padding"
+
+            ## Iterate & Track Versions
+
+            Treat your prompts like code. Continuously version, test, and be prepared to roll back to previous versions if a new prompt introduces regressions or undesirable behavior.
+          `
+        },
+        {
+          id: "slide-3-6",
+          title: "Zero-Shot Frameworks",
+          content: `
+            Zero-shot frameworks are designed to work effectively with minimal or no examples provided in the prompt itself. They rely on the model's existing knowledge and the clarity of your instructions. These frameworks are intuitive to use and provide immediate results.
+
+            ## CoT (Chain-of-Thought)
+
+            **When to Use:** Complex reasoning, multi-step problems, mathematical calculations
+            **Trigger:** "Think step-by-step..." works immediately
+            **Benefits:** Encourages logical reasoning without needing explicit examples
+
+            **Minimal Skeleton:**
+            \`\`\`
+            Task: [Your complex problem]
+            Instructions: Think step-by-step and show your reasoning.
+            \`\`\`
+
+            ## RTF (Role-Task-Format)
+
+            **When to Use:** General-purpose tasks, content creation, analysis
+            **Benefits:** Simple and self-explanatory structure
+            **Best For:** Quick, focused requests with clear outputs
+
+            **Minimal Skeleton:**
+            \`\`\`
+            Role: [Who the AI should be]
+            Task: [What to accomplish]
+            Format: [How to structure the output]
+            \`\`\`
+
+            ## TAG (Task-Action-Goal)
+
+            **When to Use:** Process-oriented work, step-by-step procedures
+            **Benefits:** Intuitive structure that guides action-oriented thinking
+            **Best For:** Procedural tasks and workflow design
+
+            **Minimal Skeleton:**
+            \`\`\`
+            Task: [What needs to be done]
+            Action: [Specific steps to take]
+            Goal: [Desired outcome]
+            \`\`\`
+
+            These frameworks provide reliable structure for most prompting scenarios without requiring complex setup or examples.
+          `
+        },
+        {
+          id: "slide-3-7",
+          title: "Few-Shot Frameworks",
+          content: `
+            Few-shot frameworks generally benefit significantly from one or more examples provided within the prompt. These examples demonstrate the desired input-output pattern, guiding the AI to replicate the structure and style for new, similar tasks.
+
+            ## ReAct (Reason + Act)
+
+            **When to Use:** Tool-augmented tasks, complex decision-making, API interactions
+            **Needs:** Examples showing proper Thought/Action/Observation formatting
+            **Benefits:** Significantly reduces hallucination, ensures systematic thinking
+
+            **Minimal Skeleton:**
+            \`\`\`
+            Thought: [Reasoning about what to do next]
+            Action[tool]: [Specific tool call or action]
+            Observation: [Result from the action]
+            \`\`\`
+
+            ## RACE (Role-Action-Context-Execute)
+
+            **When to Use:** Structured documents, PRDs, comprehensive analysis
+            **Benefits:** Detailed framework for complex, multi-faceted tasks
+            **Best For:** Product requirements, strategic planning
+
+            **Minimal Skeleton:**
+            \`\`\`
+            Role: [Professional persona]
+            Action: [What to accomplish]
+            Context: [Background information]
+            Execute: [Detailed implementation steps]
+            \`\`\`
+
+            ## PAR (Problem-Action-Result)
+
+            **When to Use:** Root-cause analysis, solution generation, troubleshooting
+            **Benefits:** Systematic approach to problem-solving
+            **Best For:** Debugging, optimization, strategic solutions
+
+            **Minimal Skeleton:**
+            \`\`\`
+            Problem: [Clear problem statement]
+            Action: [Steps taken to address]
+            Result: [Desired or achieved outcome]
+            \`\`\`
+
+            ## STAR (Situation-Task-Action-Result)
+
+            **When to Use:** Status reports, incident summaries, project updates
+            **Benefits:** Comprehensive reporting structure
+            **Best For:** Documentation, progress reports, retrospectives
+
+            **Minimal Skeleton:**
+            \`\`\`
+            Situation: [Current context/background]
+            Task: [What needed to be accomplished]
+            Action: [Steps actually taken]
+            Result: [Outcomes achieved]
+            \`\`\`
+          `
+        },
+        {
+          id: "slide-3-8",
+          title: "System vs User Messages & Prompt Anatomy",
+          content: `
+            Understanding the distinction between system and user messages is fundamental to structuring effective prompts, particularly in more advanced AI interactions. This separation allows for precise control over the AI's behavior and context.
+
+            ## System Messages = The App's DNA
+
+            The system message is where you lock in foundational instructions for the AI. This includes:
+            - **Persona/Role Definition**: Who the AI should be
+            - **Tool Access**: What capabilities are available
+            - **Tone & Style**: How the AI should communicate
+            - **Safety Guidelines**: Behavioral boundaries
+            - **XML Tags**: Structural output formatting
+
+            Think of it as the AI's core programming that remains consistent across interactions.
+
+            ## User Messages = Dynamic Requests
+
+            User messages convey the dynamic aspects of your request:
+            - **Current Context**: Real-time information like dates
+            - **Specific Data**: File snippets, user input, variables
+            - **Ephemeral Details**: Information that changes per interaction
+            - **Task-Specific Instructions**: What you want accomplished right now
+
+            ## Anatomy of a High-Signal Prompt
+
+            **Effective Structure:**
+            \`\`\`xml
+            <system>
+            You are {{ROLE}}. Follow the RACE structure. 
+            Respond in {{STYLE}}.
+            </system>
+
+            <user>
+            ### Task
+            {{TASK}}
+
+            ### Context
+            {{CONTEXT}}
+
+            ### Output Format
+            Return JSON: {"answer": string, "steps": string[]}
+            </user>
+            \`\`\`
+
+            ## Why It Works
+
+            This structure locks in the AI's persona and global instructions in the system tag, then explicitly defines the task, provides rich context, and specifies a deterministic output format. This clear separation minimizes ambiguity and guides the AI toward precise outputs.
+
+            ## Version Control Best Practices
+
+            Treat system prompts like application code:
+            - Store in version control (Git)
+            - Use semantic versioning (v2.1.0)
+            - Document changes and rollback capabilities
+            - Test thoroughly before deploying updates
+          `
+        },
+        {
+          id: "slide-3-9",
+          title: "Levels of Prompting Mastery",
+          content: `
+            As you become more comfortable with Lovable, you'll naturally progress through different levels of prompting mastery. Each level offers increased flexibility and control, allowing you to leverage the AI's capabilities more effectively.
+
+            ## Level 1: Structured "Training Wheels"
+
+            **Approach:** Highly structured prompts with explicit labels
+            **Example Context:** "You are an expert full-stack developer using Lovable"
+            **Example Task:** "Create a secure login page in React using Supabase"
+            **Example Guidelines:** "Minimalistic UI, follow Tailwind CSS conventions"
+            **Example Constraints:** "Only modify the LoginPage component"
+
+            This structured approach acts as valuable "training wheels," guiding the AI precisely while you learn effective communication patterns.
+
+            ## Level 2: Conversational
+
+            **Approach:** Natural, colleague-like communication
+            **Benefits:** More fluid interaction while maintaining clarity
+            **Focus:** Conveying complete intent without formal structure
+            **Example:** "Hey, I need a clean login page for my SaaS app. Use Supabase auth, keep it minimal with Tailwind, and make sure it's mobile-responsive."
+
+            Once you've grasped the basics, you can transition to this more natural style while maintaining the underlying principles.
+
+            ## Level 3: Meta Prompting
+
+            **Approach:** Using AI to improve your prompts
+            **Benefits:** Leverage AI expertise for prompt optimization
+            **Usage:** Ask the AI for help planning tasks, structuring requests, or brainstorming better articulation
+            **Example:** "Help me structure a prompt for creating a complex dashboard with multiple data visualizations"
+
+            This turns the AI into a powerful tool for self-improvement in prompt engineering.
+
+            ## Level 4: Reverse Meta Prompting
+
+            **Approach:** Using AI to document successful interactions
+            **Benefits:** Build a personal library of reusable prompts
+            **Process:** Ask AI to summarize steps taken, logic applied, or generate optimal prompts that led to desired outcomes
+            **Value:** Codify your understanding of effective AI communication
+
+            This advanced level allows you to learn deeply from your successful interactions and build systematic approaches to complex tasks.
+          `
+        },
+        {
+          id: "slide-3-10",
+          title: "Managing Hallucinations",
+          content: `
+            AI hallucinations, where the model generates factually incorrect or nonsensical information, are a known challenge. However, there are effective strategies to minimize their occurrence and ensure the reliability of the AI's output within Lovable.
+
+            ## Provide Grounding Data
+
+            One of the most effective ways to prevent hallucinations is to provide the AI with grounding data:
+
+            - **Leverage Knowledge Base**: Use PRDs and user flows as reference material
+            - **Include Documentation**: Add relevant docs snippets directly in prompts
+            - **Use Representative Examples**: Provide small, accurate data samples
+            - **Supply Context**: The more accurate information you provide, the less likely the AI is to invent details
+
+            ## Request Step-by-Step Reasoning
+
+            Ask the AI to explain its solution approach first, before generating code or complete output:
+
+            - **Slow Down the AI**: Force articulation of reasoning before execution
+            - **Logic Checking**: Make the AI verify its own approach
+            - **Honesty Guidelines**: Instruct the AI to state when it's unsure
+            - **Uncertainty Acknowledgment**: Encourage admission of knowledge gaps
+
+            **Example Prompt Addition:**
+            "Before implementing, explain your approach and highlight any assumptions you're making."
+
+            ## Iterative Verification
+
+            For complex outputs, implement iterative verification:
+
+            - **Requirement Checking**: Ask AI to confirm adherence to all specifications
+            - **Component Breakdown**: Verify smaller pieces before assembling larger solutions
+            - **Error Prevention**: Catch and correct issues early in the process
+            - **Continuous Validation**: Maintain quality throughout the development process
+
+            ## Practical Techniques
+
+            - **Reference Materials**: Always provide relevant documentation when available
+            - **Explicit Constraints**: Clearly state limitations and requirements
+            - **Verification Steps**: Build checking into your prompt workflow
+            - **Confidence Indicators**: Ask the AI to indicate certainty levels
+          `
+        },
+        {
+          id: "slide-3-11",
+          title: "Advanced Prompting Patterns & Recipes",
+          content: `
+            Beyond the core frameworks, specific patterns and recipes can be employed for more nuanced and complex AI interactions. These techniques allow you to guide the AI through sophisticated reasoning processes and achieve higher-quality outputs.
+
+            ## Advanced Pattern Reference
+
+            **Few-Shot Grading Loop**
+            - **When to Use:** Boost quality until score ≥ n
+            - **How:** Prompt → Model drafts → Model grades draft → If < threshold, improve & retry
+            - **Benefits:** Iterative feedback loop refines output until it meets defined quality standards
+
+            **Step-Back Prompting**
+            - **When to Use:** Complex strategy/creative tasks
+            - **How:** "First, outline the high-level approach. Then dive into details."
+            - **Benefits:** Encourages strategic planning before execution
+
+            **Tree-of-Thought (ToT)**
+            - **When to Use:** Branching reasoning problems
+            - **How:** Explore multiple reasoning paths, evaluate them, prune less promising ones, converge on best solution
+            - **Benefits:** Comprehensive exploration of solution space
+
+            **Self-Consistency**
+            - **When to Use:** Reduce CoT variance for critical tasks
+            - **How:** Sample multiple Chain-of-Thought paths (e.g., 5 distinct paths), then pick majority answer
+            - **Benefits:** Reduces variance and improves reliability
+
+            **Power-Prompt Filter**
+            - **When to Use:** Auto-refine a rough prompt
+            - **How:** Prefix with "Improve this prompt for clarity and completeness: [your original prompt]"
+            - **Benefits:** AI itself refines your input prompt
+
+            **XML Tagging**
+            - **When to Use:** Claude long-context navigation
+            - **How:** Wrap sections in XML tags like \`<section id="requirements">Your content</section>\`
+            - **Benefits:** Helps model navigate and reference specific parts of long prompts efficiently
+
+            ## Implementation Tips
+
+            - **Combine Patterns:** You can nest frameworks (e.g., CoT within RACE)
+            - **Chain Prompts:** For very complex workflows, use output of one prompt as input for the next
+            - **Modular Approach:** Think LEGO—not monoliths
+            - **Iterate and Refine:** Test patterns and adjust based on results
+          `
+        },
+        {
+          id: "slide-3-12",
+          title: "LLM Parameters Reference",
+          content: `
+            Understanding and adjusting the parameters, or "knobs," of the underlying Large Language Model (LLM) allows for fine-tuning the AI's behavior to suit specific tasks. Here's your comprehensive reference guide for controlling AI output characteristics.
+
+            ## Core Parameters
+
+            **Temperature (0-2)**
+            - **Effect:** Controls randomness and creativity
+            - **Low (0.2):** Factual documentation, precise code generation
+            - **Medium (0.7):** Creative brainstorming, idea generation
+            - **High (1.5+):** Experimental creative writing, unconventional solutions
+            - **Quick Rule:** ↓ for facts, ↑ for creativity
+
+            **Top_p (0-1)**
+            - **Effect:** Diversity cutoff for token selection
+            - **Low (0.1):** Very focused, deterministic output
+            - **Medium (0.5):** Balanced diversity and focus
+            - **High (0.9):** More diverse vocabulary and phrasing
+            - **Usage:** Can be paired with temperature or set independently
+
+            **Top_k (1-∞)**
+            - **Effect:** Token count ceiling for predictions
+            - **Low (10):** Very constrained vocabulary choices
+            - **Medium (50):** Balanced selection pool
+            - **High (100+):** Maximum vocabulary diversity
+            - **Note:** Supported by Google models, limits prediction to top k most likely tokens
+
+            **Max_tokens (integer)**
+            - **Effect:** Hard length stop for output
+            - **Usage:** Control output length, manage costs, improve response latency
+            - **Strategy:** Set appropriate limits based on expected output size
+            - **Budget:** Lower values reduce API costs
+
+            **Stop (strings[])**
+            - **Effect:** Early cut-off triggers
+            - **Usage:** List of strings that immediately halt generation
+            - **Benefits:** Trim tool chatter, prevent unwanted continuation
+            - **Example:** ["END", "---", "STOP"] to create clean boundaries
+
+            ## Parameter Strategies
+
+            **For Code Generation:**
+            - Temperature: 0.2-0.4 (low variance, reliable patterns)
+            - Top_p: 0.5-0.7 (focused but not overly constrained)
+            - Max_tokens: Based on expected code length
+
+            **For Creative Tasks:**
+            - Temperature: 0.7-1.2 (higher creativity and variation)
+            - Top_p: 0.8-0.9 (diverse vocabulary and phrasing)
+            - Top_k: 50-100 (broad selection pool)
+
+            **For Factual Content:**
+            - Temperature: 0.1-0.3 (maximum consistency)
+            - Top_p: 0.3-0.5 (focused on most likely accurate responses)
+            - Stop: Include terms that might indicate uncertainty
           `
         }
       ]
