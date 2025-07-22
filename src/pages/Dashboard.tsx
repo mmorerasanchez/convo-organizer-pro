@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import ProjectList from '@/components/dashboard/ProjectList';
-import { BarChart } from 'lucide-react';
+import { BarChart, LayoutDashboard } from 'lucide-react';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProjects, fetchConversations } from '@/lib/api';
@@ -50,7 +50,8 @@ const Dashboard = () => {
   const tabs = [
     {
       value: 'overview',
-      label: 'Overview'
+      label: 'Overview',
+      icon: <LayoutDashboard size={14} />
     },
     {
       value: 'analytics',
