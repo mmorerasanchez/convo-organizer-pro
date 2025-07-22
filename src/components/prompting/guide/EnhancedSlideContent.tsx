@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -229,7 +230,7 @@ const EnhancedSlideContent = ({
       { regex: /\*\*(.+?)\*\*/g, component: (match: string) => <strong className="text-foreground font-semibold">{match}</strong> },
       { regex: /\*(.+?)\*/g, component: (match: string) => <em className="italic">{match}</em> },
       { regex: /`(.+?)`/g, component: (match: string) => <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground border">{match}</code> },
-      { regex: /\[(.+?)\]\((.+?)\)/g, component: (match: string, text: string, url: string) => <a href={url} className="text-primary hover:underline font-medium" target="_blank" rel="noopener noreferrer">{text}</a> }
+      { regex: /\[(.+?)\]\((.+?)\)/g, component: (text: string, url: string) => <a href={url} className="text-primary hover:underline font-medium" target="_blank" rel="noopener noreferrer">{text}</a> }
     ];
 
     let result: React.ReactNode[] = [text];
@@ -250,13 +251,17 @@ const EnhancedSlideContent = ({
               const text = parts[i];
               const url = parts[i + 1];
               if (text && url) {
-                newResult.push(React.createElement('a', {
-                  key: `link-${index}-${i}`,
-                  href: url,
-                  className: 'text-primary hover:underline font-medium',
-                  target: '_blank',
-                  rel: 'noopener noreferrer'
-                }, text));
+                newResult.push(
+                  <a 
+                    key={`link-${index}-${i}`}
+                    href={url}
+                    className="text-primary hover:underline font-medium"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {text}
+                  </a>
+                );
                 i++; // Skip next part as it's the URL
               }
             } else {
