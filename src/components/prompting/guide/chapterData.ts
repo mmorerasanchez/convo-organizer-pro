@@ -921,56 +921,516 @@ export const chapters: Chapter[] = [
     },
     {
       id: "chapter-4",
-      title: "Best Practices in Prompt Design",
-      description: "Guidelines for crafting effective prompts",
+      title: "Designing Engaging Interfaces",
+      description: "Create stunning, intuitive user interfaces that captivate and engage your audience through strategic design choices",
       slides: [
         {
           id: "slide-4-1",
-          title: "Start Simple and Iterate",
+          title: "Designing Engaging Interfaces",
           content: `
-            Begin with a simple prompt and gradually increase its complexity by adding necessary context or examples. 
-            This iterative process helps identify which elements most influence the model's performance.
-            
-            ## Tip
-            
-            Experiment with different variations and record the outputs to determine which approach yields the best results.
+            Designing intuitive and visually appealing interfaces is crucial for user engagement and product success. This chapter explores how Lovable empowers you to create stunning designs that not only look beautiful but also provide exceptional user experiences. We'll cover everything from selecting the right aesthetic to incorporating advanced visual elements and ensuring accessibility.
+
+            Creating exceptional interfaces requires more than just making things look pretty—it's about understanding your users, communicating effectively with AI, and leveraging powerful design tools to bring your vision to life.
+
+            ## What You'll Master
+
+            - **Design Style Selection**: Choosing the perfect aesthetic for your application's purpose and audience
+            - **Effective Communication**: Conveying your design vision clearly to Lovable's AI
+            - **Visual Editing Features**: Leveraging powerful tools for precision design control
+            - **Component Strategy**: Building scalable, consistent design systems
+            - **Mobile & Accessibility**: Ensuring your designs work for everyone, everywhere
+            - **Motion & Animation**: Adding life and engagement through thoughtful interactions
+
+            ## The Design-First Mindset
+
+            Great design isn't an afterthought—it's integral to your product's success. With Lovable, you can achieve professional-grade design results while maintaining focus on user experience and functionality.
+
+            ## Your Design Journey
+
+            From initial style selection to advanced animation integration, this chapter will transform how you approach interface design, enabling you to create applications that users love to interact with.
           `
         },
         {
           id: "slide-4-2",
-          title: "Be Specific and Concise",
+          title: "Design Style Selection: Expressive & Fun",
           content: `
-            Clarity is key. Avoid ambiguous or overly complex language. Instead, focus on clear and direct 
-            instructions that leave little room for misinterpretation.
-            
-            ## Advice
-            
-            Instead of saying "Write something about AI," specify "Write a 200-word summary on the impact of AI in healthcare."
+            Choosing the right design style early in your project sets the foundation for all subsequent design decisions. Lovable offers several distinct aesthetic approaches, each optimized for different types of applications and target audiences.
+
+            ## Expressive & Fun Style
+
+            This vibrant design approach is perfect for applications that need to feel approachable, energetic, and user-friendly. It's particularly effective for consumer-facing products, educational platforms, creative tools, and any application where user delight is a primary objective.
+
+            ## Key Characteristics
+
+            - **Vibrant Color Palettes**: Bold, cheerful colors that create emotional connection
+            - **Playful Typography**: Friendly, rounded fonts that feel approachable
+            - **Dynamic Layouts**: Asymmetrical compositions that create visual interest
+            - **Interactive Elements**: Buttons and components that invite exploration
+            - **Personality-Rich Icons**: Custom illustrations and iconography that convey character
+
+            ## Perfect Applications
+
+            - **Dashboards & Analytics**: Making data visualization engaging and accessible
+            - **Consumer Apps**: Social platforms, entertainment, lifestyle applications
+            - **Educational Tools**: Learning platforms that need to maintain user engagement
+            - **Creative Platforms**: Design tools, content creation, artistic communities
+            - **Productivity Apps**: Task management tools that aim to make work enjoyable
+
+            ## Design Goals
+
+            The Expressive & Fun style prioritizes user engagement, emotional connection, and creating memorable experiences. Users should feel welcomed, energized, and motivated to explore your application's features.
+
+            ## Implementation Strategy
+
+            When communicating this style to Lovable's AI, emphasize emotional descriptors like "vibrant," "playful," "energetic," and "delightful." Reference successful consumer applications and focus on creating interfaces that spark joy.
           `
         },
         {
           id: "slide-4-3",
-          title: "Provide Relevant Examples",
+          title: "Design Style Selection: Premium & Sleek, Futuristic & Cinematic",
           content: `
-            When using few-shot prompting, choose examples that are as close as possible to the task at hand. 
-            This helps reduce confusion and guides the model toward producing consistent outputs.
-            
-            ## Best Practice
-            
-            Use consistent formatting in your examples so that the pattern is unmistakable.
+            Different applications require different design approaches. Understanding when and how to apply sophisticated design styles can elevate your product and align it perfectly with your brand positioning and user expectations.
+
+            ## Premium & Sleek Style
+
+            This sophisticated approach conveys professionalism, exclusivity, and high quality. It's ideal for applications that need to establish trust, credibility, and premium positioning in the market.
+
+            **Characteristics:**
+            - **Refined Color Palettes**: Muted, sophisticated colors with careful accent usage
+            - **Clean Typography**: Professional, readable fonts with excellent hierarchy
+            - **Minimal Layouts**: Generous white space and focused attention
+            - **Subtle Interactions**: Elegant animations and transitions
+            - **Quality Materials**: Design elements that suggest premium craftsmanship
+
+            **Best For:** Financial services, luxury brands, professional tools, high-end e-commerce, consulting services
+
+            ## Futuristic & Cinematic Style
+
+            This cutting-edge aesthetic creates immersive, high-tech experiences that feel advanced and visually striking. Perfect for applications that want to position themselves at the forefront of innovation.
+
+            **Characteristics:**
+            - **Dark Themes**: Deep backgrounds with strategic bright accents
+            - **Glowing Elements**: Neon colors, light effects, and luminous highlights
+            - **Advanced Typography**: Futuristic fonts with technical precision
+            - **Layered Depth**: Complex visual hierarchies with dimensional effects
+            - **Motion Graphics**: Sophisticated animations that enhance the sci-fi aesthetic
+
+            **Best For:** Tech startups, gaming platforms, cryptocurrency applications, AI/ML tools, innovative software
+
+            ## Selection Strategy
+
+            Choose your style based on your target audience's expectations, your brand positioning, and the emotional response you want to create. Consider how your style choice will impact user trust, engagement, and overall perception of your product's quality.
           `
         },
         {
           id: "slide-4-4",
-          title: "Avoid Negative Instructions",
+          title: "Design Communication: Language & Terminology",
           content: `
-            Rather than telling the model what not to do, focus on instructing it on what should be done. 
-            Negative instructions (e.g., "Do not ask for personal information") can sometimes be ignored. 
-            Instead, frame your prompt with positive instructions.
-            
-            ## Example Improvement
-            
-            "Provide a list of trending movies without referencing personal data" is clearer than a list of prohibitions.
+            Effectively communicating your design vision to Lovable's AI is crucial for achieving the desired aesthetic outcome. Beyond simply describing structural elements, using the right language and terminology can significantly enhance the AI's understanding of your design goals.
+
+            ## Use Emotional Language
+
+            When describing your desired design, go beyond mere functional descriptions. Emotional and evocative language helps the AI understand the feeling and user experience you're aiming to create.
+
+            **Effective Emotional Descriptors:**
+            - **"Delightful"**: Creates experiences that surprise and please users
+            - **"Bold"**: Confident design choices that make strong statements
+            - **"Elegant"**: Sophisticated, refined approaches with attention to detail
+            - **"Tactile"**: Interfaces that feel responsive and physically engaging
+            - **"Warm"**: Welcoming, approachable design that puts users at ease
+            - **"Crisp"**: Clean, precise design with sharp attention to detail
+
+            ## Design Buzzwords & Terminology
+
+            Familiarizing yourself with specific design terminology allows you to communicate more precisely with the AI. Using established design language helps ensure your vision is interpreted correctly.
+
+            **Movement & Style Terms:**
+            - **"Minimalist"**: Clean, uncluttered design with focus on essential elements
+            - **"Skeuomorphic"**: Design that mimics real-world materials and textures
+            - **"Material Design"**: Google's design system emphasizing depth and motion
+            - **"Neo-brutalism"**: Bold, raw design with stark contrasts and geometric shapes
+            - **"Glassmorphism"**: Translucent design elements with frosted glass effects
+
+            ## Communication Best Practices
+
+            - **Reference Popular Applications**: "Make it feel like Stripe's dashboard" or "Similar to Linear's clean interface"
+            - **Describe User Feelings**: "Users should feel confident and in control"
+            - **Specify Interactions**: "Buttons should feel satisfying to click"
+            - **Define Atmosphere**: "Create a sense of premium quality and attention to detail"
+
+            ## Combining Approaches
+
+            The most effective design communication combines emotional language with specific terminology, creating rich, comprehensive descriptions that guide the AI toward your exact vision.
+          `
+        },
+        {
+          id: "slide-4-5",
+          title: "Visual Editing Features: Direct Editing Capabilities",
+          content: `
+            Lovable provides powerful visual editing capabilities that allow you to refine and customize your designs directly within the interface. These features enable precise control over your design elements, often without requiring additional AI interactions or credits.
+
+            ## What You See Is What You Get (WYSIWYG)
+
+            Lovable's visual editor operates on an intuitive "what you see is what you get" principle, allowing you to make immediate changes to your interface and see results in real-time.
+
+            ## Direct Text Editing
+
+            - **Click to Edit**: Simply click on any text element to modify content instantly
+            - **Inline Editing**: Change headlines, descriptions, button labels, and form fields directly
+            - **Real-time Updates**: See changes applied immediately without page refreshes
+            - **Content Management**: Update copy, messaging, and informational text effortlessly
+
+            ## Button & Component Customization
+
+            - **Color Changes**: Modify button colors using pre-defined Tailwind CSS palettes
+            - **Size Adjustments**: Alter button dimensions and padding with visual controls
+            - **State Variations**: Preview and edit hover, active, and disabled states
+            - **Style Modifications**: Switch between button styles (filled, outlined, ghost) instantly
+
+            ## Image Management
+
+            - **Upload & Replace**: Drag and drop new images to replace existing ones
+            - **Instant Integration**: New images are automatically optimized and integrated
+            - **Format Support**: Support for various image formats including PNG, JPG, SVG
+            - **Responsive Handling**: Images automatically adapt to different screen sizes
+
+            ## Benefits of Direct Editing
+
+            - **Speed**: Make quick adjustments without generating new AI prompts
+            - **Efficiency**: Preserve AI credits for complex design changes
+            - **Precision**: Achieve pixel-perfect results through direct manipulation
+            - **Iteration**: Rapidly test different variations and combinations
+
+            ## When to Use Direct Editing
+
+            Direct editing is perfect for fine-tuning, content updates, color adjustments, and minor layout modifications. For major structural changes or new component creation, combine direct editing with AI prompts for optimal results.
+          `
+        },
+        {
+          id: "slide-4-6",
+          title: "Visual Editing Features: Navigation & Selection",
+          content: `
+            Mastering Lovable's navigation and selection tools is essential for efficient design work. These features provide precise control over your interface elements and enable sophisticated design refinements.
+
+            ## Element Selection & Hierarchy
+
+            Understanding how to navigate your design's structure allows you to make targeted modifications and understand the relationships between different components.
+
+            **Selection Techniques:**
+            - **Direct Element Selection**: Click on any component to select it immediately
+            - **Parent Navigation**: Click on an element, then its parent to move up the hierarchy
+            - **Nested Component Access**: Navigate through complex layouts systematically
+            - **Multi-level Selection**: Select broader sections by moving up the component tree
+
+            ## Real-time Font Previews
+
+            Typography changes are immediately visible, allowing you to experiment with different typefaces and see their impact on your overall design.
+
+            **Font Features:**
+            - **Style Previews**: See different font families applied instantly
+            - **Weight Variations**: Toggle between light, regular, bold, and other weights
+            - **Size Adjustments**: Modify text size with immediate visual feedback
+            - **Spacing Controls**: Adjust line height and letter spacing in real-time
+
+            ## Live Color Changes
+
+            Color modifications provide instant feedback, enabling rapid exploration of different color schemes and palettes.
+
+            **Color Capabilities:**
+            - **Palette Integration**: Access pre-defined Tailwind CSS color palettes
+            - **Custom Colors**: Apply specific hex, RGB, or HSL values
+            - **Theme Consistency**: Maintain color harmony across your application
+            - **Accessibility Checking**: Ensure sufficient contrast ratios automatically
+
+            ## Workflow Integration
+
+            These visual tools work seamlessly with AI-powered design generation, creating a hybrid workflow that combines the speed of AI with the precision of manual editing.
+
+            **Best Practices:**
+            - **Start with AI**: Use prompts for major layout and component generation
+            - **Refine Visually**: Use direct editing for precise adjustments and polish
+            - **Iterate Quickly**: Combine both approaches for rapid design evolution
+            - **Save Frequently**: Document successful combinations for future reference
+
+            ## Advanced Navigation Tips
+
+            - **Keyboard Shortcuts**: Learn common shortcuts for faster navigation
+            - **Design System Awareness**: Understand how changes affect related components
+            - **Responsive Preview**: Check how modifications appear across device sizes
+          `
+        },
+        {
+          id: "slide-4-7",
+          title: "Component Strategy: Think in Design Systems",
+          content: `
+            Approaching design with a systematic, component-based mindset is one of the most effective strategies for creating consistent, scalable, and maintainable interfaces with Lovable. This methodology promotes reusability and ensures your application feels cohesive across all screens and interactions.
+
+            ## The Design System Mindset
+
+            Think of your interface as a collection of building blocks rather than individual pages. This modular approach, similar to assembling Lego blocks, allows you to create complex layouts from simple, reusable components.
+
+            ## Atomic Design Principles
+
+            Break down your interface into hierarchical levels of components:
+
+            **Atoms (Basic Elements):**
+            - **Buttons**: Primary, secondary, text, icon buttons
+            - **Form Fields**: Input boxes, dropdowns, checkboxes, radio buttons
+            - **Typography**: Headings, body text, captions, labels
+            - **Icons**: Action icons, status indicators, decorative elements
+            - **Colors & Spacing**: Consistent color palette and spacing scales
+
+            **Molecules (Simple Combinations):**
+            - **Cards**: Content containers with headers, body, and actions
+            - **Form Groups**: Label + input + validation message combinations
+            - **Navigation Items**: Logo + menu + user profile combinations
+            - **List Items**: Icon + text + action button combinations
+
+            **Organisms (Complex Components):**
+            - **Headers**: Complete navigation sections with branding and user controls
+            - **Forms**: Complete input forms with validation and submission
+            - **Data Tables**: Full-featured tables with sorting, filtering, and actions
+            - **Dashboards**: Complex layouts combining multiple data presentations
+
+            ## Benefits of Component Thinking
+
+            - **Consistency**: Uniform appearance and behavior across your application
+            - **Efficiency**: Reuse components rather than recreating similar elements
+            - **Scalability**: Easy to extend and modify as your application grows
+            - **Maintenance**: Changes to base components propagate throughout the system
+            - **Collaboration**: Clear component vocabulary for team communication
+
+            ## Implementation with Lovable
+
+            When describing components to Lovable's AI, reference this modular approach: "Create a card component with an image, title, description, and action button that we can reuse throughout the application."
+
+            ## Design System Evolution
+
+            Start with basic components and gradually build complexity. Document successful patterns and component combinations for future projects and team members.
+          `
+        },
+        {
+          id: "slide-4-8",
+          title: "Component Strategy: Reference Images",
+          content: `
+            Visual references are one of the most powerful tools for communicating your design vision to Lovable's AI. Providing concrete examples eliminates ambiguity and ensures the AI understands exactly the kind of interface elements you want to create.
+
+            ## The Power of Visual Communication
+
+            Images communicate design intent more effectively than words alone. A single reference image can convey style, layout, proportions, color relationships, and interaction patterns that might take paragraphs to describe.
+
+            ## Effective Reference Sources
+
+            **Design Platform Screenshots:**
+            - **Figma Designs**: Screenshot specific components or sections from Figma projects
+            - **Dribbble & Behance**: High-quality design examples from the design community
+            - **UI Design Libraries**: Component libraries and design system documentation
+
+            **Real Application Examples:**
+            - **Linear**: Clean, minimal interfaces with excellent typography and spacing
+            - **Stripe**: Professional, sophisticated design with clear information hierarchy
+            - **Notion**: Flexible, content-focused layouts with smart component organization
+            - **Airbnb**: User-friendly, accessible design with strong visual hierarchy
+
+            **Component Inspiration:**
+            - **21st.dev**: Excellent source for modern component designs and patterns
+            - **Component Libraries**: Material-UI, Ant Design, Chakra UI examples
+            - **Design Systems**: Apple Human Interface Guidelines, Google Material Design
+
+            ## Reference Best Practices
+
+            **Focus on Specific Elements:**
+            - **Highlight Sections**: Circle or annotate the specific parts you want to emulate
+            - **Component Focus**: Reference individual components rather than entire pages
+            - **Style Elements**: Point out specific typography, color usage, or spacing patterns
+
+            **Provide Context:**
+            - **Explain Why**: Describe what you like about the reference
+            - **Adaptation Notes**: Mention how it should be adapted for your specific use case
+            - **Style Translation**: Explain how the reference should fit your overall design direction
+
+            ## Communication Framework
+
+            When using references, combine them with clear descriptions: "Create a dashboard card similar to this Linear component, but adapt the color scheme to match our Premium & Sleek style and include our specific data fields."
+
+            ## Building a Reference Library
+
+            Collect successful design patterns and components in a personal library. This accelerates future projects and helps maintain consistency across your design work.
+          `
+        },
+        {
+          id: "slide-4-9",
+          title: "Mobile & Accessibility: Mobile-First Approach",
+          content: `
+            In today's digital landscape, mobile optimization isn't optional—it's essential. With mobile devices accounting for over half of all web traffic, adopting a mobile-first approach ensures your application provides excellent experiences on the devices your users actually use.
+
+            ## The Mobile-First Imperative
+
+            Starting with mobile constraints forces you to prioritize essential content and functionality, often resulting in cleaner, more focused designs that work better across all devices.
+
+            ## Mobile-First Principles
+
+            **Content Prioritization:**
+            - **Essential First**: Lead with the most important information and actions
+            - **Progressive Enhancement**: Add features and content as screen space increases
+            - **Touch-Friendly Design**: Ensure all interactive elements are easily tappable
+            - **Readable Typography**: Use font sizes that don't require zooming
+
+            **Layout Optimization:**
+            - **Single Column Layouts**: Stack content vertically for easy scrolling
+            - **Full-Width Elements**: Input fields should expand to fill available width
+            - **Generous Spacing**: Provide adequate space between interactive elements
+            - **Thumb-Friendly Navigation**: Place important actions within easy reach
+
+            ## Lovable's Mobile Optimization
+
+            Lovable makes mobile optimization straightforward through intelligent responsive design generation and specific mobile-focused prompts.
+
+            **One-Prompt Optimization:**
+            "Optimize this entire page for mobile devices" - Lovable will automatically adjust layouts, spacing, typography, and interactions for mobile screens.
+
+            **Specific Mobile Features:**
+            - **Responsive Breakpoints**: Automatic layout adjustments for different screen sizes
+            - **Touch Targets**: Buttons and links sized appropriately for finger taps
+            - **Mobile Navigation**: Hamburger menus, bottom tabs, and swipe gestures
+            - **Performance Optimization**: Fast loading times and smooth scrolling
+
+            ## Mobile Design Best Practices
+
+            - **Test Early and Often**: Preview designs on actual mobile devices
+            - **Consider Context**: Mobile users often have different needs and constraints
+            - **Optimize Loading**: Ensure fast performance on mobile networks
+            - **Simplify Navigation**: Reduce complexity and focus on core user flows
+
+            ## Cross-Device Consistency
+
+            While optimizing for mobile, maintain brand consistency and core functionality across all device sizes. Users should feel they're using the same application regardless of their device.
+          `
+        },
+        {
+          id: "slide-4-10",
+          title: "Mobile & Accessibility: Accessibility Compliance",
+          content: `
+            Building accessible applications ensures your product can be used effectively by people with diverse abilities and needs. Accessibility isn't just about compliance—it's about creating inclusive experiences that work for everyone, often resulting in better usability for all users.
+
+            ## The Universal Design Advantage
+
+            Accessible design benefits everyone, not just users with disabilities. Features like high contrast ratios, clear navigation, and keyboard support improve the experience for users in various contexts—from bright sunlight to hands-free situations.
+
+            ## Web Content Accessibility Guidelines (WCAG)
+
+            WCAG provides the international standard for web accessibility, organized around four key principles:
+
+            **Perceivable:**
+            - **Color Contrast**: Sufficient contrast ratios between text and background colors
+            - **Alternative Text**: Descriptive alt text for images and visual content
+            - **Scalable Text**: Content that remains usable when text size is increased
+            - **Visual Indicators**: Clear focus states and visual feedback for interactions
+
+            **Operable:**
+            - **Keyboard Navigation**: All functionality accessible via keyboard
+            - **Touch Targets**: Buttons and links large enough for easy interaction
+            - **Timing Controls**: Users can control or extend time limits
+            - **Seizure Prevention**: Avoid content that flashes rapidly
+
+            **Understandable:**
+            - **Clear Language**: Simple, straightforward content and instructions
+            - **Consistent Navigation**: Predictable interface patterns throughout
+            - **Error Prevention**: Clear error messages and correction guidance
+            - **Form Labels**: Descriptive labels and instructions for all form elements
+
+            **Robust:**
+            - **Semantic HTML**: Proper HTML structure that works with assistive technologies
+            - **Screen Reader Support**: Content that can be read aloud effectively
+            - **Cross-Platform Compatibility**: Functionality across different devices and browsers
+
+            ## Lovable's Accessibility Features
+
+            Lovable can automatically implement accessibility best practices when you explicitly request WCAG compliance:
+
+            **Automatic Implementations:**
+            - **Contrast Adjustments**: AI automatically ensures sufficient color contrast ratios
+            - **Screen Reader Tags**: Proper ARIA labels and semantic HTML structure
+            - **Keyboard Navigation**: Logical tab order and keyboard-accessible interactions
+            - **Focus Management**: Clear visual indicators for keyboard navigation
+
+            ## Implementation Strategy
+
+            Include accessibility requirements in your prompts: "Ensure this form meets WCAG 2.1 AA standards with proper labels, contrast ratios, and keyboard navigation support."
+
+            ## Testing & Validation
+
+            Regularly test your application with accessibility tools and, when possible, real users with diverse abilities to ensure your implementation truly serves everyone effectively.
+          `
+        },
+        {
+          id: "slide-4-11",
+          title: "Motion & Animation: Animation Integration",
+          content: `
+            Strategic use of motion and animation can transform a static interface into an engaging, intuitive experience that guides users, provides feedback, and creates delight. Lovable excels at implementing sophisticated animation effects that enhance usability while maintaining performance.
+
+            ## The Purpose of Motion in Design
+
+            Effective animation serves specific purposes beyond mere visual appeal:
+
+            **Functional Animation:**
+            - **State Changes**: Visual feedback when buttons are pressed or forms are submitted
+            - **Loading Indicators**: Progress bars and spinners that communicate system status
+            - **Transitions**: Smooth movements between different interface states
+            - **Guided Attention**: Subtle animations that direct user focus to important elements
+
+            **Emotional Animation:**
+            - **Delight Moments**: Small animations that surprise and please users
+            - **Brand Expression**: Motion that reinforces your application's personality
+            - **Engagement**: Interactive elements that encourage exploration
+            - **Celebration**: Success animations that acknowledge user achievements
+
+            ## Animation Principles
+
+            **Timing & Easing:**
+            - **Natural Movement**: Animations should feel organic, not mechanical
+            - **Appropriate Duration**: Fast enough to feel responsive, slow enough to be perceived
+            - **Easing Curves**: Use acceleration and deceleration for realistic motion
+            - **Consistent Timing**: Establish timing patterns across your interface
+
+            **Direction & Choreography:**
+            - **Meaningful Direction**: Animation direction should match user expectations
+            - **Choreographed Sequences**: Multiple elements should move in harmony
+            - **Spatial Relationships**: Animations should respect the interface's spatial logic
+            - **Entry & Exit**: Clear patterns for how elements appear and disappear
+
+            ## Communicating Animation to Lovable
+
+            When describing animations to Lovable's AI, be specific about direction, timing, and purpose:
+
+            **Effective Animation Descriptions:**
+            - **"Slide in from the right with a gentle bounce"**
+            - **"Fade in gradually over 300 milliseconds"**
+            - **"Scale up slightly on hover with a smooth transition"**
+            - **"Rotate the loading spinner continuously with ease-in-out timing"**
+
+            ## Animation Libraries & Inspiration
+
+            **Technical References:**
+            - **Motion.dev**: Advanced web animation library with sophisticated effects
+            - **P5.js**: Creative coding platform for interactive visual effects
+            - **CSS Animations**: Built-in browser capabilities for smooth transitions
+
+            **Design Inspiration:**
+            - **Interface Animations**: Study how leading applications use motion effectively
+            - **Micro-interactions**: Small animations that provide feedback and delight
+            - **Loading States**: Creative approaches to communicating wait times
+
+            ## Performance Considerations
+
+            Well-implemented animations enhance performance perception by providing immediate feedback while background processes complete. Ensure animations feel smooth and don't interfere with application functionality.
+
+            ## Best Practices
+
+            - **Respect User Preferences**: Consider users who prefer reduced motion
+            - **Progressive Enhancement**: Ensure functionality works without animation
+            - **Test Across Devices**: Verify performance on various hardware capabilities
+            - **Purposeful Implementation**: Every animation should serve a clear purpose
           `
         }
       ]
