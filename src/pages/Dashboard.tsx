@@ -1,10 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import ProjectList from '@/components/dashboard/ProjectList';
 import { BarChart } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProjects, fetchConversations } from '@/lib/api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
@@ -15,6 +15,7 @@ import PageHeader from '@/components/common/PageHeader';
 
 const Dashboard = () => {
   const { user, loading: authLoading } = useRequireAuth();
+  const [activeTab, setActiveTab] = useState('overview');
   
   const { data: projects = [], isLoading: projectsLoading } = useQuery({
     queryKey: ['projects'],
@@ -65,7 +66,8 @@ const Dashboard = () => {
           title="Dashboard"
           description="Monitor your projects, conversations, and analytics at a glance"
           tabs={tabs}
-          activeTab="overview"
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
         />
         
         {isLoading ? (
@@ -74,7 +76,7 @@ const Dashboard = () => {
             <Skeleton className="h-64 w-full" />
           </div>
         ) : (
-          <Tabs defaultValue="overview" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsContent value="overview" className="space-y-0">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <RecentActivity conversations={sortedConversations} />
