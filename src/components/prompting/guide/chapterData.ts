@@ -10,10 +10,7 @@ export const chapters: Chapter[] = [
           id: "slide-1-1",
           title: "Welcome to Lovable",
           content: `
-            Welcome to the Lovable AI Development Playbook, your essential guide to harnessing the power of 
-            artificial intelligence to create exceptional products. In this chapter, we'll introduce you to 
-            Lovable, an innovative platform designed to transform your product development process, enabling 
-            you to build sophisticated AI-powered applications with unprecedented speed and efficiency.
+            Welcome to the Lovable AI Development Playbook, your essential guide to harnessing the power of artificial intelligence to create exceptional products. In this chapter, we'll introduce you to Lovable, an innovative platform designed to transform your product development process, enabling you to build sophisticated AI-powered applications with unprecedented speed and efficiency.
             
             ## What You'll Learn
             
@@ -27,9 +24,7 @@ export const chapters: Chapter[] = [
           id: "slide-1-2",
           title: "What is Lovable?",
           content: `
-            Lovable is more than just a development platform; it's a revolutionary AI-powered solution that 
-            empowers users to create full-stack web applications without writing a single line of code. 
-            Imagine describing your desired application in plain English and watching it materialize before your eyes.
+            Lovable is more than just a development platform; it's a revolutionary AI-powered solution that empowers users to create full-stack web applications without writing a single line of code. Imagine describing your desired application in plain English and watching it materialize before your eyes.
             
             ## Key Features
             
@@ -38,17 +33,14 @@ export const chapters: Chapter[] = [
             - **Streamlined Workflow**: From concept to deployment seamlessly
             - **Accessibility First**: Designed for innovators, entrepreneurs, and designers
             
-            This intuitive approach significantly lowers the barrier to entry, allowing you to build complex 
-            applications that would traditionally require a team of seasoned developers.
+            This intuitive approach significantly lowers the barrier to entry, allowing you to build complex applications that would traditionally require a team of seasoned developers.
           `
         },
         {
           id: "slide-1-3",
           title: "AI-Powered Platform",
           content: `
-            At its heart, Lovable leverages advanced AI to interpret your descriptions and generate functional code. 
-            This means you can articulate your vision, and the platform handles the intricate details of programming, 
-            database management, and UI design.
+            At its heart, Lovable leverages advanced AI to interpret your descriptions and generate functional code. This means you can articulate your vision, and the platform handles the intricate details of programming, database management, and UI design.
             
             ## How It Works
             
@@ -65,8 +57,7 @@ export const chapters: Chapter[] = [
           id: "slide-1-4",
           title: "Why Choose Lovable?",
           content: `
-            In today's fast-paced digital landscape, speed, efficiency, and accessibility are paramount. 
-            Lovable addresses these needs directly, offering compelling advantages over traditional development methods.
+            In today's fast-paced digital landscape, speed, efficiency, and accessibility are paramount. Lovable addresses these needs directly, offering compelling advantages over traditional development methods.
             
             ## Perfect For
             
@@ -75,16 +66,14 @@ export const chapters: Chapter[] = [
             - **Product Managers**: Who want to prototype quickly
             - **Designers**: Who want to bring concepts to life
             
-            Whether you're building your first application or your hundredth, Lovable provides the tools 
-            and capabilities to achieve your goals effectively.
+            Whether you're building your first application or your hundredth, Lovable provides the tools and capabilities to achieve your goals effectively.
           `
         },
         {
           id: "slide-1-5",
           title: "Speed & Efficiency",
           content: `
-            Lovable dramatically accelerates the development lifecycle, allowing you to transform abstract ideas 
-            into high-quality user interfaces and fully functional applications at an unprecedented pace.
+            Lovable dramatically accelerates the development lifecycle, allowing you to transform abstract ideas into high-quality user interfaces and fully functional applications at an unprecedented pace.
             
             ## Benefits
             
@@ -98,16 +87,14 @@ export const chapters: Chapter[] = [
             - **Traditional**: Weeks or months of development
             - **Lovable**: Hours or days from concept to deployment
             
-            This rapid development capability means you can iterate quickly, test concepts, and bring products 
-            to market much faster than ever before.
+            This rapid development capability means you can iterate quickly, test concepts, and bring products to market much faster than ever before.
           `
         },
         {
           id: "slide-1-6",
           title: "No-Code Empowerment",
           content: `
-            One of Lovable's most significant advantages is its commitment to no-code empowerment. You can build 
-            sophisticated AI products and complex web applications without needing to write any programming code.
+            One of Lovable's most significant advantages is its commitment to no-code empowerment. You can build sophisticated AI products and complex web applications without needing to write any programming code.
             
             ## What's Eliminated
             
@@ -129,9 +116,7 @@ export const chapters: Chapter[] = [
           id: "slide-1-7",
           title: "Core Capabilities",
           content: `
-            Lovable is designed to be a comprehensive solution for modern web application development. Its core 
-            capabilities span the entire spectrum of building and deploying applications, ensuring you have all 
-            the necessary tools within a unified environment.
+            Lovable is designed to be a comprehensive solution for modern web application development. Its core capabilities span the entire spectrum of building and deploying applications, ensuring you have all the necessary tools within a unified environment.
             
             ## Complete Development Suite
             
@@ -143,16 +128,14 @@ export const chapters: Chapter[] = [
             
             ## Unified Environment
             
-            Everything you need is integrated into a single platform, eliminating the need to juggle multiple 
-            tools and services.
+            Everything you need is integrated into a single platform, eliminating the need to juggle multiple tools and services.
           `
         },
         {
           id: "slide-1-8",
           title: "Full-Stack Development",
           content: `
-            With Lovable, you're not just building front-end websites; you're creating complete, full-stack web 
-            applications. This comprehensive approach ensures your applications are production-ready and scalable.
+            With Lovable, you're not just building front-end websites; you're creating complete, full-stack web applications. This comprehensive approach ensures your applications are production-ready and scalable.
             
             ## What You Can Build
             
@@ -164,8 +147,7 @@ export const chapters: Chapter[] = [
             
             ## Your AI Co-Pilot
             
-            The AI assistant functions as your constant co-pilot, providing intelligent suggestions and automating 
-            complex tasks, ensuring a smooth and efficient development experience from concept to deployment.
+            The AI assistant functions as your constant co-pilot, providing intelligent suggestions and automating complex tasks, ensuring a smooth and efficient development experience from concept to deployment.
             
             **Ready to start building?** Let's dive into the next chapter and begin creating your first application!
           `
