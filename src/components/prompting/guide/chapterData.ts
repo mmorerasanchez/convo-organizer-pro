@@ -3251,9 +3251,8 @@ Remember: The goal isn't just to build a successful product—it's to create las
   },
   {
     id: 'chapter-9',
-    title: 'Workflow Enhancement Add-ons',
+    title: '⚡ Workflow Enhancement Add-ons',
     description: 'Discover powerful browser extensions, external tool integrations, and add-ons that supercharge your Lovable development workflow.',
-    icon: '⚡',
     slides: [
       {
         id: 'slide-9-1',
@@ -3608,7 +3607,7 @@ Integrate powerful no-code backend platforms like N8N and Make to handle complex
 ## Integration Strategies
 
 **Webhook Implementation**
-```javascript
+\`\`\`javascript
 // Example webhook call from Lovable
 const triggerWorkflow = async (data) => {
   await fetch('https://your-n8n-instance.com/webhook/trigger', {
@@ -3617,7 +3616,7 @@ const triggerWorkflow = async (data) => {
     body: JSON.stringify(data)
   });
 };
-```
+\`\`\`
 
 **Benefits for Lovable Projects**
 - **Reduced Complexity**: Keep Lovable focused on UI/UX
@@ -3775,5 +3774,3 @@ These built-in integrations dramatically reduce development time and ensure reli
     ]
   }
 ];
-
-export { chapters };
