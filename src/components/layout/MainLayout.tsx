@@ -18,13 +18,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         <div className="flex flex-1">
           <SidebarNav />
           
-          <div className="flex flex-col flex-1">
+          <div className="flex flex-col flex-1 min-w-0">
             {/* Mobile header */}
             <MobileHeader />
 
-            {/* Desktop header */}
+            {/* Desktop header - now sticky */}
             <DesktopHeader />
             
+            {/* Main content with adjusted padding for fixed header */}
             <main className="flex-1 px-container py-section sm:px-section">
               <div className="mx-auto max-w-7xl">{children}</div>
             </main>
