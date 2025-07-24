@@ -17,7 +17,7 @@ const EmptyAnalyticsState: React.FC = () => {
     action: () => navigate('/conversations')
   }, {
     title: 'Upload Knowledge Files',
-    description: 'Build your knowledge base integrated with AI with documents and files',
+    description: 'Build your knowledge base integrated with AI, documents and files',
     icon: <FileText className="h-5 w-5" />,
     action: () => navigate('/projects')
   }];
