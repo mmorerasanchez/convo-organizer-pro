@@ -70,11 +70,8 @@ const TemplateLibrary: React.FC<TemplateLibraryProps> = ({
           {filteredTemplates.map(template => <TemplateCard key={template.id} template={template} />)}
         </div> : <div className="space-y-4">
           <div className="text-center p-8 bg-muted/20 rounded-lg border border-dashed">
-            <h3 className="text-lg font-medium mb-2">
-              {searchTerm ? 'No templates found' : 'No templates yet'}
-            </h3>
             <p className="text-muted-foreground">
-              {searchTerm ? "Try adjusting your search criteria" : "Create your first template to get started"}
+              {searchTerm ? "No templates found" : "No templates found. Create a new template to get started"}
             </p>
           </div>
           {!searchTerm && <div className="text-center">

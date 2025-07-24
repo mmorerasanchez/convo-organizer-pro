@@ -24,9 +24,8 @@ const ToolsEmptyState: React.FC<ToolsEmptyStateProps> = ({
   }
   return <div className="space-y-4">
       <div className="text-center p-8 bg-muted/20 rounded-lg border border-dashed">
-        <h3 className="text-lg font-medium mb-2">No tools yet</h3>
         <p className="text-muted-foreground">
-          Create your first tool to get started
+          No tools found. Create a new tool to get started
         </p>
       </div>
       

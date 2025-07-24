@@ -180,9 +180,9 @@ const SharedProjectDetail = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12 border rounded-lg bg-muted/40">
+              <div className="text-center p-8 bg-muted/20 rounded-lg border border-dashed">
                 <p className="text-muted-foreground">
-                  No conversations found in this project. Get started by creating a new conversation.
+                  No conversations found. Create a project first to get started
                 </p>
               </div>
             )}

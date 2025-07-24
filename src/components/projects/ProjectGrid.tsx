@@ -41,7 +41,7 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
     
     return (
       <div className="col-span-full text-center p-8 bg-muted/20 rounded-lg border border-dashed">
-        <p className="text-muted-foreground">No projects found.</p>
+        <p className="text-muted-foreground">No projects found. Create a project to get started</p>
       </div>
     );
   }

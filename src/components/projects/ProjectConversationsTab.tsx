@@ -47,18 +47,18 @@ const ProjectConversationsTab: React.FC<ProjectConversationsTabProps> = ({
           ))}
         </div>
       ) : (
-        <div className="text-center py-16 empty-state rounded-lg border">
-          <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">No conversations yet</h3>
-          <p className="text-muted-foreground mb-4">
-            Start adding conversations to this project
-          </p>
-          <NewConversationDialog projectId={projectId} trigger={
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Conversation
-            </Button>
-          } />
+        <div className="space-y-4">
+          <div className="text-center p-8 bg-muted/20 rounded-lg border border-dashed">
+            <p className="text-muted-foreground">No conversations found. Create a project first to get started</p>
+          </div>
+          <div className="text-center">
+            <NewConversationDialog projectId={projectId} trigger={
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Conversation
+              </Button>
+            } />
+          </div>
         </div>
       )}
     </div>

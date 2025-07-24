@@ -133,22 +133,27 @@ const Conversations = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 grid-pattern rounded-lg">
-            <h3 className="text-lg font-medium mb-2">No conversations found</h3>
-            <p className="text-muted-foreground mb-4">
-              {searchTerm || selectedTags.length > 0 
-                ? "Try changing your search or filters"
-                : "Start adding conversations to your projects"}
-            </p>
+          <div className="space-y-4">
+            <div className="text-center p-8 bg-muted/20 rounded-lg border border-dashed">
+              <p className="text-muted-foreground">
+                {searchTerm || selectedTags.length > 0 
+                  ? "No conversations found"
+                  : "No conversations found. Create a project first to get started"}
+              </p>
+            </div>
             {searchTerm || selectedTags.length > 0 ? (
-              <Button onClick={clearFilters}>Clear Filters</Button>
+              <div className="text-center">
+                <Button onClick={clearFilters}>Clear Filters</Button>
+              </div>
             ) : (
-              <NewConversationDialog trigger={
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Conversation
-                </Button>
-              } />
+              <div className="text-center">
+                <NewConversationDialog trigger={
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Conversation
+                  </Button>
+                } />
+              </div>
             )}
           </div>
         )}
