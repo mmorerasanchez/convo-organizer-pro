@@ -30,10 +30,18 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
     );
   }
 
-  if (projects.length === 0 && searchTerm) {
+  if (projects.length === 0) {
+    if (searchTerm) {
+      return (
+        <div className="col-span-full text-center py-8">
+          <p className="text-muted-foreground">No projects match your search</p>
+        </div>
+      );
+    }
+    
     return (
-      <div className="col-span-full text-center py-8">
-        <p className="text-muted-foreground">No projects match your search</p>
+      <div className="col-span-full text-center p-8 bg-muted/20 rounded-lg border border-dashed">
+        <p className="text-muted-foreground">No projects found.</p>
       </div>
     );
   }
