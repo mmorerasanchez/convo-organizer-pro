@@ -35,7 +35,7 @@ const EmptyAnalyticsState: React.FC = () => {
                   {action.icon}
                 </div>
                 <CardTitle className="text-sm font-medium text-center">
-                  {action.title}
+                  {action.title === 'Create Your First Project' ? 'Create a Project' : action.title}
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
