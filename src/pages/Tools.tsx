@@ -6,19 +6,37 @@ import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import MainLayout from '@/components/layout/MainLayout';
 import MyToolsTab from '@/components/tools/MyToolsTab';
-import ToolFinderTab from '@/components/tools/ToolFinderTab';
 import ModelSectionsTab from '@/components/tools/ModelSectionsTab';
+import TemplateLibrary from '@/components/templates/TemplateLibrary';
+import TemplatesControlBar from '@/components/templates/TemplatesControlBar';
+import CreateTemplateDialog from '@/components/templates/CreateTemplateDialog';
 import PageHeader from '@/components/common/PageHeader';
-import { Search, CodeSquare, Cpu } from 'lucide-react';
+import { FileCode, CodeSquare, Cpu } from 'lucide-react';
 
 const Tools = () => {
   useRequireAuth();
   const [activeTab, setActiveTab] = useState('my-tools');
   
+  // Templates-specific state
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState<'name' | 'created' | 'updated'>('name');
+  const [filterBy, setFilterBy] = useState('all');
+  
   const { data: tools = [], isLoading, error } = useQuery({
     queryKey: ['tools'],
     queryFn: fetchTools
   });
+
+  const handleCreateTemplate = () => {
+    setShowCreateDialog(true);
+  };
+
+  const resetFilters = () => {
+    setSearchTerm('');
+    setSortBy('name');
+    setFilterBy('all');
+  };
 
   const tabs = [
     {
@@ -32,10 +50,9 @@ const Tools = () => {
       icon: <Cpu className="h-4 w-4" />
     },
     {
-      value: 'tool-finder',
-      label: 'Tool Finder',
-      icon: <Search className="h-4 w-4" />,
-      disabled: true
+      value: 'templates',
+      label: 'Templates',
+      icon: <FileCode className="h-4 w-4" />
     }
   ];
 
@@ -63,10 +80,30 @@ const Tools = () => {
             <ModelSectionsTab />
           </TabsContent>
           
-          <TabsContent value="tool-finder" className="mt-0">
-            <ToolFinderTab />
+          <TabsContent value="templates" className="space-y-6 mt-0">
+            <TemplatesControlBar
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              filterBy={filterBy}
+              setFilterBy={setFilterBy}
+              resetFilters={resetFilters}
+              onCreateTemplate={handleCreateTemplate}
+            />
+            <TemplateLibrary 
+              onCreateTemplate={handleCreateTemplate}
+              searchTerm={searchTerm}
+              sortBy={sortBy}
+              filterBy={filterBy}
+            />
           </TabsContent>
         </Tabs>
+        
+        <CreateTemplateDialog 
+          open={showCreateDialog}
+          onOpenChange={setShowCreateDialog}
+        />
       </div>
     </MainLayout>
   );
