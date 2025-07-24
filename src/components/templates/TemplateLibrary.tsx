@@ -88,18 +88,24 @@ const TemplateLibrary: React.FC<TemplateLibraryProps> = ({
           ))}
         </div>
       ) : (
-        <div className="text-center py-16">
-          <h3 className="text-lg font-medium mb-2">
-            {searchTerm ? 'No templates found' : 'No templates yet'}
-          </h3>
-          <p className="text-muted-foreground mb-4">
-            {searchTerm 
-              ? "Try adjusting your search criteria"
-              : "Create your first template to get started"}
-          </p>
-          <Button onClick={onCreateTemplate}>
-            Create Template
-          </Button>
+        <div className="space-y-4">
+          <div className="text-center p-8 bg-muted/20 rounded-lg border border-dashed">
+            <h3 className="text-lg font-medium mb-2">
+              {searchTerm ? 'No templates found' : 'No templates yet'}
+            </h3>
+            <p className="text-muted-foreground">
+              {searchTerm 
+                ? "Try adjusting your search criteria"
+                : "Create your first template to get started"}
+            </p>
+          </div>
+          {!searchTerm && (
+            <div className="text-center">
+              <Button onClick={onCreateTemplate}>
+                Create Template
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
