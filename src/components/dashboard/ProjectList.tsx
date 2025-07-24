@@ -17,10 +17,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
     <Card className="col-span-1 lg:col-span-1">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-lg font-medium">Recent Projects</CardTitle>
-            <CardDescription>Your recently updated projects</CardDescription>
-          </div>
+          <CardTitle className="text-lg font-medium">Recent Projects</CardTitle>
           <Link to="/projects">
             <Button variant="ghost" size="sm" className="text-primary h-8 text-sm">
               View all

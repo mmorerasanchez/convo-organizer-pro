@@ -1,6 +1,8 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Conversation } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -12,7 +14,14 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ conversations }) => {
   return (
     <Card className="col-span-1">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-medium">Recent Activity</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg font-medium">Recent Activity</CardTitle>
+          <Link to="/prompting">
+            <Button variant="ghost" size="sm" className="text-primary h-8 text-sm">
+              Create a Prompt
+            </Button>
+          </Link>
+        </div>
       </CardHeader>
       <CardContent className="p-0">
         <div className="divide-y">
