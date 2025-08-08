@@ -105,6 +105,7 @@ export function SaveDialogContent({
             onProjectDescriptionChange={onNewProjectDescriptionChange}
             onBack={onHideNewProjectForm}
             disabled={isProcessing}
+            showHeader={true}
           />
         )}
       </div>

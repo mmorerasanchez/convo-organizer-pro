@@ -69,12 +69,13 @@ const NewProjectDialog: React.FC<NewProjectDialogProps> = ({
       open={isOpen}
       onOpenChange={setIsOpen}
       showCancel
+      isProcessing={isProcessing}
+      contentClassName="sm:max-w-[525px]"
       footer={
         <Button onClick={handleSubmit} disabled={isProcessing}>
           {isProcessing ? 'Creating...' : 'Create Project'}
         </Button>
       }
-      isProcessing={isProcessing}
     >
       <div className="space-y-4">
         <NewProjectForm

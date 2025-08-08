@@ -13,6 +13,7 @@ interface NewProjectFormProps {
   onProjectDescriptionChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onBack: () => void;
   disabled?: boolean;
+  showHeader?: boolean;
 }
 
 export function NewProjectForm({
@@ -21,24 +22,27 @@ export function NewProjectForm({
   onProjectNameChange,
   onProjectDescriptionChange,
   onBack,
-  disabled = false
+  disabled = false,
+  showHeader = false
 }: NewProjectFormProps) {
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={onBack}
-          disabled={disabled}
-          className="gap-1 px-2"
-        >
-          <ArrowLeft className="h-3 w-3" />
-          Back
-        </Button>
-        <Label className="text-base font-medium">Create New Project</Label>
-      </div>
+      {showHeader && (
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onBack}
+            disabled={disabled}
+            className="gap-1 px-2"
+          >
+            <ArrowLeft className="h-3 w-3" />
+            Back
+          </Button>
+          <Label className="text-base font-medium">Create New Project</Label>
+        </div>
+      )}
       
       <div className="space-y-2">
         <Label htmlFor="project-name">Project Name *</Label>
