@@ -119,6 +119,22 @@ const SharedProjectDetail = () => {
   return (
     <MainLayout>
       <div className="space-y-6">
+        <nav aria-label="Breadcrumb">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/projects">Projects</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{project?.name || 'Shared Project'}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </nav>
+        
         {isLoadingProject ? (
           <div className="space-y-4">
             <Skeleton className="h-10 w-1/3" />
@@ -127,9 +143,6 @@ const SharedProjectDetail = () => {
         ) : (
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Button variant="ghost" size="icon" onClick={() => navigate('/projects')}>
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
               <h1 className="text-3xl font-bold">{project?.name}</h1>
             </div>
             <p className="text-muted-foreground">{project?.description}</p>
