@@ -14,6 +14,7 @@ import ProjectDetailHeader from '@/components/projects/ProjectDetailHeader';
 import ProjectTabs from '@/components/projects/ProjectTabs';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from '@/components/ui/breadcrumb';
 
 const ProjectDetail = () => {
   useRequireAuth();
@@ -97,8 +98,23 @@ const ProjectDetail = () => {
   return (
     <MainLayout>
       <div className="space-y-6">
+        <nav aria-label="Breadcrumb">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/projects">Projects</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{project.name}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </nav>
         <ProjectDetailHeader project={project} isShared={isSharedProject} />
-        
+
         <ProjectTabs
           projectId={project.id}
           conversations={conversations}

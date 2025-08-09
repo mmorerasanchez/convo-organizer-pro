@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MessageCircle, Book, Link as LinkIcon, AlertCircle, Users } from 'lucide-react';
+import { MessageCircle, Book, Link as LinkIcon, AlertCircle, Users } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { fetchConversationsByProjectId, fetchProjectById, fetchKnowledgeByProjectId } from '@/lib/api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
@@ -16,6 +16,7 @@ import KnowledgeEmptyState from '@/components/knowledge/KnowledgeEmptyState';
 import NewKnowledgeDialog from '@/components/knowledge/NewKnowledgeDialog';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from '@/components/ui/breadcrumb';
 
 const SharedProjectDetail = () => {
   useRequireAuth();
