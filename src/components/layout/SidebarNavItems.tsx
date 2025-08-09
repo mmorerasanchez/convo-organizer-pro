@@ -7,9 +7,7 @@ import {
   CodeSquare, 
   Bot, 
   MessageSquare,
-  BarChart,
   LineChart,
-  UsersRound,
   ArrowUpRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -22,11 +20,21 @@ import {
   SidebarMenuButton
 } from '@/components/ui/sidebar';
 
-export const activeModules = [
+interface ModuleItem {
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+  path: string
+  external?: boolean
+}
+
+export const activeModules: ModuleItem[] = [
   { icon: Home, label: 'Dashboard', path: '/' },
   { icon: BookOpen, label: 'Projects', path: '/projects' },
   { icon: Bot, label: 'Prompting', path: '/prompting' },
   { icon: CodeSquare, label: 'Tools', path: '/tools' },
+];
+
+const getInTouchModules: ModuleItem[] = [
   { 
     icon: MessageSquare, 
     label: 'Feedback', 
@@ -41,11 +49,6 @@ export const activeModules = [
   }
 ];
 
-export const comingSoonModules = [
-  { icon: BarChart, label: 'Metrics', path: '/metrics' },
-  { icon: UsersRound, label: 'Agents', path: '/agents' },
-];
-
 interface SidebarNavItemsProps {
   onNavItemClick?: () => void;
 }
@@ -57,7 +60,7 @@ const SidebarNavItems: React.FC<SidebarNavItemsProps> = ({ onNavItemClick }) => 
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
-  const renderSidebarLinks = (items: typeof activeModules, disabled = false) => (
+  const renderSidebarLinks = (items: ModuleItem[], disabled = false) => (
     <SidebarMenu>
       {items.map((item) => (
         <SidebarMenuItem key={item.path}>
@@ -102,9 +105,9 @@ const SidebarNavItems: React.FC<SidebarNavItemsProps> = ({ onNavItemClick }) => 
       </SidebarGroup>
       
       <SidebarGroup>
-        <SidebarGroupLabel>Coming soon</SidebarGroupLabel>
+        <SidebarGroupLabel>Get in touch</SidebarGroupLabel>
         <SidebarGroupContent>
-          {renderSidebarLinks(comingSoonModules, true)}
+          {renderSidebarLinks(getInTouchModules)}
         </SidebarGroupContent>
       </SidebarGroup>
     </>

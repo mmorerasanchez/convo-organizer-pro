@@ -3,7 +3,7 @@ import React from 'react';
 import { SheetContent } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles } from 'lucide-react';
-import { activeModules, comingSoonModules } from './SidebarNavItems';
+
 import SidebarNavItems from './SidebarNavItems';
 
 interface MobileNavSheetProps {
