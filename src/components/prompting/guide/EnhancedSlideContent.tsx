@@ -291,7 +291,7 @@ const EnhancedSlideContent = ({
               <CardTitle className="text-xl">{title}</CardTitle>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={handleBookmarkToggle} className="shrink-0">
+              <Button variant="ghost" size="icon" onClick={handleBookmarkToggle} className="shrink-0" aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}>
                 {isBookmarked ? <BookmarkCheck className="h-4 w-4 text-primary" /> : <Bookmark className="h-4 w-4" />}
               </Button>
             </div>
@@ -318,19 +318,19 @@ const EnhancedSlideContent = ({
 
         <CardFooter className="flex justify-between pt-3">
           <div className="flex space-x-2">
-            <Button variant="outline" size="icon" onClick={onPrevChapter} disabled={chapterIndex === 0}>
+            <Button variant="outline" size="icon" onClick={onPrevChapter} disabled={chapterIndex === 0} aria-label="Previous chapter">
               <ChevronsLeft className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="icon" onClick={onPrevSlide} disabled={chapterIndex === 0 && slideIndex === 0}>
+            <Button variant="outline" size="icon" onClick={onPrevSlide} disabled={chapterIndex === 0 && slideIndex === 0} aria-label="Previous slide">
               <ChevronLeft className="h-4 w-4" />
             </Button>
           </div>
 
           <div className="flex space-x-2">
-            <Button variant="outline" size="icon" onClick={onNextSlide} disabled={chapterIndex === totalChapters - 1 && slideIndex === chapterSlidesCount - 1}>
+            <Button variant="outline" size="icon" onClick={onNextSlide} disabled={chapterIndex === totalChapters - 1 && slideIndex === chapterSlidesCount - 1} aria-label="Next slide">
               <ChevronRight className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="icon" onClick={onNextChapter} disabled={chapterIndex === totalChapters - 1}>
+            <Button variant="outline" size="icon" onClick={onNextChapter} disabled={chapterIndex === totalChapters - 1} aria-label="Next chapter">
               <ChevronsRight className="h-4 w-4" />
             </Button>
           </div>

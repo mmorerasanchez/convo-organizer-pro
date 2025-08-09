@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './useAuth';
 import { useRole } from './useRole';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 
 interface UseRequireAuthOptions {
   redirectUrl?: string;

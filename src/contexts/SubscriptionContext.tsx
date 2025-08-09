@@ -28,9 +28,24 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
     currentUsage: 0,
     limit: 10, // sensible default for UI until fetched
   });
+  // Simple retry wrapper for edge functions
+  const invokeWithRetry = async (fnName: string, options?: any, retries = 1) => {
+    let attempt = 0;
+    let lastError: any = null;
+    while (attempt <= retries) {
+      const { data, error } = await supabase.functions.invoke(fnName, options);
+      if (!error) return { data, error: null } as const;
+      lastError = error;
+      attempt++;
+      if (attempt <= retries) {
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+    return { data: null, error: lastError } as const;
+  };
 
   const fetchUsage = useCallback(async () => {
-    const { data, error } = await supabase.functions.invoke('usage-status');
+    const { data, error } = await invokeWithRetry('usage-status');
     if (error) {
       console.warn('usage-status error:', error);
       return;
@@ -51,7 +66,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, []);
 
   const fetchSubscription = useCallback(async () => {
-    const { data, error } = await supabase.functions.invoke('check-subscription');
+    const { data, error } = await invokeWithRetry('check-subscription');
     if (error) {
       console.warn('check-subscription error:', error);
       return;

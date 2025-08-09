@@ -3,12 +3,14 @@ import React, { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
-import PromptingGuide from '@/components/prompting/PromptingGuide';
-import { EnhancedPromptScanner } from '@/components/prompting/scanner/EnhancedPromptScanner';
-import { EnhancedPromptDesigner } from '@/components/prompting/designer/EnhancedPromptDesigner';
-import { BookOpen, Sparkles, Zap } from 'lucide-react';
+import { BookOpen, Sparkles, Zap, Loader2 } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 import { PromptingProvider } from '@/components/prompting/context/PromptingContext';
+
+const PromptingGuide = React.lazy(() => import('@/components/prompting/PromptingGuide'));
+const EnhancedPromptScanner = React.lazy(() => import('@/components/prompting/scanner/EnhancedPromptScanner').then(m => ({ default: m.EnhancedPromptScanner })));
+const EnhancedPromptDesigner = React.lazy(() => import('@/components/prompting/designer/EnhancedPromptDesigner').then(m => ({ default: m.EnhancedPromptDesigner })));
+
 
 const Prompting = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -71,15 +73,21 @@ const Prompting = () => {
           
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsContent value="scanner" className="space-y-6 mt-0">
-              <EnhancedPromptScanner />
+              <React.Suspense fallback={<div className="py-12 flex items-center justify-center text-muted-foreground"><Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading scanner...</div>}>
+                <EnhancedPromptScanner />
+              </React.Suspense>
             </TabsContent>
             
             <TabsContent value="designer" className="space-y-6 mt-0">
-              <EnhancedPromptDesigner />
+              <React.Suspense fallback={<div className="py-12 flex items-center justify-center text-muted-foreground"><Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading designer...</div>}>
+                <EnhancedPromptDesigner />
+              </React.Suspense>
             </TabsContent>
             
             <TabsContent value="playbook" className="space-y-6 mt-0">
-              <PromptingGuide />
+              <React.Suspense fallback={<div className="py-12 flex items-center justify-center text-muted-foreground"><Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading playbook...</div>}>
+                <PromptingGuide />
+              </React.Suspense>
             </TabsContent>
           </Tabs>
         </div>

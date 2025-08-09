@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Input } from '@/components/ui/input';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { assignTagToConversation, createTag, fetchTags, removeTagFromConversation } from '@/lib/api';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 
 interface TagManagementProps {
   conversationId: string;
@@ -137,7 +137,7 @@ const TagManagement: React.FC<TagManagementProps> = ({ conversationId, assignedT
           ))}
         </div>
       ) : (
-        <div className="text-xs text-muted-foreground italic">
+        <div className="text-xs text-muted-foreground">
           No tags assigned yet
         </div>
       )}
