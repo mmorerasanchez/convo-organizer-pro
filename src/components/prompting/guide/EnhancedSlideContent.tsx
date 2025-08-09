@@ -81,6 +81,8 @@ const EnhancedSlideContent = ({
   const totalProgress = getTotalProgress(totalSlides);
   const chapterProgressPercentage = (chapterProgress.completed / chapterProgress.total) * 100;
   const totalProgressPercentage = (totalProgress.completed / totalProgress.total) * 100;
+  const displayContent = content.replace(/Lovable/gi, 'AI');
+  const displayTitle = title.replace(/Lovable/gi, 'AI');
 
   // Enhanced function to render rich markdown-like content
   const renderContent = (text: string) => {
@@ -291,16 +293,8 @@ const EnhancedSlideContent = ({
 
   return (
     <div className="space-y-4">
-      {/* Progress Bars */}
+      {/* Chapter Progress */}
       <div className="space-y-3">
-        <div>
-          <div className="flex items-center justify-between text-sm text-muted-foreground mb-1">
-            <span>Overall Progress</span>
-            <span>{totalProgress.completed} of {totalProgress.total} slides</span>
-          </div>
-          <Progress value={totalProgressPercentage} className="h-2" />
-        </div>
-        
         <div>
           <div className="flex items-center justify-between text-sm text-muted-foreground mb-1">
             <span>Chapter {chapterIndex + 1} Progress</span>
@@ -339,15 +333,16 @@ const EnhancedSlideContent = ({
 
         <CardContent className="space-y-6">
           <div className="prose prose-slate max-w-none dark:prose-invert">
-            {renderContent(content)}
+            {renderContent(displayContent)}
           </div>
 
           {/* Completion Checkbox */}
-          <div className="flex items-center space-x-2 pt-4 border-t">
+          <div className="mt-2 flex items-center gap-3 rounded-md border bg-muted/30 px-3 py-2">
             <Checkbox
               id={`slide-${slideId}`}
               checked={isCompleted}
               onCheckedChange={handleCompletionChange}
+              className="h-5 w-5"
             />
             <label
               htmlFor={`slide-${slideId}`}

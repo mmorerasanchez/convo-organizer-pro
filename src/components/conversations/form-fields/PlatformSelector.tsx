@@ -14,13 +14,13 @@ export const PlatformSelector: React.FC<PlatformSelectorProps> = ({ value, onCha
     { value: 'Claude', label: 'Claude' },
     { value: 'Gemini', label: 'Gemini' },
     { value: 'Multiple', label: 'Multiple' },
-    { value: 'Lovable', label: 'Lovable' },
+    { value: 'Lovable', label: 'AI' },
     { value: 'Replit', label: 'Replit' },
     { value: 'DeepSeek', label: 'DeepSeek' },
     { value: 'Mistral', label: 'Mistral' },
     { value: 'Perplexity', label: 'Perplexity' }
   ];
-  
+
   return (
     <div className="space-y-2">
       <Label htmlFor="platform">Platform</Label>

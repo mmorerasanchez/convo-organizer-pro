@@ -4,6 +4,9 @@ import EnhancedChapterList from './guide/EnhancedChapterList';
 import EnhancedSlideContent from './guide/EnhancedSlideContent';
 import { chapters } from './guide/chapterData';
 import { useAuth } from '@/hooks/useAuth';
+import { useGuideProgress } from '@/hooks/useGuideProgress';
+import { Progress } from '@/components/ui/progress';
+import { Card, CardContent } from '@/components/ui/card';
 
 const PromptingGuide = () => {
   const { user } = useAuth();
@@ -12,6 +15,10 @@ const PromptingGuide = () => {
 
   const totalSlidesInChapter = chapters[currentChapter].slides.length;
   const totalSlidesAcrossAll = chapters.reduce((acc, chapter) => acc + chapter.slides.length, 0);
+
+  const { getTotalProgress } = useGuideProgress();
+  const totalProgress = getTotalProgress(totalSlidesAcrossAll);
+  const totalProgressPercentage = (totalProgress.completed / totalProgress.total) * 100;
 
   const goToPreviousSlide = () => {
     if (currentSlide > 0) {
@@ -64,12 +71,22 @@ const PromptingGuide = () => {
 
   return (
     <div className="space-y-6">
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between text-sm text-muted-foreground mb-1">
+            <span>Overall Progress</span>
+            <span>{Math.round(totalProgressPercentage)}% — {totalProgress.completed}/{totalProgress.total} slides</span>
+          </div>
+          <Progress value={totalProgressPercentage} className="h-2" />
+        </CardContent>
+      </Card>
+
       <EnhancedChapterList
         chapters={chapters}
         currentChapter={currentChapter}
         onChapterSelect={handleChapterSelect}
       />
-      
+
       <EnhancedSlideContent
         chapterIndex={currentChapter}
         totalChapters={chapters.length}

@@ -111,8 +111,8 @@ export const EnhancedPromptDesigner = () => {
       }
     });
 
-    // Add Lovable-specific optimizations
-    compiled += `\nLovable.dev Optimization Guidelines:
+    // Add AI optimization guidelines
+    compiled += `\nAI Optimization Guidelines:
 - Use React, TypeScript, and Tailwind CSS
 - Implement mobile-first responsive design
 - Follow atomic design principles for components
