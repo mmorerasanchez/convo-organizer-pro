@@ -81,9 +81,7 @@ const EnhancedSlideContent = ({
   const totalProgress = getTotalProgress(totalSlides);
   const chapterProgressPercentage = (chapterProgress.completed / chapterProgress.total) * 100;
   const totalProgressPercentage = (totalProgress.completed / totalProgress.total) * 100;
-  const displayContent = content.replace(/Lovable/gi, 'AI');
-  const displayTitle = title.replace(/Lovable/gi, 'AI');
-
+  const displayContent = content;
   // Enhanced function to render rich markdown-like content
   const renderContent = (text: string) => {
     const lines = text.trim().split('\n');
@@ -144,8 +142,92 @@ const EnhancedSlideContent = ({
         continue;
       }
       
+      // Handle tables (GitHub-style Markdown)
+      if (
+        line.includes('|') &&
+        i + 1 < lines.length &&
+        /^\s*\|?[:\-\|\s]+\|?\s*$/.test(lines[i + 1].trim())
+      ) {
+        const headerLine = line;
+        const separatorLine = lines[i + 1].trim();
+
+        const splitCells = (row: string) =>
+          row
+            .replace(/^\|/, '')
+            .replace(/\|$/, '')
+            .split('|')
+            .map((c) => c.trim());
+
+        const headers = splitCells(headerLine);
+        const aligns = splitCells(separatorLine).map((s) => {
+          const left = s.startsWith(':');
+          const right = s.endsWith(':');
+          if (left && right) return 'center';
+          if (right) return 'right';
+          return 'left';
+        });
+
+        i += 2; // move past header and separator
+        const rows: string[][] = [];
+        while (
+          i < lines.length &&
+          lines[i].trim() !== '' &&
+          lines[i].includes('|') &&
+          !/^\s*`{3}/.test(lines[i].trim())
+        ) {
+          rows.push(splitCells(lines[i].trim()));
+          i++;
+        }
+
+        elements.push(
+          <div key={`table-${elements.length}`} className="my-6 overflow-x-auto">
+            <table className="w-full text-sm border rounded-md border-border/60">
+              <thead className="bg-muted/40">
+                <tr>
+                  {headers.map((h, idx) => (
+                    <th
+                      key={idx}
+                      className={`px-3 py-2 text-foreground border-b border-border/60 ${
+                        aligns[idx] === 'center'
+                          ? 'text-center'
+                          : aligns[idx] === 'right'
+                          ? 'text-right'
+                          : 'text-left'
+                      }`}
+                    >
+                      {renderInlineFormatting(h)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r, ridx) => (
+                  <tr key={ridx} className="odd:bg-background even:bg-muted/20">
+                    {headers.map((_, cidx) => (
+                      <td
+                        key={cidx}
+                        className={`px-3 py-2 border-t border-border/60 align-top ${
+                          aligns[cidx] === 'center'
+                            ? 'text-center'
+                            : aligns[cidx] === 'right'
+                            ? 'text-right'
+                            : 'text-left'
+                        }`}
+                      >
+                        {renderInlineFormatting(r[cidx] ?? '')}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+        continue;
+      }
+
       // Handle headers (##, ###)
-      if (line.startsWith('### ')) {
+      else if (line.startsWith('### ')) {
         elements.push(
           <h4 key={`h4-${elements.length}`} className="text-lg font-semibold mt-8 mb-4 first:mt-0 text-foreground">
             {renderInlineFormatting(line.substring(4))}
