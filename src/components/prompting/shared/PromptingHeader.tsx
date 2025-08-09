@@ -29,9 +29,9 @@ export function PromptingHeader({
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="text-primary">
-              {icon}
-            </div>
+            {icon && (
+              <div className="text-primary">{icon}</div>
+            )}
             <CardTitle className="text-xl">{title}</CardTitle>
           </div>
           <Badge variant="outline" className="flex items-center gap-2">
