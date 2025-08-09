@@ -36,7 +36,7 @@ export function PromptingHeader({
           </div>
           <Badge variant="outline" className="flex items-center gap-2">
             <TrendingUp className="h-3 w-3" />
-            <span>{currentUsage}/{limit} requests</span>
+            <span>{currentUsage}/{Number.isFinite(limit as number) ? limit : '∞'} requests</span>
           </Badge>
         </div>
       </CardHeader>

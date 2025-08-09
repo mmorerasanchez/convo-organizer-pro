@@ -19,6 +19,7 @@ import AuthCallback from "./pages/AuthCallback";
 import VerifySuccess from "./pages/VerifySuccess";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/common/ProtectedRoute";
+import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -52,15 +53,79 @@ const App = () => (
         <TooltipProvider>
           <Sonner position="top-right" closeButton />
           <BrowserRouter>
+            {/* Subscription provider supplies plan and usage across the app */}
             <Routes>
-              <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <RootWithSubscription>
+                      <Dashboard />
+                    </RootWithSubscription>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/projects"
+                element={
+                  <ProtectedRoute>
+                    <RootWithSubscription>
+                      <Projects />
+                    </RootWithSubscription>
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/projects/shared/:shareLink" element={<SharedProjectDetail />} />
-              <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
-              <Route path="/conversations" element={<ProtectedRoute><Conversations /></ProtectedRoute>} />
-              <Route path="/conversations/:id" element={<ProtectedRoute><ConversationDetail /></ProtectedRoute>} />
-              <Route path="/prompting" element={<ProtectedRoute><Prompting /></ProtectedRoute>} />
-              <Route path="/tools" element={<ProtectedRoute><Tools /></ProtectedRoute>} />
+              <Route
+                path="/projects/:id"
+                element={
+                  <ProtectedRoute>
+                    <RootWithSubscription>
+                      <ProjectDetail />
+                    </RootWithSubscription>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/conversations"
+                element={
+                  <ProtectedRoute>
+                    <RootWithSubscription>
+                      <Conversations />
+                    </RootWithSubscription>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/conversations/:id"
+                element={
+                  <ProtectedRoute>
+                    <RootWithSubscription>
+                      <ConversationDetail />
+                    </RootWithSubscription>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/prompting"
+                element={
+                  <ProtectedRoute>
+                    <RootWithSubscription>
+                      <Prompting />
+                    </RootWithSubscription>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/tools"
+                element={
+                  <ProtectedRoute>
+                    <RootWithSubscription>
+                      <Tools />
+                    </RootWithSubscription>
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/auth" element={<Auth />} />
               <Route path="/login" element={<Login />} />
               <Route path="/auth/callback" element={<AuthCallback />} />
@@ -73,5 +138,14 @@ const App = () => (
     </ErrorBoundary>
   </QueryClientProvider>
 );
+
+// Small wrapper to provide SubscriptionProvider only once around protected pages
+const RootWithSubscription: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <SubscriptionProvider>
+      {children}
+    </SubscriptionProvider>
+  );
+};
 
 export default App;

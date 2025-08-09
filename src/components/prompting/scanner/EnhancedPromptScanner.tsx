@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { PromptingHeader } from '../shared/PromptingHeader';
 import { useProjectContext } from '@/hooks/use-project-context';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 interface ScannerState {
   originalPrompt: string;
@@ -47,9 +48,8 @@ const INITIAL_STATE: ScannerState = {
 
 export const EnhancedPromptScanner = () => {
   const [state, setState] = useState<ScannerState>(INITIAL_STATE);
+  const { currentUsage, limit, refreshUsage } = useSubscription();
   const { data: models = [] } = useModels();
-  
-  const requestLimit = 10; // Free tier limit
 
   // Project context integration
   const {
@@ -67,8 +67,9 @@ export const EnhancedPromptScanner = () => {
       return;
     }
 
-    if (state.requestCount >= requestLimit) {
-      toast.error(`Request limit reached (${requestLimit}). Please try again later.`);
+    const effectiveLimit = limit ?? Infinity;
+    if (currentUsage >= effectiveLimit) {
+      toast.error(`Request limit reached (${Number.isFinite(effectiveLimit) ? effectiveLimit : '∞'}). Please upgrade to continue.`);
       return;
     }
 
@@ -116,10 +117,10 @@ export const EnhancedPromptScanner = () => {
       setState(prev => ({ 
         ...prev, 
         improvedPrompt: improvedText,
-        requestCount: prev.requestCount + 1,
         isProcessing: false,
         feedback: withFeedback ? '' : prev.feedback
       }));
+      await refreshUsage();
       
       toast.success(contextEnabled && hasContext ? 
         "Prompt improved with project context" : 
@@ -174,8 +175,8 @@ export const EnhancedPromptScanner = () => {
         title="Enhanced Prompt Scanner"
         description="Analyze and improve your prompts using AI-powered best practices and system prompt optimization."
         icon={null}
-        currentUsage={state.requestCount}
-        limit={requestLimit}
+        currentUsage={currentUsage}
+        limit={limit ?? Infinity}
         onProjectSelect={handleProjectSelect}
         selectedProjectId={state.selectedProjectId}
       />

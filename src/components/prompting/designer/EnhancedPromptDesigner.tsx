@@ -17,6 +17,7 @@ import { PromptingHeader } from '../shared/PromptingHeader';
 import { useQuery } from '@tanstack/react-query';
 import { fetchTemplates } from '@/lib/api/templates';
 import type { Template } from '@/lib/types';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 interface FieldValues {
   [key: string]: string;
@@ -71,6 +72,7 @@ export const EnhancedPromptDesigner = () => {
   const { data: examples = [] } = useFrameworkExamples(state.selectedFramework?.id || null);
   const { data: models = [] } = useModels();
   const { data: templates = [] } = useQuery<Template[]>({ queryKey: ['templates'], queryFn: fetchTemplates });
+  const { currentUsage, limit } = useSubscription();
 
   // Filter frameworks by selected method
   const compatibleFrameworks = frameworks.filter(framework => 
@@ -255,6 +257,8 @@ export const EnhancedPromptDesigner = () => {
         title="Enhanced Prompt Designer"
         description="Create, test, and iterate on prompts using proven frameworks and system-level optimizations."
         icon={null}
+        currentUsage={currentUsage}
+        limit={limit ?? Infinity}
         onProjectSelect={handleProjectSelect}
         selectedProjectId={state.selectedProjectId}
       />
