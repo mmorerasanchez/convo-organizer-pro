@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, Settings, Eye, Play, Copy, BookOpen, Zap, Bot } from 'lucide-react';
+import { ChevronDown, Eye, Play, Copy, BookOpen, Zap } from 'lucide-react';
 import { useFrameworks, useFrameworkFields, useFrameworkExamples, Framework } from '@/hooks/use-frameworks';
 import { useModels } from '@/hooks/use-frameworks';
 import { supabase } from '@/integrations/supabase/client';
@@ -232,7 +232,7 @@ export const EnhancedPromptDesigner = () => {
       <PromptingHeader
         title="Enhanced Prompt Designer"
         description="Create, test, and iterate on prompts using proven frameworks and system-level optimizations."
-        icon={<Bot className="h-5 w-5" />}
+        icon={null}
         onProjectSelect={handleProjectSelect}
         selectedProjectId={state.selectedProjectId}
       />
@@ -370,8 +370,7 @@ export const EnhancedPromptDesigner = () => {
             {/* Model Settings - Expanded horizontally */}
             <Card className="h-fit">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" />
+                <CardTitle>
                   Model Settings
                 </CardTitle>
               </CardHeader>
