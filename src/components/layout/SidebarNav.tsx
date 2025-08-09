@@ -4,7 +4,9 @@ import {
   Sidebar, 
   SidebarHeader,
   SidebarContent,
-  SidebarRail
+  SidebarFooter,
+  SidebarRail,
+  SidebarTrigger
 } from '@/components/ui/sidebar';
 import SidebarNavItems from './SidebarNavItems';
 
@@ -20,6 +22,11 @@ const SidebarNav: React.FC = () => {
       <SidebarContent>
         <SidebarNavItems />
       </SidebarContent>
+      <SidebarFooter className="border-t">
+        <div className="flex w-full items-center justify-end p-2">
+          <SidebarTrigger />
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 };
