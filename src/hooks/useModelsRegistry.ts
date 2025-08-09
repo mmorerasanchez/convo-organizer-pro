@@ -57,7 +57,7 @@ export const useModelsRegistry = () => {
       const dbModels: CombinedModel[] = (data || []).map((row: any) => ({
         id: row.external_id || row.display_name,
         displayName: row.display_name || row.external_id,
-        provider: row.provider || "openrouter",
+        provider: (row.provider || "openrouter").toLowerCase(),
         contextWindow: row.context_window || undefined,
         icon: undefined,
         pricing: undefined,
@@ -103,11 +103,35 @@ export const useModelsRegistry = () => {
     }
   }, [statusQuery.data?.openrouter, modelsQuery.data, modelsQuery]);
 
-  // Compose with availability
-  const models: CombinedModel[] = (modelsQuery.data || []).map((m) => ({
+  // Compose with availability and ensure baseline models for configured providers
+  const baseModels = modelsQuery.data || [];
+  const baseWithAvailability: CombinedModel[] = baseModels.map((m) => ({
     ...m,
     available: mapAvailability(m.provider, statusQuery.data),
   }));
+
+  // If a provider is configured but has no DB entries, merge in curated static models for that provider
+  const providersToEnsure = ["openai", "google", "anthropic"] as const;
+  const staticAll = getAllModels();
+  const additional: CombinedModel[] = [];
+
+  providersToEnsure.forEach((p) => {
+    const isConfigured = mapAvailability(p, statusQuery.data);
+    const hasAny = baseWithAvailability.some((m) => m.provider === p);
+    if (isConfigured && !hasAny) {
+      const curated = staticAll
+        .filter((m) => m.provider === p)
+        .map((m) => ({ ...m, available: true } as CombinedModel));
+      additional.push(...curated);
+    }
+  });
+
+  // Merge and dedupe by id
+  const mergedMap = new Map<string, CombinedModel>();
+  [...baseWithAvailability, ...additional].forEach((m) => {
+    if (!mergedMap.has(m.id)) mergedMap.set(m.id, m);
+  });
+  const models: CombinedModel[] = Array.from(mergedMap.values());
 
   const byProvider = models.reduce<Record<string, CombinedModel[]>>((acc, m) => {
     acc[m.provider] = acc[m.provider] || [];

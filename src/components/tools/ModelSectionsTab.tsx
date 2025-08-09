@@ -6,18 +6,32 @@ import { MessageSquare, CheckCircle, Zap, Monitor, Building, Clock, Play } from 
 import { useModelsRegistry } from '@/hooks/useModelsRegistry';
 
 const ModelSectionsTab: React.FC = () => {
-  const { byProvider, isLoading } = useModelsRegistry();
+  const { byProvider, status, isLoading } = useModelsRegistry();
 
   const renderSection = (providerId: string, title: string) => {
     const models = byProvider[providerId] || [];
-    if (!models.length) return null;
+    const availableModels = models.filter((m: any) => m.available);
+    const count = availableModels.length;
+    if (count === 0) {
+      if (providerId === 'openrouter' && status?.openrouter) {
+        return (
+          <section>
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
+              <span className="mr-2">{title} (0)</span>
+            </h2>
+            <div className="text-sm text-muted-foreground">OpenRouter is connected. The catalog will populate shortly.</div>
+          </section>
+        );
+      }
+      return null;
+    }
     return (
       <section>
         <h2 className="text-xl font-semibold mb-4 flex items-center">
-          <span className="mr-2">{title}</span>
+          <span className="mr-2">{title} ({count})</span>
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {models.map((model) => (
+          {availableModels.map((model) => (
             <ModelCard key={model.id} model={{
               id: model.id,
               title: model.displayName,
