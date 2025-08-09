@@ -40,13 +40,14 @@ This playbook turns fuzzy ideas into shipped features with **clear prompts**, **
 
 > **Starter Prompt**
 
-```
+\`\`\`
 You are a senior AI coding assistant working in Lovable on my project.
 Goal: Scaffold a minimal landing page with a hero, features grid, CTA, and footer.
 Constraints: Tailwind + shadcn/ui, mobile-first, WCAG AA colors, no placeholder lorem—use simple real copy.
 Deliverables: One React page, extracted reusable <FeatureCard> component, and a quick readme section in the file header.
 Don't change any other files.
-```
+\`\`\`
+      `
       }
     ]
   },
@@ -70,14 +71,14 @@ Don't change any other files.
 
 > **Prompt Structure Template**
 
-```
+\`\`\`
 Role: [Set the AI's role]
 Context: [Product vision, users, design system]
 Task: [One specific outcome]
 Guidelines: [Style, libs, accessibility, performance]
 Constraints: [Files not to touch, limits, security]
 Acceptance: [What proves it works]
-```
+\`\`\`
 
 ### 2‑2. Structure, Context & the Knowledge File
 
@@ -109,11 +110,11 @@ Acceptance: [What proves it works]
 
 > **Planning Prompt (Chat Mode)**
 
-```
+\`\`\`
 Analyze current repo structure and list the safest next 3 steps to add a /pricing page.
 For each step: files to touch, risks, and a rollback note.
 No code yet.
-```
+\`\`\`
 
 ### 2‑3. Iteration & Refinement
 
@@ -123,15 +124,16 @@ No code yet.
 
 > **Meta‑Prompting**
 
-```
+\`\`\`
 My last prompt produced inconsistent layout. Rewrite my prompt to be unambiguous. Keep Tailwind + shadcn, mobile‑first, and do not touch auth.
-```
+\`\`\`
 
 > **Reverse Meta‑Prompting**
 
-```
+\`\`\`
 Summarize what changed in this edit, why it worked, and save a reusable mini‑prompt I can keep in my library.
-```
+\`\`\`
+      `
       }
     ]
   },
@@ -149,11 +151,11 @@ Ask for small, reusable blocks—**cards, badges, toasts, toggles, inputs**—th
 
 > **Component First Prompt**
 
-```
+\`\`\`
 Create a reusable <FeatureCard title description icon /> using shadcn Card.
 Constraints: responsive grid usage, focus ring visible, dark mode ready.
 Provide usage example in a /components/examples file.
-```
+\`\`\`
 
 ### 3‑2. Design System Checklist
 
@@ -161,7 +163,7 @@ Provide usage example in a /components/examples file.
 
 > **Example: FeatureCard.tsx**
 
-```tsx
+\`\`\`tsx
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ReactNode } from "react";
 
@@ -188,7 +190,7 @@ export default function FeatureCard({
     </Card>
   );
 }
-```
+\`\`\`
 
 ### 3‑3. Compose in Bricks
 
@@ -208,11 +210,11 @@ Build one **brick** (feature/flow) at a time → test → refine → move on. Al
 
 > **Plan‑First Template**
 
-```
+\`\`\`
 Goal: Add a /pricing page.
 Plan 5 steps max with files to touch, then wait for my OK.
 Constraints: shadcn, mobile-first, copy in plain English (no lorem), do not modify auth or Stripe.
-```
+\`\`\`
 
 ### 4‑2. Context Management
 
@@ -221,10 +223,10 @@ Constraints: shadcn, mobile-first, copy in plain English (no lorem), do not modi
 
 > **Opener / Closer**
 
-```
+\`\`\`
 Opener: "Investigate and outline options—no code edits yet."
 Closer: "Confirm only the files listed below were changed and summarize diffs."
-```
+\`\`\`
 
 ### 4‑3. Error Handling & Edge Cases
 
@@ -233,14 +235,15 @@ Closer: "Confirm only the files listed below were changed and summarize diffs."
 
 > **Debugging Prompts**
 
-```
+\`\`\`
 Use the console error below to locate the root cause. Propose 2 safe fixes and the minimal diff.
 [Paste error stack]
-```
+\`\`\`
 
-```
+\`\`\`
 I suspect a state leak in <PricingTable/>. Audit for unnecessary re-renders and suggest memoization points.
-```
+\`\`\`
+      `
       }
     ]
   },
@@ -260,7 +263,7 @@ Lovable knows common APIs and models. You describe the outcome; it wires code, p
 
 > **Edge Function Logging (Supabase)**
 
-```ts
+\`\`\`ts
 // supabase/functions/checkout/index.ts
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -274,7 +277,7 @@ serve(async (req) => {
     return new Response("Internal Error", { status: 500 });
   }
 });
-```
+\`\`\`
 
 ### 5‑3. GitHub Integration (2‑way sync)
 
@@ -284,15 +287,15 @@ serve(async (req) => {
 
 > **Safeguard Prompt**
 
-```
+\`\`\`
 Before editing, list the exact files you intend to change. After editing, output a summary diff and confirm no other files were touched.
-```
+\`\`\`
 
 ### 5‑4. Supabase (Auth, DB, RLS)
 
 **Starter schema**
 
-```sql
+\`\`\`sql
 create table profiles (
   id uuid primary key references auth.users(id),
   full_name text,
@@ -304,28 +307,28 @@ create policy "profiles are self-readable" on profiles
 for select using (auth.uid() = id);
 create policy "profiles are self-updatable" on profiles
 for update using (auth.uid() = id);
-```
+\`\`\`
 
 > **RLS Prompt**
 
-```
+\`\`\`
 Write least-privilege RLS for table `subscriptions` so users can only read their own rows. Admin role can read all. Show SQL.
-```
+\`\`\`
 
 ### 5‑5. Stripe (Payments)
 
 > **Checkout Button (client)**
 
-```tsx
+\`\`\`tsx
 <button onClick={startCheckout} className="btn btn-primary">Buy Now</button>
-```
+\`\`\`
 
 > **Server call (Edge Function)**
 
-```ts
+\`\`\`ts
 // Create Stripe Checkout Session using server-side secret.
 // Return the session URL; never expose secrets in the client.
-```
+\`\`\`
 
 **Notes**: Link Stripe customers to **Supabase user IDs**. Store secrets in env; never hard‑code.
 
@@ -337,11 +340,11 @@ Use when you need orgs, SSO, or richer profiles. Lovable integrates natively.
 
 > **System Prompt Example**
 
-```
+\`\`\`
 You are a helpful nutritionist.
 Style: friendly, precise, evidence-informed.
 Output: 150 words; include 3 bullet tips.
-```
+\`\`\`
 
 ### 5‑8. Vision & Media APIs
 
@@ -361,9 +364,9 @@ Use GPT‑4o, Stable Diffusion, Replicate, Pexels, Exa for generation and analys
 
 ### 5‑11. Integration Prompts
 
-```
+\`\`\`
 Integrate Stripe subscriptions: 3 tiers (Starter, Pro, Team). Server-side checkout, link to Supabase users, add a /billing page with manage button. No code beyond listed files.
-```
+\`\`\`
 
 ### 5‑12. Advanced Patterns
 
@@ -389,19 +392,19 @@ Integrate Stripe subscriptions: 3 tiers (Starter, Pro, Team). Server-side checko
 
 > **Pattern**
 
-```tsx
+\`\`\`tsx
 const PriceRow = React.memo(function PriceRow({ plan }) {
   return <div>{plan.name}</div>;
 });
-```
+\`\`\`
 
 ### 6‑2. Refactoring Without Behavior Changes
 
 > **Refactor Prompt**
 
-```
+\`\`\`
 Refactor <PricingTable/> to smaller functions. Keep identical UI and outputs. List changes first, then apply them in one commit. Add tests if trivial.
-```
+\`\`\`
 
 * Split long files
 * Remove dead code
@@ -441,9 +444,9 @@ Ask for state recap, attempted fixes, and a safe plan.
 
 ### 7‑5. Effective Debug Prompts
 
-```
+\`\`\`
 Here is the stack trace and the component. Find the root cause and propose the minimal safe patch. Do not edit unrelated files.
-```
+\`\`\`
 
 ```
 Explain this error like I'm a junior dev. Then show a production-grade fix with error handling.
@@ -614,43 +617,43 @@ Lovable installs/configures packages from context. You request the outcome; it w
 
 **Start a Feature**
 
-```
+\`\`\`
 Role: Senior AI dev in Lovable.
 Task: Add /pricing page with 3 tiers and FAQ.
 Guidelines: Tailwind + shadcn; mobile-first; AA contrast; no lorem.
 Constraints: Only touch /app/pricing/* and /components/pricing/*.
 Acceptance: Renders on mobile/desktop; snapshot attached.
-```
+\`\`\`
 
 **Investigate First**
 
-```
+\`\`\`
 Investigate the failing signup flow. Summarize root cause candidates, affected files, and the safest fix. No code yet.
-```
+\`\`\`
 
 **Refactor No Behavior Change**
 
-```
+\`\`\`
 Refactor utils/formatPrice.ts into smaller pure functions. Keep identical outputs. Add 3 unit tests.
-```
+\`\`\`
 
 **RLS Authoring**
 
-```
+\`\`\`
 Write RLS so users can read/update only their profile row. Admin can read all. Show SQL and explain.
-```
+\`\`\`
 
 **Stripe Subscriptions**
 
-```
+\`\`\`
 Add subscriptions (Starter/Pro/Team). Server-side checkout, link Stripe customer to Supabase user id, add /billing with manage button. Show changed files only.
-```
+\`\`\`
 
 **Codebase Audit**
 
-```
+\`\`\`
 Audit architecture and DX. List top 10 risks with file paths and incremental fixes. No edits yet.
-```
+\`\`\`
 
 #### A2. Do / Don’t Table
 
@@ -668,7 +671,7 @@ Audit architecture and DX. List top 10 risks with file paths and incremental fix
 
 #### A4. JSON‑LD FAQ (SEO)
 
-```json
+\`\`\`json
 {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -699,7 +702,7 @@ Audit architecture and DX. List top 10 risks with file paths and incremental fix
     }
   ]
 }
-```
+\`\`\`
 
 ---
 
