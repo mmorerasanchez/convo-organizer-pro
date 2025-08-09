@@ -98,7 +98,7 @@ const SidebarNavItems: React.FC<SidebarNavItemsProps> = ({ onNavItemClick }) => 
   return (
     <>
       <SidebarGroup>
-        <SidebarGroupLabel>Active modules</SidebarGroupLabel>
+        <SidebarGroupLabel className="mt-2">Active modules</SidebarGroupLabel>
         <SidebarGroupContent>
           {renderSidebarLinks(activeModules)}
         </SidebarGroupContent>
