@@ -466,20 +466,32 @@ export type Database = {
         Row: {
           context_window: number | null
           display_name: string | null
+          external_id: string | null
           id: string
+          last_synced_at: string | null
           provider: string | null
+          source: string
+          vendor: string | null
         }
         Insert: {
           context_window?: number | null
           display_name?: string | null
+          external_id?: string | null
           id?: string
+          last_synced_at?: string | null
           provider?: string | null
+          source?: string
+          vendor?: string | null
         }
         Update: {
           context_window?: number | null
           display_name?: string | null
+          external_id?: string | null
           id?: string
+          last_synced_at?: string | null
           provider?: string | null
+          source?: string
+          vendor?: string | null
         }
         Relationships: []
       }

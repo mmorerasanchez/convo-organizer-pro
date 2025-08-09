@@ -2,7 +2,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { PromptState, TestPromptParams, TestPromptResult } from './types';
 import { toast } from 'sonner';
-import { getModelById } from '@/lib/modelData';
 import { logger } from '@/lib/utils/logger';
 import { errorHandler } from '@/lib/utils/errorHandler';
 
@@ -144,17 +143,22 @@ export const deletePromptById = async (promptId: string) => {
   }
 };
 
+const resolveProviderFromModelId = (modelId: string): 'google' | 'anthropic' | 'openai' | 'openrouter' => {
+  const id = modelId.toLowerCase();
+  if (id.startsWith('gemini')) return 'google';
+  if (id.includes('claude')) return 'anthropic';
+  if (id.startsWith('gpt') || id.startsWith('o3') || id.startsWith('o4')) return 'openai';
+  return 'openrouter';
+};
+
 export const testPromptRequest = async (params: TestPromptParams): Promise<TestPromptResult> => {
-  const model = getModelById(params.modelId);
-  const isGemini = model?.provider === 'google';
-  
-  logger.debug('Testing prompt', { metadata: { modelId: params.modelId, provider: model?.provider } });
+  const provider = resolveProviderFromModelId(params.modelId);
+  logger.debug('Testing prompt', { metadata: { modelId: params.modelId, provider } });
   
   try {
-    let data, error;
+    let data: any, error: any;
     
-    if (isGemini) {
-      // Use Gemini API
+    if (provider === 'google') {
       const response = await supabase.functions.invoke('gemini-api', {
         body: { 
           prompt: params.prompt,
@@ -163,22 +167,36 @@ export const testPromptRequest = async (params: TestPromptParams): Promise<TestP
           maxTokens: params.maxTokens || 1000
         }
       });
-      
-      data = response.data;
-      error = response.error;
-    } else {
-      // Use OpenAI API (existing test-prompt function)
+      data = response.data; error = response.error;
+    } else if (provider === 'anthropic') {
+      const response = await supabase.functions.invoke('anthropic-chat', {
+        body: { 
+          prompt: params.prompt,
+          model: params.modelId,
+          temperature: params.temperature || 0.7,
+          max_tokens: params.maxTokens || 1000
+        }
+      });
+      data = response.data; error = response.error;
+    } else if (provider === 'openai') {
       const response = await supabase.functions.invoke('test-prompt', {
         body: params
       });
-      
-      data = response.data;
-      error = response.error;
+      data = response.data; error = response.error;
+    } else {
+      const response = await supabase.functions.invoke('openrouter-chat', {
+        body: { 
+          prompt: params.prompt,
+          model: params.modelId,
+          temperature: params.temperature || 0.7,
+          max_tokens: params.maxTokens || 1000
+        }
+      });
+      data = response.data; error = response.error;
     }
     
     if (error) throw error;
     
-    // If there's a versionId, record the test
     if (params.versionId) {
       await supabase
         .from('prompt_tests')
@@ -195,6 +213,7 @@ export const testPromptRequest = async (params: TestPromptParams): Promise<TestP
     logger.info('Prompt test completed successfully', { 
       metadata: { 
         modelId: params.modelId, 
+        provider,
         responseTime: data.response_ms || 0 
       }
     });
@@ -207,7 +226,7 @@ export const testPromptRequest = async (params: TestPromptParams): Promise<TestP
       cost_usd: data.cost_usd || 0
     };
   } catch (error) {
-    logger.error('Error testing prompt', error as Error, { metadata: { modelId: params.modelId } });
+    logger.error('Error testing prompt', error as Error, { metadata: { modelId: params.modelId, provider } });
     throw error;
   }
 };

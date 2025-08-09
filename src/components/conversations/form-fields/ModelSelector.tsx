@@ -3,10 +3,10 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AIModel } from '@/lib/types';
-import { getAllModels } from '@/lib/modelData';
 import { Brain } from 'lucide-react';
 import { OpenAILogo } from '@/components/ui/logos/OpenAILogo';
 import { GoogleLogo } from '@/components/ui/logos/GoogleLogo';
+import { useModelsRegistry } from '@/hooks/useModelsRegistry';
 
 interface ModelSelectorProps {
   value: string;
@@ -26,8 +26,8 @@ const getProviderIcon = (provider: string) => {
 };
 
 export const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange, models }) => {
-  // Use enhanced model data if no models prop provided
-  const availableModels = models || getAllModels();
+  const { models: registryModels } = useModelsRegistry();
+  const availableModels: AIModel[] = models || registryModels;
   
   return (
     <div className="space-y-2">
