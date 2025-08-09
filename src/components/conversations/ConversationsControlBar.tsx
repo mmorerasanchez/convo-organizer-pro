@@ -54,6 +54,11 @@ const ConversationsControlBar: React.FC<ConversationsControlBarProps> = ({
       <div className="flex items-center gap-2">
         {/* New Conversation Button */}
         <NewConversationDialog />
+        {(searchTerm || selectedTags.length > 0) && (
+          <Button variant="outline" onClick={clearFilters}>
+            Clear Filters
+          </Button>
+        )}
       </div>
     </div>
   );

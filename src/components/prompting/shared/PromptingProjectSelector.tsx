@@ -77,22 +77,10 @@ export function PromptingProjectSelector({
           />
         </div>
       ) : (
-        <div className="text-center py-4 border-2 border-dashed border-muted-foreground/25 rounded-lg">
-          <FolderPlus className="h-6 w-6 mx-auto text-muted-foreground mb-2" />
-          <p className="text-sm text-muted-foreground mb-3">
-            Create a project to save and organize your prompts
+        <div className="text-center p-4 bg-muted/20 rounded-lg border border-dashed">
+          <p className="text-sm text-muted-foreground">
+            No projects found. Create a project to save and organize your prompts.
           </p>
-          <NewProjectDialog 
-            trigger={
-              <Button
-                size="sm"
-                className="gap-2"
-              >
-                <Plus className="h-3 w-3" />
-                Create Your First Project
-              </Button>
-            }
-          />
         </div>
       )}
     </div>
