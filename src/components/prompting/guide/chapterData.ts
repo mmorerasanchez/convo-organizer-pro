@@ -7,16 +7,6 @@ export const chapters: Chapter[] = [
     description: 'Orientation + SEO snippet and how to use this playbook effectively.',
     slides: [
       {
-        id: 'slide-1-1',
-        title: 'SEO Snippet (for promptito.super.site)',
-        content: `* **Suggested Title**: Prompt Engineering Playbook for Lovable & AI IDEs — Clear Prompts, Faster Shipping
-* **Meta Description**: Learn a practical framework to build full‑stack apps with Lovable and AI IDEs. Prompt templates, component patterns, integrations (Supabase, Stripe), debugging recipes, and SEO tips.
-* **Keywords**: prompt engineering, lovable, AI IDE, Supabase, Stripe, shadcn, RLS, AI agents, RAG, n8n, Make, GitHub sync, component-driven development
-* **URL Slug**: /lovable-prompt-engineering-playbook
-
-> **Who this is for**: founders, PMs, designers, and engineers who want to ship production‑ready apps with Lovable or similar AI IDEs—without wrestling with vague prompts or brittle code.`
-      },
-      {
         id: 'slide-1-2',
         title: 'Welcome + How this guide works',
         content: `## 1‑1. What is Lovable (and AI IDEs)?
