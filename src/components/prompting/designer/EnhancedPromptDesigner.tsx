@@ -99,8 +99,27 @@ export const EnhancedPromptDesigner = () => {
     }
   }, [state.fieldValues, state.selectedFramework, fields]);
 
+  // Normalize template fields: map label-keyed values to id keys when fields load
+  useEffect(() => {
+    if (!state.selectedFramework || fields.length === 0) return;
+    setState(prev => {
+      const next = { ...prev.fieldValues } as Record<string, string>;
+      let changed = false;
+      fields.forEach(f => {
+        const idVal = next[f.id];
+        const labelVal = next[f.label];
+        if ((idVal === undefined || idVal === '') && (labelVal !== undefined && labelVal !== '')) {
+          next[f.id] = labelVal;
+          changed = true;
+        }
+      });
+      return changed ? { ...prev, fieldValues: next } : prev;
+    });
+  }, [fields, state.selectedFramework]);
   const compilePrompt = () => {
     if (!state.selectedFramework || fields.length === 0) return;
+
+    console.debug('Compiling prompt with values:', state.fieldValues, 'fields:', fields);
 
     let compiled = '';
     
@@ -109,7 +128,7 @@ export const EnhancedPromptDesigner = () => {
     
     // Add field values
     fields.forEach(field => {
-      const value = state.fieldValues[field.id];
+      const value = state.fieldValues[field.id] ?? state.fieldValues[field.label];
       if (value && value.trim()) {
         compiled += `${field.label}:\n${value}\n\n`;
       }
@@ -126,7 +145,6 @@ export const EnhancedPromptDesigner = () => {
 
     setState(prev => ({ ...prev, compiledPrompt: compiled.trim() }));
   };
-
   const handleProjectSelect = (projectId: string) => {
     setState(prev => ({ ...prev, selectedProjectId: projectId }));
   };
@@ -151,16 +169,16 @@ export const EnhancedPromptDesigner = () => {
     }));
   };
 
-  const handleFieldChange = (fieldId: string, value: string) => {
+  const handleFieldChange = (fieldId: string, value: string, fieldLabel?: string) => {
     setState(prev => ({
       ...prev,
       fieldValues: {
         ...prev.fieldValues,
-        [fieldId]: value
+        [fieldId]: value,
+        ...(fieldLabel ? { [fieldLabel]: value } : {})
       }
     }));
   };
-
   const handleRunPrompt = async () => {
     if (!state.compiledPrompt.trim()) {
       toast.error("No compiled prompt to run");
@@ -220,8 +238,8 @@ export const EnhancedPromptDesigner = () => {
       <Textarea
         id={field.id}
         placeholder={field.help_text}
-        value={state.fieldValues[field.id] || ''}
-        onChange={(e) => handleFieldChange(field.id, e.target.value)}
+        value={state.fieldValues[field.id] ?? state.fieldValues[field.label] ?? ''}
+        onChange={(e) => handleFieldChange(field.id, e.target.value, field.label)}
         className="min-h-20"
       />
       {field.help_text && (
@@ -318,6 +336,7 @@ export const EnhancedPromptDesigner = () => {
                   const tmpl = templates.find(t => t.id === templateId);
                   if (!tmpl) return;
                   const fw = frameworks.find(f => f.id === tmpl.framework_id) || null;
+                  console.debug('Template selected:', { template: tmpl, field_values: tmpl.field_values, framework: fw });
                   const mappedFieldValues: Record<string, string> = Object.fromEntries(
                     Object.entries(tmpl.field_values || {}).map(([k, v]) => [k, typeof v === 'string' ? v : String(v)])
                   );
