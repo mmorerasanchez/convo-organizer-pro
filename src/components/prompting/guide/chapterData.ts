@@ -312,7 +312,7 @@ for update using (auth.uid() = id);
 > **RLS Prompt**
 
 \`\`\`
-Write least-privilege RLS for table `subscriptions` so users can only read their own rows. Admin role can read all. Show SQL.
+Write least-privilege RLS for table \`subscriptions\` so users can only read their own rows. Admin role can read all. Show SQL.
 \`\`\`
 
 ### 5‑5. Stripe (Payments)
@@ -448,9 +448,9 @@ Ask for state recap, attempted fixes, and a safe plan.
 Here is the stack trace and the component. Find the root cause and propose the minimal safe patch. Do not edit unrelated files.
 \`\`\`
 
-```
+\`\`\`
 Explain this error like I'm a junior dev. Then show a production-grade fix with error handling.
-```
+\`\`\`
 
 ### 7‑6. Provide Evidence
 
@@ -462,9 +462,9 @@ Don’t just fix; remove the cause.
 
 ### 7‑8. Codebase Audit Prompt
 
-```
+\`\`\`
 Perform a codebase audit for architecture, modularity, naming, and DX. List top 10 risks with file references and suggest incremental fixes. No code changes yet.
-```
+\`\`\`
 
 ### 7‑9. Prompt Lifecycle & Versioning
 
