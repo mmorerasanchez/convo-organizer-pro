@@ -1,7 +1,8 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePromptImprovement } from '@/hooks/use-prompt-improvement';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 export function usePromptScanner() {
   const [promptInput, setPromptInput] = useState('');
@@ -9,7 +10,7 @@ export function usePromptScanner() {
   const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
   const [currentFeedback, setCurrentFeedback] = useState('');
   const [requestCount, setRequestCount] = useState(0);
-  const [requestLimit] = useState(10); // Free tier limit
+  const [requestLimit, setRequestLimit] = useState<number | null>(30); // Free tier default
   
   const {
     isProcessing,
@@ -17,14 +18,43 @@ export function usePromptScanner() {
     improvePrompt,
   } = usePromptImprovement();
 
+  // Fetch live usage on mount
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const { data, error } = await supabase.functions.invoke('usage-status');
+      if (!mounted) return;
+      if (error) {
+        console.warn('usage-status error:', error);
+        return;
+      }
+      if (data) {
+        setRequestCount(data.currentUsage ?? 0);
+        setRequestLimit(data.limit ?? null);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const refreshUsage = async () => {
+    const { data, error } = await supabase.functions.invoke('usage-status');
+    if (error) {
+      console.warn('usage-status refresh error:', error);
+      return;
+    }
+    if (data) {
+      setRequestCount(data.currentUsage ?? 0);
+      setRequestLimit(data.limit ?? null);
+    }
+  };
+
   const handleImprovePrompt = async (feedback?: string) => {
     try {
       const result = await improvePrompt(promptInput, feedback);
       if (result) {
         setImprovedPrompt(result);
-        
-        // Increment request count
-        setRequestCount(prev => prev + 1);
+        // Sync usage from server (more accurate than local ++)
+        await refreshUsage();
       }
     } catch (error) {
       console.error('Error in handleImprovePrompt:', error);
@@ -79,7 +109,7 @@ export function usePromptScanner() {
     currentFeedback,
     setCurrentFeedback,
     requestCount,
-    requestLimit,
+    requestLimit: requestLimit ?? Infinity, // TokenUsageDisplay expects a number; treat null as unlimited
     isProcessing,
     
     // Actions
