@@ -25,12 +25,12 @@ const EnhancedChapterList = ({
   const slidesLabel = (count: number) => `${count} ${count === 1 ? 'slide' : 'slides'}`;
   return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {chapters.map((chapter, index) => {
-      const chapterId = `chapter-${index + 1}`;
-      const chapterProgress = getChapterProgress(chapterId, chapter.slides.length);
-      const progressPercentage = chapterProgress.total > 0 ? chapterProgress.completed / chapterProgress.total * 100 : 0;
-      const isActive = currentChapter === index;
-      const isCompleted = chapterProgress.total > 0 && chapterProgress.completed === chapterProgress.total;
-      const bookmarkCount = getChapterBookmarkCount(chapterId);
+       const chapterId = chapter.id;
+       const chapterProgress = getChapterProgress(chapterId, chapter.slides.length);
+       const progressPercentage = chapterProgress.total > 0 ? (chapterProgress.completed / chapterProgress.total) * 100 : 0;
+       const isActive = currentChapter === index;
+       const isCompleted = chapterProgress.total > 0 && chapterProgress.completed === chapterProgress.total;
+       const bookmarkCount = getChapterBookmarkCount(chapterId);
       return <Card key={index} className={`cursor-pointer learning-card transition-all duration-200 hover:shadow-md ${isActive ? 'ring-2 ring-primary shadow-md' : 'hover:ring-1 hover:ring-primary/50'}`} onClick={() => onChapterSelect(index)}>
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
@@ -53,10 +53,18 @@ const EnhancedChapterList = ({
               <p className="text-sm text-muted-foreground line-clamp-2">
                 {chapter.description}
               </p>
-
-              
-
-              
+              <div className="space-y-2">
+                <Progress value={progressPercentage} className="h-2" />
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{chapterProgress.completed}/{chapterProgress.total} {slidesLabel(chapter.slides.length)}</span>
+                  {bookmarkCount > 0 && (
+                    <span className="inline-flex items-center gap-1">
+                      <BookmarkCheck className="h-3 w-3 text-primary" />
+                      {bookmarkCount}
+                    </span>
+                  )}
+                </div>
+              </div>
             </CardContent>
           </Card>;
     })}

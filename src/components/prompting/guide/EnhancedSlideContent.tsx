@@ -106,7 +106,7 @@ const EnhancedSlideContent = ({
           quoteLines.push(lines[i].trim().substring(2));
           i++;
         }
-        elements.push(<blockquote key={`quote-${elements.length}`} className="border-l-4 border-primary/30 pl-4 my-4 italic text-muted-foreground bg-muted/20 py-2 rounded-r">
+        elements.push(<blockquote key={`quote-${elements.length}`} className="border-l-4 border-primary/30 pl-4 my-4 text-muted-foreground bg-muted/20 py-2 rounded-r">
             {quoteLines.map((quoteLine, idx) => <p key={idx} className="leading-relaxed">
                 {renderInlineFormatting(quoteLine)}
               </p>)}
@@ -226,7 +226,7 @@ const EnhancedSlideContent = ({
       component: (match: string) => <strong className="text-foreground font-semibold">{match}</strong>
     }, {
       regex: /\*(.+?)\*/g,
-      component: (match: string) => <em className="italic">{match}</em>
+      component: (match: string) => <span>{match}</span>
     }, {
       regex: /`(.+?)`/g,
       component: (match: string) => <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground border">{match}</code>
@@ -316,7 +316,7 @@ const EnhancedSlideContent = ({
           </div>
         </CardContent>
 
-        <CardFooter className="flex justify-between border-t">
+        <CardFooter className="flex justify-between pt-3">
           <div className="flex space-x-2">
             <Button variant="outline" size="icon" onClick={onPrevChapter} disabled={chapterIndex === 0}>
               <ChevronsLeft className="h-4 w-4" />
