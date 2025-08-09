@@ -173,7 +173,7 @@ export const EnhancedPromptScanner = () => {
       <PromptingHeader
         title="Enhanced Prompt Scanner"
         description="Analyze and improve your prompts using AI-powered best practices and system prompt optimization."
-        icon={<Sparkles className="h-5 w-5" />}
+        icon={null}
         currentUsage={state.requestCount}
         limit={requestLimit}
         onProjectSelect={handleProjectSelect}
