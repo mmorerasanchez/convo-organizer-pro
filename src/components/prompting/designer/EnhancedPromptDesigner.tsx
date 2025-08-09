@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, Eye, Play, Copy, BookOpen, Zap } from 'lucide-react';
+import { ChevronDown, Play, Copy, BookOpen, Zap } from 'lucide-react';
 import { useFrameworks, useFrameworkFields, useFrameworkExamples, Framework } from '@/hooks/use-frameworks';
 import { useModels } from '@/hooks/use-frameworks';
 import { supabase } from '@/integrations/supabase/client';
@@ -425,10 +425,7 @@ export const EnhancedPromptDesigner = () => {
       {state.compiledPrompt && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Eye className="h-5 w-5" />
-              Compiled Prompt Preview
-            </CardTitle>
+            <CardTitle>Compiled Prompt Preview</CardTitle>
           </CardHeader>
           <CardContent>
             <Tabs value={state.activeTab} onValueChange={(value) => setState(prev => ({ ...prev, activeTab: value as 'preview' | 'response' }))}>
