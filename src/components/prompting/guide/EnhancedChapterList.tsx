@@ -24,14 +24,16 @@ const EnhancedChapterList = ({
     return bookmarks.filter(b => b.chapter_id === chapterId).length;
   };
 
+  const slidesLabel = (count: number) => `${count} ${count === 1 ? 'slide' : 'slides'}`;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {chapters.map((chapter, index) => {
         const chapterId = `chapter-${index + 1}`;
         const chapterProgress = getChapterProgress(chapterId, chapter.slides.length);
-        const progressPercentage = (chapterProgress.completed / chapterProgress.total) * 100;
+        const progressPercentage = (chapterProgress.total > 0 ? (chapterProgress.completed / chapterProgress.total) * 100 : 0);
         const isActive = currentChapter === index;
-        const isCompleted = chapterProgress.completed === chapterProgress.total;
+        const isCompleted = chapterProgress.total > 0 && chapterProgress.completed === chapterProgress.total;
         const bookmarkCount = getChapterBookmarkCount(chapterId);
 
         return (
@@ -73,13 +75,13 @@ const EnhancedChapterList = ({
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>Progress</span>
-                  <span>{chapterProgress.completed}/{chapterProgress.total} slides</span>
+                  <span>{chapterProgress.completed}/{chapterProgress.total} {chapterProgress.total === 1 ? 'slide' : 'slides'}</span>
                 </div>
                 <Progress value={progressPercentage} className="h-2" />
               </div>
 
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>{chapter.slides.length} slides</span>
+                <span>{slidesLabel(chapter.slides.length)}</span>
                 {bookmarkCount > 0 && (
                   <div className="flex items-center gap-1">
                     <BookmarkCheck className="h-3 w-3" />

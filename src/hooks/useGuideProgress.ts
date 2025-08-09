@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { chapters } from '@/components/prompting/guide/chapterData';
 
 export interface GuideProgress {
   id: string;
@@ -153,15 +154,30 @@ export const useGuideProgress = () => {
   };
 
   const getChapterProgress = (chapterId: string, totalSlides: number) => {
-    const completedSlides = progress.filter(p => 
-      p.chapter_id === chapterId && p.completed
+    const chapter = chapters.find((c) => c.id === chapterId);
+    const validSlideIds = new Set<string>(chapter?.slides.map((s) => s.id) ?? []);
+
+    const completedSlides = progress.filter(
+      (p) => p.chapter_id === chapterId && p.completed && validSlideIds.has(p.slide_id)
     ).length;
-    return { completed: completedSlides, total: totalSlides };
+
+    const total = chapter ? chapter.slides.length : totalSlides;
+    return { completed: completedSlides, total };
   };
 
-  const getTotalProgress = (totalSlides: number) => {
-    const completedSlides = progress.filter(p => p.completed).length;
-    return { completed: completedSlides, total: totalSlides };
+  const getTotalProgress = (_totalSlides: number) => {
+    // Build the set of valid (chapter, slide) pairs from current chapter data
+    const validPairs = new Set<string>();
+    let total = 0;
+    chapters.forEach((c) => {
+      c.slides.forEach((s) => {
+        validPairs.add(`${c.id}__${s.id}`);
+        total += 1;
+      });
+    });
+
+    const completed = progress.filter((p) => p.completed && validPairs.has(`${p.chapter_id}__${p.slide_id}`)).length;
+    return { completed, total };
   };
 
   return {

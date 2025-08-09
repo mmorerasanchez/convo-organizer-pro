@@ -80,7 +80,7 @@ const EnhancedSlideContent = ({
   const chapterProgress = getChapterProgress(chapterId, chapterSlidesCount);
   const totalProgress = getTotalProgress(totalSlides);
   const chapterProgressPercentage = (chapterProgress.completed / chapterProgress.total) * 100;
-  const totalProgressPercentage = (totalProgress.completed / totalProgress.total) * 100;
+  const totalProgressPercentage = (totalProgress.total > 0 ? (totalProgress.completed / totalProgress.total) * 100 : 0);
   const displayContent = content;
   // Enhanced function to render rich markdown-like content
   const renderContent = (text: string) => {
@@ -380,7 +380,7 @@ const EnhancedSlideContent = ({
         <CardContent className="pt-6">
           <div className="flex items-center justify-between text-sm text-muted-foreground mb-1">
             <span>Chapter {chapterIndex + 1} Progress</span>
-            <span>{Math.round(chapterProgressPercentage)}% — {chapterProgress.completed}/{chapterProgress.total} slides</span>
+            <span>{Math.round(chapterProgressPercentage)}% — {chapterProgress.completed}/{chapterProgress.total} {chapterProgress.total === 1 ? 'slide' : 'slides'}</span>
           </div>
           <Progress value={chapterProgressPercentage} className="h-2" />
         </CardContent>

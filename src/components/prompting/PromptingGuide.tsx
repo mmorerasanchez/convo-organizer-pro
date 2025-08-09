@@ -75,7 +75,7 @@ const PromptingGuide = () => {
         <CardContent className="pt-6">
           <div className="flex items-center justify-between text-sm text-muted-foreground mb-1">
             <span>Overall Progress</span>
-            <span>{Math.round(totalProgressPercentage)}% — {totalProgress.completed}/{totalProgress.total} slides</span>
+            <span>{Math.round(totalProgressPercentage)}% — {totalProgress.completed}/{totalProgress.total} {totalProgress.total === 1 ? 'slide' : 'slides'}</span>
           </div>
           <Progress value={totalProgressPercentage} className="h-2" />
         </CardContent>
