@@ -32,6 +32,48 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_usage: {
+        Row: {
+          cost_usd: number | null
+          function: string | null
+          id: string
+          metadata: Json | null
+          model: string | null
+          occurred_at: string
+          provider: string | null
+          success: boolean | null
+          tokens_in: number | null
+          tokens_out: number | null
+          user_id: string | null
+        }
+        Insert: {
+          cost_usd?: number | null
+          function?: string | null
+          id?: string
+          metadata?: Json | null
+          model?: string | null
+          occurred_at?: string
+          provider?: string | null
+          success?: boolean | null
+          tokens_in?: number | null
+          tokens_out?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          cost_usd?: number | null
+          function?: string | null
+          id?: string
+          metadata?: Json | null
+          model?: string | null
+          occurred_at?: string
+          provider?: string | null
+          success?: boolean | null
+          tokens_in?: number | null
+          tokens_out?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       content_embeddings: {
         Row: {
           chunk_index: number | null
@@ -495,6 +537,36 @@ export type Database = {
         }
         Relationships: []
       }
+      plan_limits: {
+        Row: {
+          created_at: string
+          currency: string
+          monthly_price_cents: number | null
+          monthly_request_limit: number | null
+          plan_name: string
+          updated_at: string
+          yearly_price_cents: number | null
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          monthly_price_cents?: number | null
+          monthly_request_limit?: number | null
+          plan_name: string
+          updated_at?: string
+          yearly_price_cents?: number | null
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          monthly_price_cents?: number | null
+          monthly_request_limit?: number | null
+          plan_name?: string
+          updated_at?: string
+          yearly_price_cents?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -837,6 +909,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscribers: {
+        Row: {
+          billing_interval: string | null
+          created_at: string
+          email: string
+          id: string
+          stripe_customer_id: string | null
+          subscribed: boolean
+          subscription_end: string | null
+          subscription_tier: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          billing_interval?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          billing_interval?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       system_prompts: {
         Row: {
