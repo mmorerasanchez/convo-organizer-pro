@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/utils/toast';
+import { track, peopleSet } from '@/lib/analytics/mixpanel';
 
 interface SubscriptionState {
   loading: boolean;
@@ -40,6 +41,12 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         currentUsage: data.currentUsage ?? 0,
         limit: data.limit ?? null,
       }));
+      try {
+        peopleSet({
+          usage_current: data.currentUsage ?? 0,
+          usage_limit: data.limit ?? null,
+        });
+      } catch {}
     }
   }, []);
 
@@ -55,6 +62,12 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         subscribed: Boolean(data.subscribed),
         tier: data.subscription_tier ?? null,
       }));
+      try {
+        peopleSet({
+          plan_tier: data.subscription_tier ?? null,
+          subscribed: Boolean(data.subscribed),
+        });
+      } catch {}
     }
   }, []);
 
@@ -78,6 +91,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       toast.error('Unable to start checkout right now. Please try again.');
       return;
     }
+    track('Checkout Opened', { tier: state.tier, subscribed: state.subscribed });
     window.open(data.url, '_blank');
   }, []);
 

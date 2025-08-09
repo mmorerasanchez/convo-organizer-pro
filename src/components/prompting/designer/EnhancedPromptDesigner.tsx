@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchTemplates } from '@/lib/api/templates';
 import type { Template } from '@/lib/types';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { track } from '@/lib/analytics/mixpanel';
 
 interface FieldValues {
   [key: string]: string;
@@ -188,6 +189,14 @@ export const EnhancedPromptDesigner = () => {
     }
 
     setState(prev => ({ ...prev, isRunning: true, activeTab: 'response' }));
+    const startedAt = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+    track('Designer Run Started', {
+      modelId: state.modelId,
+      temperature: state.temperature,
+      maxTokens: state.maxTokens,
+      framework: state.selectedFramework?.name,
+      projectId: state.selectedProjectId,
+    });
     
     try {
       console.log('Running prompt with compiled text:', state.compiledPrompt);
@@ -218,10 +227,25 @@ export const EnhancedPromptDesigner = () => {
         aiResponse: data.completion || data.improvedPrompt || data.generatedText || 'No response received',
         isRunning: false 
       }));
+      track('Designer Run Succeeded', {
+        duration_ms: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startedAt,
+        modelId: state.modelId,
+        framework: state.selectedFramework?.name,
+        projectId: state.selectedProjectId,
+        compiled_length: state.compiledPrompt.length,
+        response_length: (data.completion || data.improvedPrompt || data.generatedText || '').length,
+      });
       
       toast.success("Prompt run successfully");
     } catch (error) {
       console.error('Error running prompt:', error);
+      track('Designer Run Failed', {
+        duration_ms: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startedAt,
+        modelId: state.modelId,
+        framework: state.selectedFramework?.name,
+        projectId: state.selectedProjectId,
+        error: error instanceof Error ? error.message : String(error),
+      });
       toast.error(error instanceof Error ? error.message : "Failed to run prompt");
       setState(prev => ({ ...prev, isRunning: false }));
     }

@@ -20,6 +20,8 @@ import VerifySuccess from "./pages/VerifySuccess";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
+import { initMixpanel } from '@/lib/analytics/mixpanel';
+import PageTracker from '@/components/analytics/PageTracker';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,6 +48,9 @@ const queryClient = new QueryClient({
   },
 });
 
+// Initialize Mixpanel if configured via localStorage or window
+initMixpanel();
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ErrorBoundary>
@@ -53,6 +58,7 @@ const App = () => (
         <TooltipProvider>
           <Sonner position="top-right" closeButton />
           <BrowserRouter>
+            <PageTracker />
             {/* Subscription provider supplies plan and usage across the app */}
             <Routes>
               <Route

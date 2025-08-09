@@ -22,6 +22,7 @@ import { PromptingHeader } from '../shared/PromptingHeader';
 import { useProjectContext } from '@/hooks/use-project-context';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { track } from '@/lib/analytics/mixpanel';
 
 interface ScannerState {
   originalPrompt: string;
@@ -74,6 +75,16 @@ export const EnhancedPromptScanner = () => {
     }
 
     setState(prev => ({ ...prev, isProcessing: true }));
+    const startedAt = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+    track('Prompt Improvement Started', {
+      withFeedback,
+      modelId: state.modelId,
+      temperature: state.temperature,
+      maxTokens: state.maxTokens,
+      contextEnabled,
+      hasContext,
+      projectId: state.selectedProjectId,
+    });
     
     try {
       console.log('Improving prompt:', state.originalPrompt);
@@ -121,6 +132,16 @@ export const EnhancedPromptScanner = () => {
         feedback: withFeedback ? '' : prev.feedback
       }));
       await refreshUsage();
+      track('Prompt Improvement Succeeded', {
+        duration_ms: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startedAt,
+        withFeedback,
+        modelId: state.modelId,
+        contextEnabled,
+        hasContext,
+        projectId: state.selectedProjectId,
+        original_length: state.originalPrompt.length,
+        improved_length: improvedText.length,
+      });
       
       toast.success(contextEnabled && hasContext ? 
         "Prompt improved with project context" : 
@@ -128,6 +149,15 @@ export const EnhancedPromptScanner = () => {
       );
     } catch (error) {
       console.error('Error improving prompt:', error);
+      track('Prompt Improvement Failed', {
+        duration_ms: (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startedAt,
+        withFeedback,
+        modelId: state.modelId,
+        contextEnabled,
+        hasContext,
+        projectId: state.selectedProjectId,
+        error: error instanceof Error ? error.message : String(error),
+      });
       toast.error(error instanceof Error ? error.message : "Failed to improve prompt");
       setState(prev => ({ ...prev, isProcessing: false }));
     }

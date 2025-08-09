@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Session, User } from '@supabase/supabase-js';
+import { identify, peopleSet, track, reset } from '@/lib/analytics/mixpanel';
 
 interface AuthContextType {
   user: User | null;
@@ -45,6 +46,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
+  // Identify user in Mixpanel on auth changes
+  useEffect(() => {
+    if (user?.id) {
+      identify(user.id);
+      peopleSet({ $email: user.email, last_login: new Date().toISOString() });
+    }
+  }, [user?.id]);
+
   const signInWithEmail = async (email: string, password: string) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -58,6 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       
       toast.success('Signed in successfully');
+      track('Signed In', { method: 'password' });
     } catch (error: any) {
       toast.error(`Sign in failed: ${error.message}`);
       throw error;
@@ -82,6 +92,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       
       toast.success('Account created successfully');
+      track('Signed Up', { method: 'password' });
     } catch (error: any) {
       toast.error(`Sign up failed: ${error.message}`);
       throw error;
@@ -97,6 +108,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         throw error;
       }
       
+      track('Signed Out');
+      reset();
       // No need for toast on signout as it will refresh/redirect
     } catch (error: any) {
       toast.error(`Sign out failed: ${error.message}`);
