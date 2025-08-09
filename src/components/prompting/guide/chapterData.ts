@@ -3251,7 +3251,7 @@ Remember: The goal isn't just to build a successful product—it's to create las
   },
   {
     id: 'chapter-9',
-    title: '⚡ Workflow Enhancement Add-ons',
+    title: 'Workflow Enhancement Add-ons',
     description: 'Discover powerful browser extensions, external tool integrations, and add-ons that supercharge your Lovable development workflow.',
     slides: [
       {

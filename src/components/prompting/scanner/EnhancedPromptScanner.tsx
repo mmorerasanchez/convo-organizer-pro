@@ -285,7 +285,7 @@ export const EnhancedPromptScanner = () => {
         <Card className="h-fit">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              📝 Original Prompt
+              Original Prompt
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -322,7 +322,7 @@ export const EnhancedPromptScanner = () => {
         <Card className="h-fit">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              ⚡ Improved Prompt
+              Improved Prompt
             </CardTitle>
           </CardHeader>
           <CardContent>
