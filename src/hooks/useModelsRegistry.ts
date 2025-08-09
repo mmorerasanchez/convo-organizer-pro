@@ -1,7 +1,9 @@
+
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AIModel } from "@/lib/types";
-import { getAllModels } from "@/lib/modelData";
+import { getAllModels, comingSoonProviders } from "@/lib/modelData";
 
 export type CombinedModel = AIModel & {
   source?: string | null;
@@ -67,15 +69,39 @@ export const useModelsRegistry = () => {
         available: false, // set after status is fetched
       }));
 
-      // Fallback to static if DB empty
+      // Fallback to static if DB empty — include "coming soon" providers
       if (!dbModels.length) {
-        return getAllModels().map((m) => ({ ...m, available: false }));
+        const staticModels: AIModel[] = [
+          ...getAllModels(),
+          ...comingSoonProviders.flatMap((p) => p.models),
+        ];
+        return staticModels.map((m) => ({ ...m, available: false }));
       }
 
       return dbModels;
     },
     staleTime: 60_000,
   });
+
+  // Auto-sync OpenRouter catalog once when key is present but no OpenRouter models yet
+  const hasSyncedOpenRouterRef = useRef(false);
+  useEffect(() => {
+    const openrouterAvailable = statusQuery.data?.openrouter;
+    const hasOpenRouterModels = (modelsQuery.data || []).some((m) => m.provider === "openrouter");
+
+    if (openrouterAvailable && !hasOpenRouterModels && !hasSyncedOpenRouterRef.current) {
+      hasSyncedOpenRouterRef.current = true;
+      console.log("[useModelsRegistry] Triggering openrouter-sync-models...");
+      supabase.functions
+        .invoke("openrouter-sync-models")
+        .then(({ data, error }) => {
+          console.log("[useModelsRegistry] openrouter-sync-models result:", { data, error });
+          // Refresh the models list so OpenRouter entries appear
+          modelsQuery.refetch();
+        })
+        .catch((e) => console.error("[useModelsRegistry] openrouter-sync-models invoke error:", e));
+    }
+  }, [statusQuery.data?.openrouter, modelsQuery.data, modelsQuery]);
 
   // Compose with availability
   const models: CombinedModel[] = (modelsQuery.data || []).map((m) => ({
