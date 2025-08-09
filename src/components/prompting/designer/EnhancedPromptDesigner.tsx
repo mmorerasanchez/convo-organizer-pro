@@ -14,6 +14,9 @@ import { useModels } from '@/hooks/use-frameworks';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { PromptingHeader } from '../shared/PromptingHeader';
+import { useQuery } from '@tanstack/react-query';
+import { fetchTemplates } from '@/lib/api/templates';
+import type { Template } from '@/lib/types';
 
 interface FieldValues {
   [key: string]: string;
@@ -67,6 +70,7 @@ export const EnhancedPromptDesigner = () => {
   const { data: fields = [] } = useFrameworkFields(state.selectedFramework?.id || null);
   const { data: examples = [] } = useFrameworkExamples(state.selectedFramework?.id || null);
   const { data: models = [] } = useModels();
+  const { data: templates = [] } = useQuery<Template[]>({ queryKey: ['templates'], queryFn: fetchTemplates });
 
   // Filter frameworks by selected method
   const compatibleFrameworks = frameworks.filter(framework => 
@@ -285,7 +289,7 @@ export const EnhancedPromptDesigner = () => {
 
             {/* Right Column: Framework Selection */}
             <div className="space-y-4">
-              <Label className="text-base font-medium">Framework</Label>
+              <Label className="text-base font-medium">Frameworks & Templates</Label>
               <Select 
                 value={state.selectedFramework?.id || ''} 
                 onValueChange={handleFrameworkChange}
@@ -306,6 +310,42 @@ export const EnhancedPromptDesigner = () => {
                       </div>
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                onValueChange={(templateId) => {
+                  const tmpl = templates.find(t => t.id === templateId);
+                  if (!tmpl) return;
+                  const fw = frameworks.find(f => f.id === tmpl.framework_id) || null;
+                  const mappedFieldValues: Record<string, string> = Object.fromEntries(
+                    Object.entries(tmpl.field_values || {}).map(([k, v]) => [k, typeof v === 'string' ? v : String(v)])
+                  );
+                  setState(prev => ({
+                    ...prev,
+                    title: prev.title?.trim() ? prev.title : tmpl.name,
+                    selectedMethod: (fw?.framework_type as MethodType) || prev.selectedMethod,
+                    selectedFramework: fw as Framework | null,
+                    fieldValues: mappedFieldValues,
+                    modelId: (tmpl as any).model_id || prev.modelId,
+                    temperature: typeof tmpl.temperature === 'number' ? tmpl.temperature : prev.temperature,
+                    maxTokens: typeof (tmpl as any).max_tokens === 'number' ? (tmpl as any).max_tokens : prev.maxTokens,
+                    compiledPrompt: ''
+                  }));
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a template (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {templates
+                    .slice()
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map(t => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
               
