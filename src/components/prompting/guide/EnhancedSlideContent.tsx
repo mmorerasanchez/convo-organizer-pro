@@ -294,15 +294,15 @@ const EnhancedSlideContent = ({
   return (
     <div className="space-y-4">
       {/* Chapter Progress */}
-      <div className="space-y-3">
-        <div>
+      <Card>
+        <CardContent className="pt-6">
           <div className="flex items-center justify-between text-sm text-muted-foreground mb-1">
             <span>Chapter {chapterIndex + 1} Progress</span>
-            <span>{chapterProgress.completed} of {chapterProgress.total} slides</span>
+            <span>{Math.round(chapterProgressPercentage)}% — {chapterProgress.completed}/{chapterProgress.total} slides</span>
           </div>
           <Progress value={chapterProgressPercentage} className="h-2" />
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Main Slide Content */}
       <Card>
