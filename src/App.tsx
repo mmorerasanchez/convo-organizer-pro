@@ -18,6 +18,7 @@ import Login from "./pages/Login";
 import AuthCallback from "./pages/AuthCallback";
 import VerifySuccess from "./pages/VerifySuccess";
 import NotFound from "./pages/NotFound";
+import DocsPlaybook from "./pages/DocsPlaybook";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
 import { initMixpanel } from '@/lib/analytics/mixpanel';
@@ -136,6 +137,16 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/auth/callback" element={<AuthCallback />} />
               <Route path="/verify-success" element={<VerifySuccess />} />
+              <Route
+                path="/docs/playbook"
+                element={
+                  <ProtectedRoute>
+                    <RootWithSubscription>
+                      <DocsPlaybook />
+                    </RootWithSubscription>
+                  </ProtectedRoute>
+                }
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
