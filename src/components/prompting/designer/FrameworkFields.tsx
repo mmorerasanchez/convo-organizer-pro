@@ -40,15 +40,19 @@ export function FrameworkFields({
       <CardContent className="space-y-5 pt-6">
         {frameworkFields.map((field) => (
           <div key={field.id} className="space-y-2">
-            <Label htmlFor={field.label} className="text-sm font-medium">
+            <Label htmlFor={field.id || field.label} className="text-sm font-medium">
               {field.label}
             </Label>
             <Textarea
-              id={field.label}
+              id={field.id || field.label}
               className="min-h-24 resize-y"
               placeholder={`Enter ${field.label.toLowerCase()}`}
-              value={activePrompt.fieldValues[field.label] || ''}
-              onChange={(e) => handleFieldChange(field.label, e.target.value)}
+              value={activePrompt.fieldValues[field?.id] ?? activePrompt.fieldValues[field.label] ?? ''}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (field?.id) handleFieldChange(field.id, v);
+                handleFieldChange(field.label, v);
+              }}
             />
             {field.help_text && (
               <p className="text-xs text-muted-foreground mt-1">{field.help_text}</p>
