@@ -1,82 +1,84 @@
 import mixpanel from 'mixpanel-browser';
 
 let initialized = false;
+let dntEnabled = false;
 
-function getStoredToken(): string | null {
+// Public project token (safe to expose in frontend)
+const TOKEN = '66f8520259897e82006d28fb9f418e76';
+// EU residency per request
+const API_HOST = 'https://api-eu.mixpanel.com';
+
+function checkDNT(): boolean {
   try {
-    const stored = localStorage.getItem('MIXPANEL_TOKEN');
-    if (stored) return stored;
-    const w: any = typeof window !== 'undefined' ? (window as any) : undefined;
-    return (w && w.__MIXPANEL_TOKEN__) || null;
+    return typeof navigator !== 'undefined' && ((navigator as any).doNotTrack === '1' || (window as any).doNotTrack === '1');
   } catch {
-    return null;
+    return false;
   }
 }
 
-function getStoredApiHost(): string | undefined {
-  try {
-    const host = localStorage.getItem('MIXPANEL_API_HOST') || undefined;
-    return host || undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-export function initMixpanel(options?: { token?: string; apiHost?: string }) {
+export function initMixpanel() {
   if (initialized) return true;
 
-  const token = options?.token || getStoredToken();
-  if (!token) return false; // No-op if no token configured
+  dntEnabled = checkDNT();
+  if (dntEnabled) return false;
 
-  const apiHost = options?.apiHost || getStoredApiHost();
+  const token = TOKEN;
+  if (!token) return false;
 
-  mixpanel.init(token, {
-    api_host: apiHost,
-    debug: import.meta.env.DEV,
-    track_pageview: false,
-    persistence: 'localStorage',
-  });
-  initialized = true;
-  return true;
-}
-
-export function configureMixpanel(token: string, apiHost?: string) {
   try {
-    localStorage.setItem('MIXPANEL_TOKEN', token);
-    if (apiHost) localStorage.setItem('MIXPANEL_API_HOST', apiHost);
-  } catch {}
-  return initMixpanel({ token, apiHost });
+    mixpanel.init(token, {
+      api_host: API_HOST,
+      debug: import.meta.env.DEV,
+      track_pageview: false,
+      persistence: 'localStorage',
+      batch_requests: true,
+      batch_size: 50,
+      batch_flush_interval_ms: 5000,
+      secure_cookie: !import.meta.env.DEV,
+      ignore_dnt: false,
+    });
+    initialized = true;
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-export function isMixpanelEnabled() {
-  return initialized || Boolean(getStoredToken());
+function ensureInitialized() {
+  return initialized || initMixpanel();
 }
 
 export function track(event: string, props?: Record<string, any>) {
-  if (!initialized && !initMixpanel()) return; // attempt lazy init
+  if (dntEnabled || !ensureInitialized()) return;
   try {
-    mixpanel.track(event, props);
+    mixpanel.track(event, {
+      ...props,
+      page_url: typeof window !== 'undefined' ? window.location.href : undefined,
+      timestamp: new Date().toISOString(),
+      environment: import.meta.env.MODE,
+    });
   } catch {}
 }
 
 export function identify(userId: string) {
-  if (!initialized && !initMixpanel()) return;
+  if (dntEnabled || !ensureInitialized()) return;
   try {
     mixpanel.identify(userId);
   } catch {}
 }
 
 export function peopleSet(props: Record<string, any>) {
-  if (!initialized && !initMixpanel()) return;
+  if (dntEnabled || !ensureInitialized()) return;
   try {
     mixpanel.people.set(props);
   } catch {}
 }
 
 export function reset() {
-  if (!initialized && !initMixpanel()) return;
+  if (!initialized) return;
   try {
     mixpanel.reset();
-    initialized = false;
   } catch {}
+  initialized = false;
 }
+

@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogOut, UserCircle, Settings } from 'lucide-react';
+import { LogOut, UserCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -14,11 +14,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import AnalyticsSettingsDialog from '@/components/analytics/AnalyticsSettingsDialog';
+
 const UserProfileControls: React.FC = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [analyticsOpen, setAnalyticsOpen] = useState(false);
+  
 
   // Extract user initials for avatar fallback
   const getUserInitials = () => {
@@ -61,11 +61,6 @@ const UserProfileControls: React.FC = () => {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => setAnalyticsOpen(true)}>
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Analytics Settings</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
@@ -80,7 +75,7 @@ const UserProfileControls: React.FC = () => {
           </Button>
         </Link>
       )}
-      <AnalyticsSettingsDialog open={analyticsOpen} onOpenChange={setAnalyticsOpen} />
+      
     </div>
   );
 };
