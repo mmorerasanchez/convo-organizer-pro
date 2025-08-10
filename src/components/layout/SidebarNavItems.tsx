@@ -8,8 +8,7 @@ import {
   Bot, 
   MessageSquare,
   LineChart,
-  ArrowUpRight,
-  FileText
+  ArrowUpRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -105,12 +104,6 @@ const SidebarNavItems: React.FC<SidebarNavItemsProps> = ({ onNavItemClick }) => 
         </SidebarGroupContent>
       </SidebarGroup>
       
-      <SidebarGroup>
-        <SidebarGroupLabel>Docs</SidebarGroupLabel>
-        <SidebarGroupContent>
-          {renderSidebarLinks([{ icon: FileText, label: 'Product Playbook', path: '/docs/playbook' }])}
-        </SidebarGroupContent>
-      </SidebarGroup>
 
       <SidebarGroup>
         <SidebarGroupLabel>Get in touch</SidebarGroupLabel>
