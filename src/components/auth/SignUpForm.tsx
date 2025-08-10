@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,14 +19,17 @@ const signUpSchema = z.object({
     message: "You must accept the terms and conditions"
   })
 });
-
 type SignUpFormProps = {
   setIsLoading: (loading: boolean) => void;
   isLoading: boolean;
 };
-
-const SignUpForm = ({ setIsLoading, isLoading }: SignUpFormProps) => {
-  const { signUpWithEmail } = useAuth();
+const SignUpForm = ({
+  setIsLoading,
+  isLoading
+}: SignUpFormProps) => {
+  const {
+    signUpWithEmail
+  } = useAuth();
   const navigate = useNavigate();
 
   // Setup form for sign up
@@ -39,7 +41,6 @@ const SignUpForm = ({ setIsLoading, isLoading }: SignUpFormProps) => {
       acceptTerms: false
     }
   });
-
   const handleSignUp = async (values: z.infer<typeof signUpSchema>) => {
     try {
       setIsLoading(true);
@@ -52,64 +53,38 @@ const SignUpForm = ({ setIsLoading, isLoading }: SignUpFormProps) => {
       setIsLoading(false);
     }
   };
-
-  return (
-    <Form {...signUpForm}>
+  return <Form {...signUpForm}>
       <form onSubmit={signUpForm.handleSubmit(handleSignUp)}>
         <CardContent className="space-y-4">
-          <CardDescription>
-            Create a new account to get started
-          </CardDescription>
+          <CardDescription>Create a new account to get started: you must confirm your email before signing in</CardDescription>
           
           {/* Removed the blue Alert box here */}
           
-          <FormField
-            control={signUpForm.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
+          <FormField control={signUpForm.control} name="email" render={({
+          field
+        }) => <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="email" 
-                    placeholder="your.email@example.com" 
-                    autoComplete="email"
-                    {...field}
-                  />
+                  <Input type="email" placeholder="your.email@example.com" autoComplete="email" {...field} />
                 </FormControl>
                 <FormMessage />
-              </FormItem>
-            )}
-          />
+              </FormItem>} />
           
-          <FormField
-            control={signUpForm.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
+          <FormField control={signUpForm.control} name="password" render={({
+          field
+        }) => <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="password"
-                    autoComplete="new-password"
-                    {...field}
-                  />
+                  <Input type="password" autoComplete="new-password" {...field} />
                 </FormControl>
                 <FormMessage />
-              </FormItem>
-            )}
-          />
+              </FormItem>} />
           
-          <FormField
-            control={signUpForm.control}
-            name="acceptTerms"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-4 border rounded-md">
+          <FormField control={signUpForm.control} name="acceptTerms" render={({
+          field
+        }) => <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-4 border rounded-md">
                 <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
+                  <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel>
@@ -117,28 +92,16 @@ const SignUpForm = ({ setIsLoading, isLoading }: SignUpFormProps) => {
                   </FormLabel>
                   <FormMessage />
                 </div>
-              </FormItem>
-            )}
-          />
+              </FormItem>} />
           
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Creating account...
-              </>
-            ) : (
-              "Sign Up"
-            )}
+              </> : "Sign Up"}
           </Button>
         </CardContent>
       </form>
-    </Form>
-  );
+    </Form>;
 };
-
 export default SignUpForm;
